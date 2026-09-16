@@ -9,7 +9,7 @@ gem "puma", ">= 5.0"
 gem "bootsnap", require: false
 
 # Frontend
-gem "tailwindcss-rails", "~> 3.3.1"
+gem "tailwindcss-rails", "~> 4.6.0"
 gem "jsbundling-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
