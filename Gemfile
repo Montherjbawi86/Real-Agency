@@ -19,7 +19,7 @@ gem "importmap-rails"
 # Authentication & Authorization
 gem "devise"
 gem "pundit"
- gem "json", "~> 2.7.0"
+ gem "json", "~> 3.0.2"
 # File Uploads (images for properties & cars)
 gem "image_processing", "~> 1.2"
 gem "active_storage_validations"
