@@ -1,0 +1,40 @@
+<footer dir="rtl" class="main-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-brand-icon">🏢</div>
+          <div>
+            <div class="footer-brand-title">سوريا للعقارات والسيارات</div>
+            <div class="footer-brand-sub">منصة الوكلاء الموثوقين</div>
+          </div>
+        </div>
+        <p class="footer-desc">
+          منصة سورية تجمع أفضل وكلاء العقارات والسيارات في مكان واحد.
+          ابحث، تواصل، واحصل على ما تريد.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="footer-head">روابط سريعة</h3>
+        <ul class="footer-list">
+          <li><%= link_to "🏠 العقارات", properties_path %></li>
+          <li><%= link_to "🚗 السيارات", cars_path %></li>
+          <li><%= link_to "📝 تسجيل", new_user_registration_path %></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="footer-head">تواصل معنا</h3>
+        <ul class="footer-list">
+          <li>📧 info@syria-agencies.sy</li>
+          <li>📞 +963 11 123 4567</li>
+          <li>📍 دمشق، سوريا</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © <%= Date.current.year %> سوريا للعقارات والسيارات — جميع الحقوق محفوظة
+  </div>
+</footer>

@@ -1,0 +1,195 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        <%= current_user.property_agent? ? "🏘️ لوحة تحكم العقارات" : "🚗 لوحة تحكم السيارات" %>
+      </h1>
+      <p class="page-subtitle">مرحباً <%= current_user.display_name %>، إليك ملخص نشاطك</p>
+    </div>
+  </div>
+
+  <div class="stats-grid-4">
+    <div class="stat-mini" style="border-right-color:#2563eb;">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="stat-mini-label">الإجمالي</p>
+          <p class="stat-mini-value"><%= current_user.property_agent? ? @properties_count : @cars_count %></p>
+        </div>
+        <div class="stat-mini-icon" style="background:#dbeafe;"><%= current_user.property_agent? ? "🏘️" : "🚗" %></div>
+      </div>
+    </div>
+
+    <div class="stat-mini" style="border-right-color:#059669;">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="stat-mini-label">منشور</p>
+          <p class="stat-mini-value" style="color:#047857;"><%= @published_count %></p>
+        </div>
+        <div class="stat-mini-icon" style="background:#d1fae5;">✅</div>
+      </div>
+    </div>
+
+    <div class="stat-mini" style="border-right-color:#4f46e5;">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="stat-mini-label">مؤجّر / مُباع</p>
+          <p class="stat-mini-value" style="color:#4338ca;"><%= @rented_count %> / <%= @sold_count %></p>
+        </div>
+        <div class="stat-mini-icon" style="background:#ede9fe;">🔑</div>
+      </div>
+    </div>
+
+    <div class="stat-mini" style="border-right-color:#d97706;">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="stat-mini-label">مسودة</p>
+          <p class="stat-mini-value" style="color:#b45309;"><%= @draft_count %></p>
+        </div>
+        <div class="stat-mini-icon" style="background:#fef3c7;">📝</div>
+      </div>
+    </div>
+  </div>
+
+  <% if current_user.property_agent? %>
+    <!-- Buildings row -->
+    <div class="report-stats-row">
+      <div class="report-stat" style="border-right-color:#0ea5e9; flex: 1;">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="report-stat-label">🏢 الأبنية</p>
+            <p class="report-stat-value" style="color:#0369a1;"><%= @buildings_count %></p>
+          </div>
+          <div class="stat-mini-icon" style="background:#e0f2fe;">🏢</div>
+        </div>
+        <%= link_to "إدارة الأبنية ←", dashboard_buildings_path, class: "text-sm text-blue-600 hover:underline mt-2 inline-block" %>
+      </div>
+
+      <div class="report-stat" style="border-right-color:#8b5cf6; flex: 1;">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="report-stat-label">🚪 وحدات داخل أبنية</p>
+            <p class="report-stat-value" style="color:#6d28d9;"><%= @total_units %></p>
+          </div>
+          <div class="stat-mini-icon" style="background:#ede9fe;">🚪</div>
+        </div>
+        <%= link_to "عرض الوحدات ←", properties_path, class: "text-sm text-blue-600 hover:underline mt-2 inline-block" %>
+      </div>
+
+      <div class="report-stat" style="border-right-color:#059669; flex: 1;">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="report-stat-label">👥 مستأجرون نشطون</p>
+            <p class="report-stat-value" style="color:#047857;"><%= @tenants.count %></p>
+          </div>
+          <div class="stat-mini-icon" style="background:#d1fae5;">👥</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold mb-4">📊 ملخص الإيجارات</h2>
+    <div class="stats-grid-3">
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#dbeafe;">👥</div>
+          <div>
+            <p class="stat-mini-label">مستأجرون نشطون</p>
+            <p class="stat-mini-value"><%= @tenants.count %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#fef3c7;">⏳</div>
+          <div>
+            <p class="stat-mini-label">دفعات معلقة</p>
+            <p class="stat-mini-value" style="color:#b45309;"><%= @unpaid_payments.count %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#fee2e2;">⚠️</div>
+          <div>
+            <p class="stat-mini-label">دفعات متأخرة</p>
+            <p class="stat-mini-value" style="color:#b91c1c;"><%= @overdue_payments.count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="stats-grid-3">
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#dbeafe;">🧑‍💼</div>
+          <div>
+            <p class="stat-mini-label">العملاء</p>
+            <p class="stat-mini-value"><%= @customers_count %></p>
+          </div>
+        </div>
+        <%= link_to "عرض العملاء ←", dashboard_customers_path, class: "recent-link-blue text-sm mt-3 inline-block" %>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#d1fae5;">📄</div>
+          <div>
+            <p class="stat-mini-label">عقود نشطة</p>
+            <p class="stat-mini-value" style="color:#047857;"><%= @active_contracts %></p>
+          </div>
+        </div>
+        <%= link_to "عرض العقود ←", dashboard_contracts_path, class: "recent-link-emerald text-sm mt-3 inline-block" %>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3">
+          <div class="stat-mini-icon" style="background:#fee2e2;">⚠️</div>
+          <div>
+            <p class="stat-mini-label">دفعات متأخرة</p>
+            <p class="stat-mini-value" style="color:#b91c1c;"><%= @overdue_payments.count %></p>
+          </div>
+        </div>
+        <%= link_to "عرض الدفعات ←", dashboard_payments_path, class: "text-red-600 text-sm mt-3 inline-block" %>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold mb-4">🧑‍💼 آخر العملاء</h2>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead><tr><th>الاسم</th><th>الهاتف</th><th>الرقم الوطني</th><th></th></tr></thead>
+        <tbody>
+          <% @customers.each do |c| %>
+            <tr>
+              <td class="font-semibold"><%= c.full_name %></td>
+              <td><%= c.phone %></td>
+              <td><%= c.national_id %></td>
+              <td><%= link_to "عرض", dashboard_customer_path(c), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+          <% if @customers.empty? %>
+            <tr><td colspan="4" class="text-center py-6">لا يوجد عملاء بعد — <%= link_to "أضف عميلاً", new_dashboard_customer_path, class: "text-blue-600 underline" %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <h2 class="text-xl font-bold mb-4">🔧 آخر أعمال الصيانة</h2>
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead><tr><th>العنوان</th><th>النوع</th><th>التاريخ</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <% @maintenances.limit(5).each do |m| %>
+          <tr>
+            <td class="font-semibold"><%= m.title %></td>
+            <td><span class="badge badge-blue"><%= m.kind %></span></td>
+            <td><%= m.performed_on %></td>
+            <td><span class="badge <%= m.completed? ? 'badge-green' : 'badge-yellow' %>"><%= m.status %></span></td>
+          </tr>
+        <% end %>
+        <% if @maintenances.empty? %>
+          <tr><td colspan="4" class="text-center py-6">لا توجد أعمال صيانة</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

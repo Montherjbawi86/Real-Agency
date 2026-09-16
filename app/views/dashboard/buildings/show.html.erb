@@ -1,0 +1,82 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏢 <%= @building.name %></h1>
+      <p class="page-subtitle">📍 <%= @building.city.name_ar %> — <%= @building.address %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "🚪 إدارة الوحدات", manage_units_dashboard_building_path(@building), class: "btn btn-primary" %>
+      <%= link_to "✏️ تعديل", edit_dashboard_building_path(@building), class: "btn btn-warning" %>
+      <%= link_to "رجوع", dashboard_buildings_path, class: "btn btn-gray" %>
+    </div>
+  </div>
+
+  <div class="stats-grid-4">
+    <div class="stat-mini" style="border-right-color:#2563eb;">
+      <p class="stat-mini-label">إجمالي الوحدات</p>
+      <p class="stat-mini-value"><%= @building.total_units %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#059669;">
+      <p class="stat-mini-label">متاح</p>
+      <p class="stat-mini-value" style="color:#047857;"><%= @building.available_units %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#7c3aed;">
+      <p class="stat-mini-label">مؤجّر</p>
+      <p class="stat-mini-value" style="color:#6d28d9;"><%= @building.rented_units %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#d97706;">
+      <p class="stat-mini-label">مُباع</p>
+      <p class="stat-mini-value" style="color:#b45309;"><%= @building.sold_units %></p>
+    </div>
+  </div>
+
+  <!-- Occupancy -->
+  <div class="card p-4 mb-6">
+    <div class="flex justify-between items-center mb-2">
+      <span class="font-bold">نسبة الإشغال</span>
+      <span class="font-bold text-blue-700"><%= @building.occupancy_percent %>%</span>
+    </div>
+    <div class="progress-bar" style="height: 12px;">
+      <div class="progress-fill" style="width: <%= @building.occupancy_percent %>%;"></div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="specs-grid mb-6">
+    <div class="spec-item"><span class="spec-label">عدد الطوابق</span><span class="spec-value"><%= @building.floors_count %></span></div>
+    <div class="spec-item"><span class="spec-label">وحدات لكل طابق</span><span class="spec-value"><%= @building.units_per_floor %></span></div>
+    <div class="spec-item"><span class="spec-label">سنة البناء</span><span class="spec-value"><%= @building.year_built %></span></div>
+    <div class="spec-item"><span class="spec-label">الحالة</span><span class="spec-value"><%= @building.status_ar %></span></div>
+  </div>
+
+  <% if @building.description.present? %>
+    <div class="card p-4 mb-6">
+      <p><%= simple_format @building.description %></p>
+    </div>
+  <% end %>
+
+  <% if @properties.any? %>
+    <h2 class="detail-section-title">🚪 الوحدات</h2>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>الوحدة</th><th>النوع</th><th>الطابق</th><th>المساحة</th><th>السعر</th><th>الحالة</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% @properties.each do |p| %>
+            <tr>
+              <td>#<%= p.id %></td>
+              <td class="font-semibold"><%= p.unit_number || p.title %></td>
+              <td><%= p.property_type_ar %></td>
+              <td><%= p.floor %></td>
+              <td><%= p.size %> م²</td>
+              <td class="font-bold"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td><span class="badge badge-gray"><%= p.status_ar %></span></td>
+              <td><%= link_to "عرض", property_path(p), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

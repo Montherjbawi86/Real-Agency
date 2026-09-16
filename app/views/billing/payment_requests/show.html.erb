@@ -1,0 +1,55 @@
+<div dir="rtl" class="container-page max-w-2xl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💳 طلب دفع #<%= @request.id %></h1>
+      <p class="page-subtitle"><%= @request.plan.name_ar %></p>
+    </div>
+    <%= link_to "← رجوع", billing_subscription_path, class: "btn btn-gray" %>
+  </div>
+
+  <div class="card p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="font-bold text-lg">الحالة</span>
+      <span class="badge <%= @request.status_badge_class %> text-base px-4 py-2"><%= @request.status_ar %></span>
+    </div>
+
+    <% if @request.pending? %>
+      <div class="alert-info"><p>⏳ <strong>طلبك قيد المراجعة</strong> — سنراجعه قريباً وسنُفعّل خطتك بعد التحقق من الدفع.</p></div>
+    <% elsif @request.approved? %>
+      <div class="alert-success"><p>✅ <strong>تم قبول طلبك!</strong> — تم تنشيط الخطة بنجاح.</p></div>
+    <% elsif @request.rejected? %>
+      <div class="alert-error">
+        <p>❌ <strong>تم رفض الطلب</strong></p>
+        <% if @request.admin_notes.present? %><p>السبب: <%= @request.admin_notes %></p><% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">💰 المبلغ</h4>
+      <p class="font-bold"><%= number_with_precision(@request.amount, precision: 0, delimiter: ",") %> <%= @request.currency %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">💳 طريقة الدفع</h4>
+      <p class="font-bold"><%= @request.payment_method_ar %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 تاريخ الحوالة</h4>
+      <p class="font-bold"><%= @request.transfer_date %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🔢 رقم الحوالة</h4>
+      <p class="font-bold"><%= @request.reference_number.presence || "—" %></p>
+    </div>
+  </div>
+
+  <% if @request.proof_image.attached? %>
+    <div class="card p-6 mb-6">
+      <h4 class="report-info-title">📸 صورة الإيصال</h4>
+      <%= link_to url_for(@request.proof_image), target: "_blank" do %>
+        <%= image_tag @request.proof_image, class: "w-full max-w-md rounded-lg" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

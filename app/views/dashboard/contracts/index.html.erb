@@ -1,0 +1,127 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📄 العقود</h1>
+      <p class="page-subtitle">تتبع المدفوع والمتبقي لكل عقد</p>
+    </div>
+    <%= link_to "➕ عقد جديد", new_dashboard_contract_path, class: "btn btn-primary" %>
+  </div>
+
+    <!-- Quick filter tabs -->
+  <div class="filter-tabs">
+    <%= link_to dashboard_contracts_path,
+        class: "filter-tab #{'active' if params[:kind].blank? && params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to dashboard_contracts_path(kind: "rent"),
+        class: "filter-tab #{'active' if params[:kind] == 'rent'}" do %>
+      🔑 إيجار <span class="filter-count"><%= @counts[:rent] %></span>
+    <% end %>
+    <%= link_to dashboard_contracts_path(kind: "sale"),
+        class: "filter-tab #{'active' if params[:kind] == 'sale'}" do %>
+      💰 بيع <span class="filter-count"><%= @counts[:sale] %></span>
+    <% end %>
+    <%= link_to dashboard_contracts_path(status: "active"),
+        class: "filter-tab #{'active' if params[:status] == 'active'}" do %>
+      ✅ نشط <span class="filter-count"><%= @counts[:active] %></span>
+    <% end %>
+  </div>
+
+  <!-- Search + sort -->
+  <div class="filter-card">
+    <%= form_with url: dashboard_contracts_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :kind,   params[:kind]   if params[:kind].present? %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+
+      <%= text_field_tag :q, params[:q],
+          placeholder: "🔍 بحث بالاسم أو رقم العقد",
+          class: "input", style: "grid-column: span 2;" %>
+
+      <%= select_tag :sort,
+          options_for_select([
+            ["الأحدث أولاً", "newest"],
+            ["الأقدم أولاً", "oldest"],
+            ["المبلغ (الأعلى)", "amount"]
+          ], params[:sort]),
+          class: "input" %>
+
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <% if params[:q].present? || params[:sort].present? %>
+          <%= link_to "مسح", dashboard_contracts_path, class: "btn btn-gray" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+<div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>الطرف الثاني</th>
+          <th>الموضوع</th>
+          <th>النوع</th>
+          <th>المبلغ</th>
+          <th>المدفوع</th>
+          <th>المتبقي</th>
+          <th>التقدم</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contracts.each do |c| %>
+          <tr>
+            <td>#<%= c.id %></td>
+            <td class="font-semibold"><%= c.party&.full_name || "—" %></td>
+            <td>
+              <% if c.property&.building %>
+                <span class="badge badge-blue text-xs mb-1">🏢 <%= c.property.building.name %></span>
+                <div class="text-sm font-semibold">
+                  🚪 وحدة <%= c.property.unit_number.presence || c.property.title %>
+                </div>
+              <% else %>
+                <%= c.subject&.try(:title) || "—" %>
+                <span class="badge <%= c.car_id.present? ? 'badge-blue' : 'badge-green' %> text-xs ml-1">
+                  <%= c.car_id.present? ? "🚗" : "🏠" %>
+                </span>
+              <% end %>
+            </td>
+            <td><span class="badge <%= c.sale? ? 'badge-purple' : 'badge-blue' %>"><%= c.kind_ar %></span></td>
+            <td class="font-bold"><%= number_with_precision(c.amount, precision: 0, delimiter: ",") %> <%= c.currency %></td>
+            <td class="font-bold text-green-700"><%= number_with_precision(c.paid_amount, precision: 0, delimiter: ",") %></td>
+            <td class="font-bold text-red-700"><%= number_with_precision(c.remaining_amount, precision: 0, delimiter: ",") %></td>
+            <td style="min-width: 100px;">
+              <div class="flex items-center gap-2">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: <%= c.progress_percent %>%;"></div>
+                </div>
+                <span class="text-xs font-bold"><%= c.progress_percent %>%</span>
+              </div>
+            </td>
+            <td><span class="badge <%= c.payment_badge_class %>"><%= c.payment_status_ar %></span></td>
+            <td>
+              <div class="flex flex-wrap gap-1">
+                <%= link_to "عرض", dashboard_contract_path(c), class: "btn btn-primary btn-sm" %>
+                <%= link_to "PDF", pdf_dashboard_contract_path(c), class: "btn btn-danger btn-sm", target: "_blank" %>
+                <%= link_to "تعديل", edit_dashboard_contract_path(c), class: "btn btn-warning btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @contracts.empty? %>
+          <tr>
+            <td colspan="10" class="text-center py-12">
+              <div class="empty-icon">📄</div>
+              <p class="empty-title">لا توجد عقود بعد</p>
+              <div class="mt-4">
+                <%= link_to "➕ عقد جديد", new_dashboard_contract_path, class: "btn btn-primary" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

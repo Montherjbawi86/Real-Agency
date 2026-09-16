@@ -1,0 +1,109 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🧑‍💼 العملاء</h1>
+      <p class="page-subtitle">إدارة ومتابعة جميع العملاء</p>
+    </div>
+    <%= link_to "➕ إضافة عميل", new_dashboard_customer_path, class: "btn btn-primary" %>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <%= link_to dashboard_customers_path,
+        class: "filter-tab #{'active' if params[:kind].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to dashboard_customers_path(kind: "rent"),
+        class: "filter-tab #{'active' if params[:kind] == 'rent'}" do %>
+      🔑 استأجروا
+    <% end %>
+    <%= link_to dashboard_customers_path(kind: "sale"),
+        class: "filter-tab #{'active' if params[:kind] == 'sale'}" do %>
+      💰 اشتروا
+    <% end %>
+  </div>
+
+  <!-- Search -->
+  <div class="filter-card">
+    <%= form_with url: dashboard_customers_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :kind, params[:kind] if params[:kind].present? %>
+
+      <%= text_field_tag :q, params[:q],
+          placeholder: "🔍 بحث بالاسم أو الهاتف أو الرقم الوطني",
+          class: "input", style: "grid-column: span 2;" %>
+
+      <%= select_tag :sort,
+          options_for_select([
+            ["الأحدث أولاً", "newest"],
+            ["الأقدم أولاً", "oldest"],
+            ["الاسم (أ-ي)",  "name"]
+          ], params[:sort]),
+          class: "input" %>
+
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <% if params[:q].present? || params[:sort].present? %>
+          <%= link_to "مسح", dashboard_customers_path, class: "btn btn-gray" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @customers.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>الاسم</th><th>الهاتف</th><th>الرقم الوطني</th>
+            <th>نوع التعامل</th>
+            <th>عقود</th><th>المدفوع</th><th>المتبقي</th><th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @customers.each do |c| %>
+            <tr>
+              <td class="font-semibold"><%= c.full_name %></td>
+              <td><a href="tel:<%= c.phone %>" class="text-blue-700 hover:underline"><%= c.phone %></a></td>
+              <td><%= c.national_id %></td>
+              <td>
+                <% kinds = c.contracts.pluck(:kind).uniq %>
+                <% if kinds.include?("rent") %>
+                  <span class="badge badge-blue">🔑 إيجار</span>
+                <% end %>
+                <% if kinds.include?("sale") %>
+                  <span class="badge badge-purple">💰 بيع</span>
+                <% end %>
+                <% if kinds.empty? %>
+                  <span class="badge badge-gray">—</span>
+                <% end %>
+              </td>
+              <td><span class="badge badge-blue"><%= c.contracts.count %></span></td>
+              <td class="font-bold text-green-700"><%= number_with_precision(c.total_paid, precision: 0, delimiter: ",") %></td>
+              <td class="font-bold text-red-700"><%= number_with_precision(c.total_pending, precision: 0, delimiter: ",") %></td>
+              <td>
+                <div class="flex flex-wrap gap-1">
+                  <%= link_to "عرض", dashboard_customer_path(c), class: "btn btn-primary btn-sm" %>
+                  <%= link_to "تعديل", edit_dashboard_customer_path(c), class: "btn btn-warning btn-sm" %>
+                  <%= link_to "دفعات", dashboard_payments_path(customer_id: c.id), class: "btn btn-outline btn-sm" %>
+                  <%= button_to "حذف", dashboard_customer_path(c), method: :delete, data: { turbo_confirm: "متأكد؟" }, class: "btn btn-danger btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-black mt-3">
+      عرض <%= @customers.size %> عميل
+      <% if params[:q].present? %> لـ "<strong><%= params[:q] %></strong>"<% end %>
+    </p>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🧑‍💼</div>
+      <h3 class="empty-title">لا توجد نتائج</h3>
+      <div class="mt-4">
+        <%= link_to "➕ إضافة عميل", new_dashboard_customer_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

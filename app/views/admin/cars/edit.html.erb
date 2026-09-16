@@ -1,0 +1,34 @@
+<div dir="rtl" class="max-w-3xl mx-auto">
+  <div class="page-header">
+    <h1 class="page-title">✏️ تعديل السيارة</h1>
+    <%= link_to "← رجوع", admin_car_path(@car), class: "btn btn-gray" %>
+  </div>
+
+  <%= form_with model: [:admin, @car], class: "bg-white p-6 rounded-xl shadow space-y-4" do |f| %>
+    <div>
+      <%= f.label :title, "العنوان", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :title, class: "input" %>
+    </div>
+
+    <div>
+      <%= f.label :description, "الوصف", class: "block mb-1 font-semibold" %>
+      <%= f.text_area :description, rows: 4, class: "input" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div><%= f.label :brand, "الماركة", class: "block mb-1 font-semibold" %><%= f.text_field :brand, class: "input" %></div>
+      <div><%= f.label :car_model, "الموديل", class: "block mb-1 font-semibold" %><%= f.text_field :car_model, class: "input" %></div>
+      <div><%= f.label :year, "السنة", class: "block mb-1 font-semibold" %><%= f.number_field :year, class: "input" %></div>
+      <div><%= f.label :city_id, "المدينة", class: "block mb-1 font-semibold" %><%= f.collection_select :city_id, City.order(:name_ar), :id, :name_ar, {}, class: "input" %></div>
+      <div><%= f.label :price, "السعر", class: "block mb-1 font-semibold" %><%= f.number_field :price, class: "input" %></div>
+      <div><%= f.label :currency, "العملة", class: "block mb-1 font-semibold" %><%= f.select :currency, [["ل.س","SYP"],["$","USD"]], {}, class: "input" %></div>
+      <div><%= f.label :mileage, "المسافة", class: "block mb-1 font-semibold" %><%= f.number_field :mileage, class: "input" %></div>
+      <div><%= f.label :status, "الحالة", class: "block mb-1 font-semibold" %><%= f.select :status, [["مسودة","draft"],["منشور","published"],["مؤجّر","rented"],["مُباع","sold"]], {}, class: "input" %></div>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+      <%= link_to "إلغاء", admin_car_path(@car), class: "btn btn-gray btn-lg" %>
+    </div>
+  <% end %>
+</div>

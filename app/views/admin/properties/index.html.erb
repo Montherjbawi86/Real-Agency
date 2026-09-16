@@ -1,0 +1,59 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">🏘️ العقارات</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to admin_properties_path, class: "filter-tab #{'active' if params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to admin_properties_path(status: "draft"), class: "filter-tab #{'active' if params[:status] == 'draft'}" do %>
+      📝 مسودة <span class="filter-count"><%= @counts[:draft] %></span>
+    <% end %>
+    <%= link_to admin_properties_path(status: "published"), class: "filter-tab #{'active' if params[:status] == 'published'}" do %>
+      ✅ منشور <span class="filter-count"><%= @counts[:published] %></span>
+    <% end %>
+    <%= link_to admin_properties_path(status: "rented"), class: "filter-tab #{'active' if params[:status] == 'rented'}" do %>
+      🔑 مؤجّر <span class="filter-count"><%= @counts[:rented] %></span>
+    <% end %>
+    <%= link_to admin_properties_path(status: "sold"), class: "filter-tab #{'active' if params[:status] == 'sold'}" do %>
+      💰 مُباع <span class="filter-count"><%= @counts[:sold] %></span>
+    <% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: admin_properties_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+      <%= text_field_tag :q, params[:q], placeholder: "🔍 بحث بالعنوان", class: "input", style: "grid-column: span 2;" %>
+      <%= select_tag :city_id, options_from_collection_for_select(@cities, :id, :name_ar, params[:city_id]), include_blank: "🏙️ كل المدن", class: "input" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", admin_properties_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>العنوان</th><th>المالك</th><th>المدينة</th><th>السعر</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @properties.each do |p| %>
+          <tr>
+            <td>#<%= p.id %></td>
+            <td class="font-semibold"><%= p.title %></td>
+            <td class="text-sm"><%= p.user.display_name %></td>
+            <td><%= p.city&.name_ar %></td>
+            <td class="font-bold"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+            <td><span class="badge badge-gray"><%= p.status_ar %></span></td>
+            <td><%= link_to "مراجعة", admin_property_path(p), class: "btn btn-primary btn-sm" %></td>
+          </tr>
+        <% end %>
+        <% if @properties.empty? %>
+          <tr><td colspan="7" class="text-center py-8">لا توجد عقارات</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

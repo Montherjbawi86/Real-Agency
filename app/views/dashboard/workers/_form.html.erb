@@ -1,0 +1,116 @@
+<%= form_with model: [:dashboard, @worker], class: "bg-white p-6 rounded-xl shadow max-w-3xl space-y-4" do |f| %>
+  <% if @worker.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @worker.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <!-- Basic info -->
+  <h3 class="agency-section-title">📋 المعلومات الأساسية</h3>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :full_name, "الاسم الكامل", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :full_name, class: "input", required: true %>
+    </div>
+    <div>
+      <%= f.label :phone, "الهاتف", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :phone, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :national_id, "الرقم الوطني", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :national_id, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :position, "الوظيفة", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :position, class: "input", placeholder: "حارس، سائق، محاسب..." %>
+    </div>
+    <div>
+      <%= f.label :birth_date, "تاريخ الميلاد", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :birth_date, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :hired_on, "تاريخ التعيين", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :hired_on, class: "input" %>
+    </div>
+    <div class="col-span-2">
+      <%= f.label :address, "العنوان", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :address, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :emergency_contact, "جهة اتصال للطوارئ", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :emergency_contact, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :emergency_phone, "هاتف الطوارئ", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :emergency_phone, class: "input" %>
+    </div>
+  </div>
+
+  <!-- Pay info -->
+  <h3 class="agency-section-title mt-6">💰 طريقة الدفع</h3>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :pay_type, "نوع الراتب", class: "block mb-1 font-semibold" %>
+      <%= f.select :pay_type,
+          [["📅 شهري (راتب ثابت)","monthly"],
+           ["📆 يومي (أجرة لكل يوم حضور)","daily"],
+           ["🕐 بالساعة (أجرة لكل ساعة)","hourly"],
+           ["📦 بالمشروع (مبلغ ثابت للمشروع)","project"]],
+          {}, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :currency, "العملة", class: "block mb-1 font-semibold" %>
+      <%= f.select :currency, [["ل.س","SYP"],["$","USD"]], {}, class: "input" %>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+    <p class="font-bold mb-3">💵 الأجرة</p>
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <%= f.label :monthly_salary, "الراتب الشهري", class: "block mb-1 font-semibold text-sm" %>
+        <%= f.number_field :monthly_salary, class: "input", step: "1000", placeholder: "0" %>
+        <p class="text-xs text-black mt-1">للشهري / بالمشروع</p>
+      </div>
+      <div>
+        <%= f.label :daily_rate, "الأجرة اليومية", class: "block mb-1 font-semibold text-sm" %>
+        <%= f.number_field :daily_rate, class: "input", step: "100", placeholder: "0" %>
+        <p class="text-xs text-black mt-1">لليومي</p>
+      </div>
+      <div>
+        <%= f.label :hourly_rate, "أجرة الساعة", class: "block mb-1 font-semibold text-sm" %>
+        <%= f.number_field :hourly_rate, class: "input", step: "10", placeholder: "0" %>
+        <p class="text-xs text-black mt-1">بالساعة + الإضافي</p>
+      </div>
+    </div>
+    <p class="text-xs text-amber-700 mt-2">⚠️ يُستخدم حقل واحد فقط حسب نوع الراتب المختار</p>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <%= f.label :overtime_multiplier, "معامل الإضافي", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :overtime_multiplier, class: "input", step: "0.1", value: @worker.overtime_multiplier || 1.5 %>
+      <p class="text-xs text-black mt-1">عادة 1.5</p>
+    </div>
+    <div>
+      <%= f.label :working_hours_per_day, "ساعات العمل اليومية", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :working_hours_per_day, class: "input", value: @worker.working_hours_per_day || 8 %>
+    </div>
+    <div>
+      <%= f.label :working_days_per_month, "أيام العمل الشهرية", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :working_days_per_month, class: "input", value: @worker.working_days_per_month || 26 %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.check_box :active %>
+    <%= f.label :active, "✅ نشط" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_workers_path, class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>

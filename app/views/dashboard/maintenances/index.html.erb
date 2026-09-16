@@ -1,0 +1,38 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div><h1 class="page-title">🔧 الصيانة</h1></div>
+    <%= link_to "➕ إضافة صيانة", new_dashboard_maintenance_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>العنوان</th><th>النوع</th><th>القيمة</th><th>التاريخ</th><th>الاستحقاق القادم</th><th>الحالة</th><th>إجراءات</th></tr>
+      </thead>
+      <tbody>
+        <% @maintenances.each do |m| %>
+          <tr>
+            <td class="font-semibold"><%= m.title %></td>
+            <td><span class="badge badge-blue"><%= m.kind %></span></td>
+            <td><%= number_with_precision(m.cost, precision: 0, delimiter: ",") if m.cost %> <%= m.currency if m.cost %></td>
+            <td><%= m.performed_on %></td>
+            <td class="<%= 'text-red-600 font-bold' if m.next_due_on && m.next_due_on < Date.current %>"><%= m.next_due_on %></td>
+            <td><span class="badge <%= m.completed? ? 'badge-green' : 'badge-yellow' %>"><%= m.status %></span></td>
+            <td>
+              <div class="flex gap-2">
+                <% unless m.completed? %>
+                  <%= button_to "إكمال", complete_dashboard_maintenance_path(m), method: :patch, class: "btn btn-success btn-sm" %>
+                <% end %>
+                <%= link_to "تعديل", edit_dashboard_maintenance_path(m), class: "btn btn-warning btn-sm" %>
+                <%= button_to "حذف", dashboard_maintenance_path(m), method: :delete, data: { turbo_confirm: "متأكد؟" }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @maintenances.empty? %>
+          <tr><td colspan="7" class="text-center py-8">لا توجد أعمال صيانة بعد</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

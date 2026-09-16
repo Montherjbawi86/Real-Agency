@@ -1,0 +1,199 @@
+<% content_for :title, @property.title %>
+<% content_for :og_type, "product" %>
+<% content_for :og_title, @property.title %>
+<% content_for :og_description, "#{@property.city.name_ar} — #{@property.property_type_ar} — #{number_with_precision(@property.price, precision: 0, delimiter: ',')} #{@property.currency}" %>
+<% if @property.cover_image.attached? %>
+  <% content_for :og_image, url_for(@property.cover_image) %>
+<% end %>
+
+<div dir="rtl" class="detail-page">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <%= link_to "الرئيسية", root_path %>
+    <span>›</span>
+    <%= link_to "العقارات", properties_path %>
+    <% if @property.building %>
+      <span>›</span>
+      <%= link_to @property.building.name, building_path(@property.building) %>
+    <% end %>
+    <span>›</span>
+    <span class="breadcrumb-current"><%= @property.title %></span>
+  </div>
+
+  <!-- Building banner -->
+  <% if @property.building %>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="stat-mini-icon" style="background:#dbeafe;">🏢</div>
+        <div>
+          <p class="text-sm text-blue-900 font-semibold">داخل البناء</p>
+          <p class="text-lg font-bold text-blue-900">
+            <%= link_to @property.building.name, building_path(@property.building), class: "hover:underline" %>
+          </p>
+        </div>
+      </div>
+      <div class="text-left">
+        <p class="text-sm text-blue-800">رقم الوحدة</p>
+        <p class="text-xl font-bold text-blue-900"><%= @property.unit_number.presence || "—" %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Hero image -->
+  <div class="detail-hero">
+    <% if @property.cover_image.attached? %>
+      <%= image_tag @property.cover_image, class: "detail-hero-img" %>
+    <% elsif @property.images.attached? %>
+      <%= image_tag @property.images.first, class: "detail-hero-img" %>
+    <% else %>
+      <div class="detail-hero-placeholder">🏠</div>
+    <% end %>
+    <div class="detail-hero-overlay"></div>
+    <div class="detail-hero-badges">
+      <span class="badge <%= @property.sale? ? 'badge-purple' : 'badge-blue' %>">
+        <%= @property.sale? ? "💰 للبيع" : "🔑 للإيجار" %>
+      </span>
+      <span class="badge badge-gray"><%= @property.property_type_ar %></span>
+      <span class="badge badge-green"><%= @property.status_ar %></span>
+    </div>
+  </div>
+
+  <!-- YouTube video -->
+  <% if @property.youtube_embed_url.present? %>
+    <div class="youtube-embed">
+      <iframe src="<%= @property.youtube_embed_url %>"
+              title="<%= @property.title %>"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"></iframe>
+    </div>
+  <% end %>
+
+  <% if user_signed_in? && @property.user == current_user %>
+    <%= render "shared/subscription_banner" %>
+  <% end %>
+
+  <!-- Share buttons -->
+  <div class="card p-4 mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+      <h3 class="font-bold">📤 شارك هذا الإعلان</h3>
+      <% if user_signed_in? && @property.user == current_user %>
+        <%= link_to "📣 انشر على حسابك (نص جاهز) ←",
+            "#",
+            class: "btn btn-primary btn-sm",
+            onclick: "event.preventDefault(); document.getElementById('share-modal-#{@property.id}').style.display='block';" %>
+      <% end %>
+    </div>
+    <%= render "shared/social_share",
+        url: request.original_url,
+        text: @property.share_text %>
+  </div>
+
+  <% if user_signed_in? && @property.user == current_user %>
+    <%= render "shared/share_modal", subject: @property, host: request.host_with_port %>
+  <% end %>
+
+  <div class="detail-grid">
+    <div class="detail-content">
+      <h1 class="detail-title"><%= @property.title %></h1>
+      <p class="detail-location">📍 <%= @property.city.name_ar %><% if @property.address.present? %> — <%= @property.address %><% end %></p>
+
+      <div class="detail-meta">
+        <span class="detail-meta-item">🗓️ <%= time_ago_in_words(@property.created_at) %> مضت</span>
+        <span class="detail-meta-item">👤 <%= @property.user.display_name %></span>
+        <span class="detail-meta-item">🔖 #<%= @property.id %></span>
+      </div>
+
+      <div class="detail-features">
+        <div class="detail-feature">
+          <div class="detail-feature-icon">📐</div>
+          <div><div class="detail-feature-label">المساحة</div><div class="detail-feature-value"><%= @property.size %> م²</div></div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">🛏️</div>
+          <div><div class="detail-feature-label">الغرف</div><div class="detail-feature-value"><%= @property.rooms %></div></div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">🚿</div>
+          <div><div class="detail-feature-label">الحمامات</div><div class="detail-feature-value"><%= @property.bathrooms %></div></div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">🏢</div>
+          <div><div class="detail-feature-label">الطابق</div><div class="detail-feature-value"><%= @property.floor %> / <%= @property.total_floors %></div></div>
+        </div>
+      </div>
+
+      <section class="detail-block">
+        <h2 class="detail-section-title">📝 الوصف</h2>
+        <div class="detail-description"><%= simple_format @property.description %></div>
+      </section>
+
+      <% if @property.active_amenities.any? %>
+        <section class="detail-block">
+          <h2 class="detail-section-title">✨ المزايا والمرافق</h2>
+          <div class="amenities-grid">
+            <% @property.active_amenities.each do |_, label| %>
+              <div class="amenity-chip">✅ <%= label %></div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <% if @property.images.attached? %>
+        <section class="detail-block">
+          <h2 class="detail-section-title">🖼️ معرض الصور</h2>
+          <div class="detail-gallery">
+            <% @property.images.each do |img| %>
+              <%= link_to img, target: "_blank" do %><%= image_tag img %><% end %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="detail-sidebar-card">
+        <div class="detail-sidebar-price">
+          <span class="detail-sidebar-price-value"><%= number_with_precision(@property.price, precision: 0, delimiter: ",") %></span>
+          <span class="detail-sidebar-price-currency"><%= @property.currency %></span>
+        </div>
+        <p class="detail-sidebar-price-type"><%= @property.listing_type_ar %></p>
+
+        <hr class="detail-sidebar-divider">
+
+        <div class="detail-sidebar-contact">
+          <p class="detail-sidebar-contact-name"><%= @property.user.display_name %></p>
+          <% if @property.user.phone.present? %>
+            <p class="detail-sidebar-contact-phone">📞 <%= @property.user.phone %></p>
+          <% end %>
+        </div>
+
+        <% if @property.user.phone.present? %>
+          <a href="https://wa.me/963<%= @property.user.phone.to_s.sub(/^0/, '').sub(/^\+963/, '') %>?text=<%= ERB::Util.url_encode("مرحباً، أنا مهتم بالعقار: #{@property.title} (##{@property.id})") %>"
+             target="_blank" class="btn btn-success btn-block btn-lg">💬 تواصل واتساب</a>
+        <% end %>
+        <a href="tel:<%= @property.user.phone %>" class="btn btn-primary btn-block btn-lg mt-2">📞 اتصل الآن</a>
+      </div>
+
+      <% if user_signed_in? && @property.user == current_user %>
+        <div class="detail-sidebar-card">
+          <h3 class="detail-sidebar-title">⚙️ إدارة العقار</h3>
+          <div class="detail-sidebar-actions">
+            <%= link_to "تعديل", edit_property_path(@property), class: "btn btn-warning btn-block" %>
+            <% unless @property.published? %>
+              <%= button_to "نشر", publish_property_path(@property), method: :patch, class: "btn btn-success btn-block" %>
+            <% end %>
+            <% unless @property.rented? %>
+              <%= button_to "تأجير", mark_rented_property_path(@property), method: :patch, class: "btn btn-primary btn-block" %>
+            <% end %>
+            <% unless @property.sold? %>
+              <%= button_to "بيع", mark_sold_property_path(@property), method: :patch, class: "btn btn-gray btn-block" %>
+            <% end %>
+            <%= button_to "حذف", @property, method: :delete, data: { turbo_confirm: "متأكد؟" }, class: "btn btn-danger btn-block" %>
+          </div>
+        </div>
+      <% end %>
+    </aside>
+  </div>
+</div>

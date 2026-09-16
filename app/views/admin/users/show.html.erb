@@ -1,0 +1,114 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">👤 <%= @user.display_name %></h1>
+      <p class="page-subtitle">
+        <%= @user.email %> — <%= @user.phone %>
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "← رجوع", admin_users_path, class: "btn btn-gray" %>
+      <%= button_to @user.admin? ? "❌ إلغاء المشرف" : "🛡️ ترقية لمشرف",
+          toggle_admin_admin_user_path(@user),
+          method: :patch,
+          data: { turbo_confirm: "متأكد؟" },
+          class: "btn #{@user.admin? ? 'btn-danger' : 'btn-warning'}" %>
+      <% if @user.agency %>
+        <%= button_to @user.agency.verified? ? "❌ إلغاء التوثيق" : "✅ توثيق الوكالة",
+            toggle_verified_admin_user_path(@user),
+            method: :patch,
+            class: "btn #{@user.agency.verified? ? 'btn-danger' : 'btn-success'}" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">🔑 الدور</h4>
+      <p class="font-bold"><%= @user.role %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 التسجيل</h4>
+      <p class="font-bold"><%= @user.created_at.strftime("%Y-%m-%d") %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🛡️ مشرف</h4>
+      <p class="font-bold"><%= @user.admin? ? "نعم" : "لا" %></p>
+    </div>
+    <% if @user.agent? %>
+      <div class="report-info-card">
+        <h4 class="report-info-title">💳 الخطة</h4>
+        <p class="font-bold"><%= @user.current_plan&.name_ar %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">📊 الإعلانات</h4>
+        <p class="font-bold"><%= @user.listings_count %> / <%= @user.current_plan&.max_listings || '∞' %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @user.agency %>
+    <h3 class="section-heading">🏢 الوكالة</h3>
+    <div class="card p-4 mb-6">
+      <p class="font-bold text-lg"><%= @user.agency.name %></p>
+      <p class="text-sm"><%= @user.agency.kind_ar %> — <%= @user.agency.city&.name_ar %></p>
+      <p class="text-sm">📞 <%= @user.agency.phone %></p>
+      <% if @user.agency.tax_number.present? %>
+        <p class="text-sm">🆔 الرقم الضريبي: <%= @user.agency.tax_number %></p>
+      <% end %>
+      <p class="mt-2">
+        الحالة:
+        <% if @user.agency.verified? %>
+          <span class="badge badge-green">✅ موثّقة</span>
+        <% else %>
+          <span class="badge badge-yellow">⏳ غير موثّقة</span>
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
+  <% if @subscriptions.any? %>
+    <h3 class="section-heading">💳 الاشتراكات</h3>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>الخطة</th><th>الحالة</th><th>البداية</th><th>الانتهاء</th></tr>
+        </thead>
+        <tbody>
+          <% @subscriptions.each do |s| %>
+            <tr>
+              <td>#<%= s.id %></td>
+              <td><%= s.plan.name_ar %></td>
+              <td><span class="badge <%= s.status_badge_class %>"><%= s.status_ar %></span></td>
+              <td><%= s.starts_on %></td>
+              <td><%= s.ends_on || "—" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <% if @payment_requests.any? %>
+    <h3 class="section-heading">📄 طلبات الدفع</h3>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>الخطة</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% @payment_requests.each do |r| %>
+            <tr>
+              <td>#<%= r.id %></td>
+              <td><%= r.plan.name_ar %></td>
+              <td><%= number_with_precision(r.amount, precision: 0, delimiter: ",") %> <%= r.currency %></td>
+              <td><span class="badge <%= r.status_badge_class %>"><%= r.status_ar %></span></td>
+              <td><%= r.created_at.strftime("%Y-%m-%d") %></td>
+              <td><%= link_to "عرض", admin_payment_request_path(r), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

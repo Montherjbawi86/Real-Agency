@@ -1,0 +1,59 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">🚗 السيارات</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to admin_cars_path, class: "filter-tab #{'active' if params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to admin_cars_path(status: "draft"), class: "filter-tab #{'active' if params[:status] == 'draft'}" do %>
+      📝 مسودة <span class="filter-count"><%= @counts[:draft] %></span>
+    <% end %>
+    <%= link_to admin_cars_path(status: "published"), class: "filter-tab #{'active' if params[:status] == 'published'}" do %>
+      ✅ منشور <span class="filter-count"><%= @counts[:published] %></span>
+    <% end %>
+    <%= link_to admin_cars_path(status: "rented"), class: "filter-tab #{'active' if params[:status] == 'rented'}" do %>
+      🔑 مؤجّر <span class="filter-count"><%= @counts[:rented] %></span>
+    <% end %>
+    <%= link_to admin_cars_path(status: "sold"), class: "filter-tab #{'active' if params[:status] == 'sold'}" do %>
+      💰 مُباع <span class="filter-count"><%= @counts[:sold] %></span>
+    <% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: admin_cars_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+      <%= text_field_tag :q, params[:q], placeholder: "🔍 بحث بالعنوان أو الماركة", class: "input", style: "grid-column: span 2;" %>
+      <%= select_tag :city_id, options_from_collection_for_select(@cities, :id, :name_ar, params[:city_id]), include_blank: "🏙️ كل المدن", class: "input" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", admin_cars_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>السيارة</th><th>المالك</th><th>المدينة</th><th>السعر</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @cars.each do |c| %>
+          <tr>
+            <td>#<%= c.id %></td>
+            <td class="font-semibold"><%= c.brand %> <%= c.car_model %> (<%= c.year %>)</td>
+            <td class="text-sm"><%= c.user.display_name %></td>
+            <td><%= c.city&.name_ar %></td>
+            <td class="font-bold"><%= number_with_precision(c.price, precision: 0, delimiter: ",") %> <%= c.currency %></td>
+            <td><span class="badge badge-gray"><%= c.status_ar %></span></td>
+            <td><%= link_to "مراجعة", admin_car_path(c), class: "btn btn-primary btn-sm" %></td>
+          </tr>
+        <% end %>
+        <% if @cars.empty? %>
+          <tr><td colspan="7" class="text-center py-8">لا توجد سيارات</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

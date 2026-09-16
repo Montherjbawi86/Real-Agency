@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: 'Arial', sans-serif; direction: rtl; color: #111; font-size: 13px; }
+    h1 { font-size: 26px; text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; }
+    .sub { text-align: center; color: #555; font-size: 12px; margin-bottom: 25px; }
+    h2 { font-size: 16px; color: #1e3a8a; border-right: 4px solid #fbbf24; padding-right: 10px; margin-top: 20px; margin-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    td { padding: 8px 12px; border: 1px solid #e5e7eb; }
+    td:first-child { background: #f9fafb; font-weight: bold; width: 35%; }
+    .amount { background: #eff6ff; text-align: center; font-size: 18px; font-weight: bold; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .progress { background: #f3f4f6; height: 10px; border-radius: 9999px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { background: linear-gradient(to left, #059669, #10b981); height: 100%; }
+    .signatures { display: flex; justify-content: space-between; margin-top: 60px; }
+    .signature { width: 45%; text-align: center; border-top: 1px solid #333; padding-top: 8px; font-size: 12px; }
+    .footer { text-align: center; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 40px; font-size: 11px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>عقد <%= @contract.kind_ar %></h1>
+  <div class="sub">
+    رقم العقد: #<%= @contract.id %><br>
+    التاريخ: <%= Date.current.strftime("%Y-%m-%d") %>
+  </div>
+
+  <h2>الأطراف</h2>
+  <table>
+    <tr><td>الطرف الأول (الوكيل)</td><td><%= @contract.user.display_name %></td></tr>
+    <tr><td>الطرف الثاني</td><td><%= @contract.party&.full_name %></td></tr>
+    <tr><td>رقم الهاتف</td><td><%= @contract.party&.phone %></td></tr>
+    <tr><td>الرقم الوطني</td><td><%= @contract.party&.try(:national_id) || "—" %></td></tr>
+  </table>
+
+  <h2>الموضوع</h2>
+  <table>
+    <tr><td>النوع</td><td><%= @contract.subject_type_ar %></td></tr>
+    <% if @contract.property&.building %>
+      <tr><td>البناء</td><td><%= @contract.property.building.name %></td></tr>
+      <tr><td>رقم الوحدة</td><td><%= @contract.property.unit_number || "—" %></td></tr>
+      <tr><td>الطابق</td><td><%= @contract.property.floor || "—" %></td></tr>
+    <% end %>
+    <tr><td>الوصف</td><td><%= @contract.subject&.try(:title) %></td></tr>
+  </table>
+
+  <h2>الشروط</h2>
+  <table>
+    <tr><td>نوع العقد</td><td><%= @contract.kind_ar %></td></tr>
+    <tr><td>من تاريخ</td><td><%= @contract.start_date %></td></tr>
+    <tr><td>إلى تاريخ</td><td><%= @contract.end_date %></td></tr>
+    <% if @contract.days.present? %>
+      <tr><td>عدد الأيام</td><td><%= @contract.days %></td></tr>
+    <% end %>
+    <% if @contract.daily_rate.present? %>
+      <tr><td>السعر اليومي</td><td><%= number_with_precision(@contract.daily_rate, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
+    <% end %>
+    <% if @contract.start_odometer.present? || @contract.end_odometer.present? %>
+      <tr><td>عداد الاستلام</td><td><%= @contract.start_odometer || "—" %> كم</td></tr>
+      <tr><td>عداد التسليم</td><td><%= @contract.end_odometer || "—" %> كم</td></tr>
+      <% if @contract.distance_km %>
+        <tr><td>المسافة المقطوعة</td><td><%= @contract.distance_km %> كم</td></tr>
+      <% end %>
+    <% end %>
+    <tr><td>الحالة</td><td><%= @contract.status_ar %></td></tr>
+  </table>
+
+  <h2>الملخص المالي</h2>
+  <div class="amount">
+    الإجمالي: <%= number_with_precision(@contract.amount, precision: 0, delimiter: ",") %>
+    <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+  </div>
+
+  <table>
+    <tr><td>المدفوع</td><td><%= number_with_precision(@contract.paid_amount, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
+    <tr><td>المتبقي</td><td><%= number_with_precision(@contract.remaining_amount, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
+    <tr><td>نسبة الإنجاز</td><td><%= @contract.progress_percent %>%</td></tr>
+    <tr><td>حالة الدفع</td><td><%= @contract.payment_status_ar %></td></tr>
+  </table>
+
+  <div class="progress"><div class="progress-fill" style="width: <%= @contract.progress_percent %>%;"></div></div>
+
+  <% if @contract.payments.any? %>
+    <h2>سجل الدفعات</h2>
+    <table>
+      <thead>
+        <tr style="background:#f3f4f6;">
+          <th style="padding:6px;">#</th>
+          <th style="padding:6px;">المبلغ</th>
+          <th style="padding:6px;">تاريخ الدفع</th>
+          <th style="padding:6px;">الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contract.payments.order(:due_on).each do |p| %>
+          <tr>
+            <td style="padding:6px;">#<%= p.id %></td>
+            <td style="padding:6px;"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+            <td style="padding:6px;"><%= p.paid_on || "—" %></td>
+            <td style="padding:6px;"><%= p.status_ar %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if @contract.notes.present? %>
+    <h2>ملاحظات</h2>
+    <p><%= @contract.notes %></p>
+  <% end %>
+
+  <div class="signatures">
+    <div class="signature">توقيع الطرف الأول</div>
+    <div class="signature">توقيع الطرف الثاني</div>
+  </div>
+
+  <div class="footer">
+    سوريا للعقارات والسيارات<br>
+    info@syria-agencies.sy | 011 123 4567<br>
+    هذا العقد صادر إلكترونياً من المنصة.
+  </div>
+</body>
+</html>

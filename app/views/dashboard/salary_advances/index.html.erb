@@ -1,0 +1,78 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💸 السلف <%= @worker ? "— #{@worker.full_name}" : "" %></h1>
+      <p class="page-subtitle">
+        <% if @worker %>
+          <%= @worker.position_ar %> — الراتب: <%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %> <%= @worker.currency %>
+        <% else %>
+          جميع العمال
+        <% end %>
+      </p>
+    </div>
+    <% if @worker %>
+      <div class="flex gap-2">
+        <%= link_to "➕ تسجيل سلفة", new_dashboard_worker_salary_advance_path(@worker), class: "btn btn-primary" %>
+        <%= link_to "← رجوع", dashboard_workers_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Summary -->
+  <% if @worker %>
+    <div class="report-stats-row mb-6">
+      <div class="report-stat" style="border-right-color:#7c3aed; flex: 1;">
+        <p class="report-stat-label">💸 إجمالي السلف</p>
+        <p class="report-stat-value" style="color:#6d28d9;">
+          <%= number_with_precision(@worker.total_advances, precision: 0, delimiter: ",") %> <%= @worker.currency %>
+        </p>
+      </div>
+      <div class="report-stat" style="border-right-color:#d97706; flex: 1;">
+        <p class="report-stat-label">📅 سلف هذا الشهر</p>
+        <p class="report-stat-value" style="color:#b45309;">
+          <%= number_with_precision(@worker.advances_total, precision: 0, delimiter: ",") %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr>
+          <% unless @worker %><th>العامل</th><% end %>
+          <th>#</th>
+          <th>المبلغ</th>
+          <th>التاريخ</th>
+          <th>السبب</th>
+          <th>الحالة</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @advances.each do |a| %>
+          <tr>
+            <% unless @worker %><td class="font-semibold"><%= a.worker.full_name %></td><% end %>
+            <td>#<%= a.id %></td>
+            <td class="font-bold text-red-700">
+              <%= number_with_precision(a.amount, precision: 0, delimiter: ",") %> <%= a.currency %>
+            </td>
+            <td><%= a.advance_date %></td>
+            <td><%= a.reason %></td>
+            <td>
+              <span class="badge <%= a.settled ? 'badge-green' : 'badge-yellow' %>">
+                <%= a.settled ? "✅ مسوّاة" : "⏳ غير مسوّاة" %>
+              </span>
+            </td>
+            <td>
+              <%= button_to "🗑️", dashboard_salary_advance_path(a), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "متأكد؟" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @advances.empty? %>
+          <tr><td colspan="7" class="text-center py-8">لا توجد سلف</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

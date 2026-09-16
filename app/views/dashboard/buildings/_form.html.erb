@@ -1,0 +1,60 @@
+<%= form_with model: [:dashboard, @building], class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+  <% if @building.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @building.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :name, "🏢 اسم البناء", class: "block mb-1 font-semibold" %>
+      <%= f.text_field :name, class: "input", placeholder: "عمارة النخبة", required: true %>
+    </div>
+    <div>
+      <%= f.label :city_id, "🏙️ المدينة", class: "block mb-1 font-semibold" %>
+      <%= f.collection_select :city_id, City.order(:name_ar), :id, :name_ar, { prompt: "— اختر —" }, class: "input" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :address, "📍 العنوان", class: "block mb-1 font-semibold" %>
+    <%= f.text_field :address, class: "input", placeholder: "المزة — شارع الجلاء" %>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <%= f.label :floors_count, "🏗️ عدد الطوابق", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :floors_count, class: "input", min: 1 %>
+    </div>
+    <div>
+      <%= f.label :units_per_floor, "🚪 وحدات لكل طابق", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :units_per_floor, class: "input", min: 1 %>
+    </div>
+    <div>
+      <%= f.label :year_built, "📅 سنة البناء", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :year_built, class: "input", min: 1900, max: Date.current.year %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :status, "📌 الحالة", class: "block mb-1 font-semibold" %>
+    <%= f.select :status,
+        [["قيد الإنشاء","under_construction"],["جاهز","ready"],["قيد التشغيل","operating"],["مؤرشف","archived"]],
+        {}, class: "input" %>
+  </div>
+
+  <div>
+    <%= f.label :description, "📝 وصف", class: "block mb-1 font-semibold" %>
+    <%= f.text_area :description, rows: 3, class: "input" %>
+  </div>
+
+  <div>
+    <%= f.label :cover_image, "🖼️ صورة الغلاف", class: "block mb-1 font-semibold" %>
+    <%= f.file_field :cover_image, class: "input" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_buildings_path, class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>

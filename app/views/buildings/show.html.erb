@@ -1,0 +1,80 @@
+<div dir="rtl" class="container-page">
+  <div class="breadcrumb">
+    <%= link_to "الرئيسية", root_path %>
+    <span>›</span>
+    <%= link_to "الأبنية", buildings_path %>
+    <span>›</span>
+    <span class="breadcrumb-current"><%= @building.name %></span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏢 <%= @building.name %></h1>
+      <p class="page-subtitle">📍 <%= @building.city.name_ar %> — <%= @building.address %></p>
+    </div>
+  </div>
+
+  <div class="report-stats-row mb-6">
+    <div class="report-stat" style="border-right-color:#2563eb; flex: 1;">
+      <p class="report-stat-label">إجمالي الوحدات</p>
+      <p class="report-stat-value"><%= @building.total_units %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#059669; flex: 1;">
+      <p class="report-stat-label">متاح</p>
+      <p class="report-stat-value" style="color:#047857;"><%= @building.available_units %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#7c3aed; flex: 1;">
+      <p class="report-stat-label">مؤجّر</p>
+      <p class="report-stat-value" style="color:#6d28d9;"><%= @building.rented_units %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#d97706; flex: 1;">
+      <p class="report-stat-label">مُباع</p>
+      <p class="report-stat-value" style="color:#b45309;"><%= @building.sold_units %></p>
+    </div>
+  </div>
+
+  <% if @building.description.present? %>
+    <div class="card p-4 mb-6">
+      <p><%= simple_format @building.description %></p>
+    </div>
+  <% end %>
+
+  <% if @properties.any? %>
+    <h2 class="detail-section-title">🚪 الوحدات المتاحة</h2>
+    <div class="listings-grid">
+      <% @properties.each do |p| %>
+        <div class="listing-card">
+          <div class="listing-image-wrap">
+            <% if p.cover_image.attached? %>
+              <%= image_tag p.cover_image, class: "listing-image" %>
+            <% else %>
+              <div class="listing-image-placeholder">🏠</div>
+            <% end %>
+            <div class="listing-badges-tr">
+              <span class="badge <%= p.sale? ? 'badge-purple' : 'badge-blue' %>">
+                <%= p.sale? ? "💰 للبيع" : "🔑 للإيجار" %>
+              </span>
+            </div>
+            <div class="listing-price-badge">
+              <span class="listing-price-value"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %></span>
+              <span class="listing-price-currency"><%= p.currency %></span>
+            </div>
+          </div>
+          <div class="listing-body">
+            <h3 class="listing-title"><%= link_to "🚪 وحدة #{p.unit_number || p.title}", property_path(p) %></h3>
+            <p class="listing-sub">🏢 <%= p.building.name %> — <%= p.property_type_ar %></p>
+            <div class="listing-features">
+              <span>📐 <%= p.size %> م²</span>
+              <% if p.rooms.to_i > 0 %><span>🛏️ <%= p.rooms %></span><% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🚪</div>
+      <h3 class="empty-title">لا توجد وحدات متاحة في هذا البناء</h3>
+    </div>
+  <% end %>
+</div>

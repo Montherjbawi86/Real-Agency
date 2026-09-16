@@ -1,0 +1,44 @@
+<div class="receipt-wrap" dir="rtl">
+  <h1 class="receipt-title">إيصال دفع</h1>
+  <div class="receipt-sub">
+    رقم الإيصال: #<%= @payment.id %><br>
+    التاريخ: <%= (@payment.paid_on || Date.current).strftime("%Y-%m-%d") %>
+  </div>
+
+  <table class="receipt-table">
+    <tr><td>اسم الدافع</td><td><%= @payment.party&.full_name || "—" %></td></tr>
+    <tr><td>رقم الهاتف</td><td><%= @payment.party&.phone || "—" %></td></tr>
+    <% if @payment.contract %>
+      <tr><td>رقم العقد</td><td>#<%= @payment.contract.id %></td></tr>
+      <tr><td>الموضوع</td><td><%= @payment.contract.subject&.try(:title) || "—" %></td></tr>
+      <tr><td>النوع</td><td><%= @payment.contract.kind_ar %></td></tr>
+    <% end %>
+    <tr><td>تاريخ الاستحقاق</td><td><%= @payment.due_on %></td></tr>
+    <tr><td>طريقة الدفع</td><td><%= { cash: "نقداً", bank: "حوالة بنكية", sham_cash: "شام كاش", haram: "هرم", other: "أخرى" }[@payment.payment_method.to_sym] %></td></tr>
+    <tr><td>الحالة</td><td><%= @payment.paid? ? "مدفوعة ✅" : "معلقة ⏳" %></td></tr>
+  </table>
+
+  <div class="receipt-total">
+    المبلغ الإجمالي: <%= @payment.amount.to_i %>
+    <%= { "SYP" => "ل.س", "USD" => "$" }[@payment.currency] %>
+  </div>
+
+  <% if @payment.notes.present? %>
+    <p><strong>ملاحظات:</strong> <%= @payment.notes %></p>
+  <% end %>
+
+  <div class="receipt-footer">
+    <p>سوريا للعقارات والسيارات</p>
+    <p>info@syria-agencies.sy | 011 123 4567</p>
+  </div>
+</div>
+
+<div class="receipt-actions" dir="rtl">
+  <button onclick="window.print()" class="btn btn-primary">🖨️ طباعة</button>
+  <%= link_to "📄 تحميل PDF", pdf_dashboard_payment_path(@payment), class: "btn btn-danger" %>
+  <% if @payment.party&.phone.present? %>
+    <a href="https://wa.me/963<%= @payment.party.phone.to_s.sub(/^0/, '').sub(/^\+963/, '') %>?text=<%= ERB::Util.url_encode("مرحباً #{@payment.party.full_name}،\nإيصال دفع رقم ##{@payment.id}\nالمبلغ: #{@payment.amount.to_i} #{@payment.currency}\nشكراً لكم.") %>"
+       target="_blank" class="btn btn-success">💬 واتساب</a>
+  <% end %>
+  <%= link_to "رجوع", dashboard_payments_path, class: "btn btn-gray" %>
+</div>

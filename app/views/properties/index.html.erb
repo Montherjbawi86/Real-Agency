@@ -1,0 +1,98 @@
+<div dir="rtl" class="container-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏘️ العقارات المتاحة</h1>
+      <p class="page-subtitle">
+        <% if params[:building_id].present? %>
+          وحدات البناء: <%= Building.find_by(id: params[:building_id])&.name %>
+        <% else %>
+          اكتشف أفضل العقارات في سوريا
+        <% end %>
+      </p>
+    </div>
+    <% if user_signed_in? && current_user.property_agent? %>
+      <%= link_to "➕ أضف عقاراً", new_property_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <%= render "shared/subscription_banner" %>
+
+  <div class="filter-card">
+    <%= form_with url: properties_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :building_id, params[:building_id] if params[:building_id].present? %>
+
+      <%= select_tag :city_id,
+          options_from_collection_for_select(City.order(:name_ar), :id, :name_ar, params[:city_id]),
+          include_blank: "🏙️ كل المدن", class: "input" %>
+      <%= select_tag :type,
+          options_for_select([
+            ["🏢 شقة","apartment"],["🏡 فيلا","villa"],["🌍 أرض","land"],
+            ["🏪 محل تجاري","shop"],["🏬 مكتب","office"],["🏨 وحدة بناء","building_unit"],
+            ["📦 مستودع","warehouse"],["🌾 مزرعة","farm"]
+          ], params[:type]),
+          include_blank: "🏠 كل الأنواع", class: "input" %>
+      <%= select_tag :listing,
+          options_for_select([["💰 للبيع","sale"],["🔑 للإيجار","rent"]], params[:listing]),
+          include_blank: "📋 بيع / إيجار", class: "input" %>
+      <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+    <% end %>
+  </div>
+
+  <% if @properties.any? %>
+    <div class="listings-grid">
+      <% @properties.each_with_index do |p, i| %>
+        <div class="listing-card" style="animation-delay:<%= i*50 %>ms;">
+          <div class="listing-image-wrap">
+            <% if p.cover_image.attached? %>
+              <%= image_tag p.cover_image, class: "listing-image" %>
+            <% else %>
+              <div class="listing-image-placeholder">🏠</div>
+            <% end %>
+            <div class="listing-badges-tr">
+              <span class="badge <%= p.sale? ? 'badge-purple' : 'badge-blue' %>">
+                <%= p.sale? ? "💰 للبيع" : "🔑 للإيجار" %>
+              </span>
+              <span class="badge badge-gray"><%= p.property_type_ar %></span>
+            </div>
+            <% if p.building %>
+              <div class="absolute bottom-3 right-3">
+                <span class="badge badge-blue" style="background:rgba(37,99,235,0.9); color:#fff;">
+                  🏢 <%= p.building.name %>
+                </span>
+              </div>
+            <% end %>
+            <div class="listing-price-badge">
+              <span class="listing-price-value"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %></span>
+              <span class="listing-price-currency"><%= p.currency %></span>
+            </div>
+          </div>
+          <div class="listing-body">
+            <h3 class="listing-title"><%= link_to p.title, property_path(p) %></h3>
+            <p class="listing-sub">📍 <%= p.city.name_ar %><% if p.unit_number.present? %> — وحدة <%= p.unit_number %><% end %></p>
+            <div class="listing-features">
+              <% if p.size.present? %><span>📐 <%= p.size %> م²</span><% end %>
+              <% if p.rooms.to_i > 0 %><span>🛏️ <%= p.rooms %> غرف</span><% end %>
+              <% if p.bathrooms.to_i > 0 %><span>🚿 <%= p.bathrooms %></span><% end %>
+            </div>
+            <div class="listing-footer">
+              <%= link_to "التفاصيل ←", property_path(p), class: "btn btn-outline btn-sm" %>
+              <div class="flex items-center gap-1">
+                <button type="button"
+                        onclick="navigator.clipboard.writeText('<%= property_url(p) %>'); this.textContent='✓'; setTimeout(()=>this.textContent='🔗', 1500);"
+                        class="text-gray-500 hover:text-blue-600 p-1"
+                        title="نسخ الرابط">🔗</button>
+                <span class="text-xs text-black"><%= time_ago_in_words(p.created_at) %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-title">لا توجد عقارات متاحة</h3>
+      <p class="empty-sub">جرب تغيير معايير البحث</p>
+    </div>
+  <% end %>
+</div>

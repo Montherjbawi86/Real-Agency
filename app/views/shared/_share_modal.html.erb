@@ -1,0 +1,121 @@
+<%
+  is_property = subject.is_a?(Property)
+  base_url    = is_property ? "https://#{host}/properties/#{subject.id}" : "https://#{host}/cars/#{subject.id}"
+  img_url     = subject.cover_image.attached? ? url_for(subject.cover_image) : nil
+
+  fb_post = is_property ? SocialPostBuilder.for_property(subject, platform: :facebook, host: host)
+                        : SocialPostBuilder.for_car(subject, platform: :facebook, host: host)
+  ig_post = is_property ? SocialPostBuilder.for_property(subject, platform: :instagram, host: host)
+                        : SocialPostBuilder.for_car(subject, platform: :instagram, host: host)
+  tt_post = is_property ? SocialPostBuilder.for_property(subject, platform: :tiktok, host: host)
+                        : SocialPostBuilder.for_car(subject, platform: :tiktok, host: host)
+  tg_post = is_property ? SocialPostBuilder.for_property(subject, platform: :telegram, host: host)
+                        : SocialPostBuilder.for_car(subject, platform: :telegram, host: host)
+%>
+
+<div id="share-modal-<%= subject.id %>" class="share-modal" style="display:none;">
+  <div class="share-modal-backdrop" onclick="document.getElementById('share-modal-<%= subject.id %>').style.display='none'"></div>
+  <div class="share-modal-content" dir="rtl">
+
+    <div class="share-modal-header">
+      <h2 class="text-xl font-bold">📤 نشر الإعلان على حساباتك</h2>
+      <button class="share-modal-close" onclick="document.getElementById('share-modal-<%= subject.id %>').style.display='none'">✕</button>
+    </div>
+
+    <div class="share-modal-preview">
+      <% if img_url %><%= image_tag img_url, class: "share-preview-img" %><% end %>
+      <div>
+        <p class="font-bold text-lg"><%= is_property ? subject.title : "#{subject.brand} #{subject.car_model} (#{subject.year})" %></p>
+        <p class="text-sm text-black">
+          <%= subject.city&.name_ar %> — <%= number_with_precision(subject.price, precision: 0, delimiter: ",") %> <%= subject.currency %>
+        </p>
+      </div>
+    </div>
+
+    <div class="share-modal-steps">
+      <p class="text-sm font-semibold text-black mb-2">
+        💡 اضغط "نسخ النص" ثم افتح التطبيق والصق النص هناك.
+      </p>
+
+      <!-- Facebook -->
+      <div class="share-post-block">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h3 class="font-bold">📘 فيسبوك</h3>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-gray btn-sm"
+                    onclick="navigator.clipboard.writeText(document.getElementById('post-fb-<%= subject.id %>').value); this.textContent='✓ تم النسخ'; setTimeout(()=>this.textContent='📋 نسخ النص', 2000);">
+              📋 نسخ النص
+            </button>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= ERB::Util.url_encode(base_url) %>"
+               target="_blank" class="btn btn-primary btn-sm">↗ فتح فيسبوك</a>
+          </div>
+        </div>
+        <textarea id="post-fb-<%= subject.id %>" class="share-textarea" readonly rows="8"><%= fb_post %></textarea>
+      </div>
+
+      <!-- Instagram -->
+      <div class="share-post-block">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h3 class="font-bold">📷 إنستغرام</h3>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-gray btn-sm"
+                    onclick="navigator.clipboard.writeText(document.getElementById('post-ig-<%= subject.id %>').value); this.textContent='✓ تم النسخ'; setTimeout(()=>this.textContent='📋 نسخ النص', 2000);">
+              📋 نسخ النص
+            </button>
+            <a href="https://www.instagram.com" target="_blank" class="btn social-instagram btn-sm">↗ فتح إنستغرام</a>
+          </div>
+        </div>
+        <textarea id="post-ig-<%= subject.id %>" class="share-textarea" readonly rows="8"><%= ig_post %></textarea>
+        <p class="text-xs text-black mt-1">💡 لا تنسَ رفع الصورة من معرض الملفات إلى إنستغرام</p>
+      </div>
+
+      <!-- TikTok -->
+      <div class="share-post-block">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h3 class="font-bold">🎵 تيك توك</h3>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-gray btn-sm"
+                    onclick="navigator.clipboard.writeText(document.getElementById('post-tt-<%= subject.id %>').value); this.textContent='✓ تم النسخ'; setTimeout(()=>this.textContent='📋 نسخ النص', 2000);">
+              📋 نسخ النص
+            </button>
+            <a href="https://www.tiktok.com/upload" target="_blank" class="btn social-tiktok btn-sm">↗ فتح تيك توك</a>
+          </div>
+        </div>
+        <textarea id="post-tt-<%= subject.id %>" class="share-textarea" readonly rows="4"><%= tt_post %></textarea>
+      </div>
+
+      <!-- Telegram -->
+      <div class="share-post-block">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h3 class="font-bold">✈️ تيليجرام</h3>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-gray btn-sm"
+                    onclick="navigator.clipboard.writeText(document.getElementById('post-tg-<%= subject.id %>').value); this.textContent='✓ تم النسخ'; setTimeout(()=>this.textContent='📋 نسخ النص', 2000);">
+              📋 نسخ النص
+            </button>
+            <a href="https://t.me/share/url?url=<%= ERB::Util.url_encode(base_url) %>&text=<%= ERB::Util.url_encode(tg_post) %>"
+               target="_blank" class="btn social-telegram btn-sm">↗ فتح تيليجرام</a>
+          </div>
+        </div>
+        <textarea id="post-tg-<%= subject.id %>" class="share-textarea" readonly rows="8"><%= tg_post %></textarea>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="share-post-block">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <h3 class="font-bold">💬 واتساب</h3>
+          <a href="https://wa.me/?text=<%= ERB::Util.url_encode(fb_post) %>"
+             target="_blank" class="btn social-whatsapp btn-sm">↗ فتح واتساب</a>
+        </div>
+      </div>
+    </div>
+
+    <% if img_url %>
+      <div class="share-modal-footer">
+        <a href="<%= img_url %>" download class="btn btn-warning">⬇️ تحميل الصورة</a>
+        <p class="text-xs text-black mt-2">💡 حمّل الصورة لرفعها على إنستغرام أو تيك توك</p>
+      </div>
+    <% end %>
+
+  </div>
+</div>

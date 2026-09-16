@@ -1,0 +1,139 @@
+<div dir="rtl" class="text-black animate-fade-in">
+  <h1 class="page-title mb-6">💵 التقارير المالية</h1>
+
+  <!-- Summary cards -->
+  <div class="report-stats-row">
+    <div class="report-stat" style="border-right-color:#059669;">
+      <p class="report-stat-label">✅ مدفوعة</p>
+      <p class="report-stat-value" style="color:#047857;"><%= @paid_count %></p>
+      <p class="text-sm mt-2 font-bold"><%= number_with_precision(@paid_total_syp.to_f, precision: 0, delimiter: ",") %> ل.س</p>
+      <% if @paid_total_usd.to_f > 0 %>
+        <p class="text-sm font-bold">+ <%= number_with_precision(@paid_total_usd.to_f, precision: 0, delimiter: ",") %> $</p>
+      <% end %>
+    </div>
+    <div class="report-stat" style="border-right-color:#d97706;">
+      <p class="report-stat-label">⏳ معلقة</p>
+      <p class="report-stat-value" style="color:#b45309;"><%= @pending_count %></p>
+      <p class="text-sm mt-2 font-bold"><%= number_with_precision(@pending_total_syp.to_f, precision: 0, delimiter: ",") %> ل.س</p>
+    </div>
+    <div class="report-stat" style="border-right-color:#dc2626;">
+      <p class="report-stat-label">⚠️ متأخرة</p>
+      <p class="report-stat-value" style="color:#b91c1c;"><%= @overdue_count %></p>
+      <p class="text-sm mt-2 font-bold"><%= number_with_precision(@overdue_total_syp.to_f, precision: 0, delimiter: ",") %> ل.س</p>
+    </div>
+    <div class="report-stat" style="border-right-color:#2563eb;">
+      <p class="report-stat-label">📄 إجمالي العقود</p>
+      <p class="report-stat-value" style="color:#1d4ed8;"><%= number_with_precision(@total_contract_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm mt-2 font-bold">ل.س</p>
+    </div>
+    <div class="report-stat" style="border-right-color:#7c3aed;">
+      <p class="report-stat-label">⚠️ المتبقي</p>
+      <p class="report-stat-value" style="color:#6d28d9;"><%= number_with_precision(@total_remaining_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm mt-2 font-bold">ل.س</p>
+    </div>
+  </div>
+
+  <!-- This month + maintenance + workers -->
+  <div class="report-info-grid">
+    <div class="report-info-card">
+      <h3 class="report-info-title">📅 هذا الشهر</h3>
+      <p class="text-sm">إجمالي المحصّل:</p>
+      <p class="text-xl font-bold text-blue-700">
+        <%= number_with_precision(@this_month_total_syp.to_f, precision: 0, delimiter: ",") %> ل.س
+      </p>
+      <% if @this_month_total_usd.to_f > 0 %>
+        <p class="text-lg font-bold text-blue-700">
+          <%= number_with_precision(@this_month_total_usd.to_f, precision: 0, delimiter: ",") %> $
+        </p>
+      <% end %>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">🔧 تكاليف الصيانة</h3>
+      <p class="text-sm">عدد الأعمال: <strong><%= @maintenance_count %></strong></p>
+      <p class="text-xl font-bold text-orange-700">
+        <%= number_with_precision(@maintenance_cost_syp.to_f, precision: 0, delimiter: ",") %> ل.س
+      </p>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">👷 رواتب العمال</h3>
+      <p class="text-sm">عدد العمال: <strong><%= @workers_count %></strong></p>
+      <p class="text-xl font-bold text-purple-700">
+        <%= number_with_precision(@salaries_syp.to_f, precision: 0, delimiter: ",") %> ل.س
+      </p>
+    </div>
+  </div>
+
+  <!-- Net -->
+  <div class="net-summary">
+    <h3 class="net-summary-title">📊 صافي الإيراد (ل.س)</h3>
+    <div class="net-summary-grid">
+      <div>
+        <p class="net-summary-label">الإيرادات المدفوعة</p>
+        <p class="net-summary-value"><%= number_with_precision(@paid_total_syp.to_f, precision: 0, delimiter: ",") %></p>
+      </div>
+      <div>
+        <p class="net-summary-label">المصروفات</p>
+        <p class="net-summary-value"><%= number_with_precision((@maintenance_cost_syp + @salaries_syp).to_f, precision: 0, delimiter: ",") %></p>
+      </div>
+      <div>
+        <p class="net-summary-label">الصافي</p>
+        <p class="net-summary-highlight">
+          <%= number_with_precision((@paid_total_syp - @maintenance_cost_syp - @salaries_syp).to_f, precision: 0, delimiter: ",") %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top payers + Recent -->
+  <div class="report-info-grid" style="grid-template-columns: 1fr;">
+    <div class="report-info-card">
+      <h3 class="report-info-title">🏆 أعلى 5 دافعين</h3>
+      <% top_list = (@top_tenants || []).to_a %>
+      <% if top_list.any? %>
+        <ol class="space-y-2">
+          <% top_list.each_with_index do |item, i| %>
+            <% name, total = item.is_a?(Array) ? item : [item[0], item[1]] %>
+            <li class="report-info-row">
+              <span><%= i + 1 %>. <%= name %></span>
+              <span class="font-bold text-blue-700">
+                <%= number_with_precision(total, precision: 0, delimiter: ",") %> ل.س
+              </span>
+            </li>
+          <% end %>
+        </ol>
+      <% else %>
+        <p class="text-black">لا توجد بيانات بعد</p>
+      <% end %>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">🧾 آخر الدفعات المدفوعة</h3>
+      <% if (@recent_paid || []).any? %>
+        <table class="table-clean">
+          <thead>
+            <tr><th>الاسم</th><th>المبلغ</th><th>التاريخ</th></tr>
+          </thead>
+          <tbody>
+            <% @recent_paid.each do |p| %>
+              <tr>
+                <td><%= p.party&.full_name || "—" %></td>
+                <td class="font-bold text-green-700"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+                <td><%= p.paid_on %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="text-black">لا توجد دفعات مدفوعة بعد</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex gap-3 mt-6">
+    <%= link_to "➕ دفعة جديدة", new_dashboard_payment_path, class: "btn btn-primary" %>
+    <%= link_to "💰 كل الدفعات", dashboard_payments_path, class: "btn btn-gray" %>
+  </div>
+</div>

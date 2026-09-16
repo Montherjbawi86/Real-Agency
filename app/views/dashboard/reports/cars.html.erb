@@ -1,0 +1,115 @@
+<div dir="rtl" class="text-black animate-fade-in">
+  <h1 class="text-3xl font-bold mb-6">📈 تقارير السيارات</h1>
+
+  <div class="stats-grid-5">
+    <div class="stat-mini" style="border-right-color:#6b7280;">
+      <p class="stat-mini-label">📦 الإجمالي</p>
+      <p class="stat-mini-value"><%= @total_count %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#059669;">
+      <p class="stat-mini-label">✅ منشور</p>
+      <p class="stat-mini-value" style="color:#047857;"><%= @published_count %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#2563eb;">
+      <p class="stat-mini-label">🔑 مؤجّر</p>
+      <p class="stat-mini-value" style="color:#1d4ed8;"><%= @rented_count %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#7c3aed;">
+      <p class="stat-mini-label">💰 مُباع</p>
+      <p class="stat-mini-value" style="color:#6d28d9;"><%= @sold_count %></p>
+    </div>
+    <div class="stat-mini" style="border-right-color:#d97706;">
+      <p class="stat-mini-label">📝 مسودة</p>
+      <p class="stat-mini-value" style="color:#b45309;"><%= @draft_count %></p>
+    </div>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-4">💵 الملخص المالي</h2>
+  <div class="payment-summary">
+    <div class="payment-summary-card paid">
+      <p class="payment-summary-label">✅ المدفوع (ل.س)</p>
+      <p class="payment-summary-value paid"><%= number_with_precision(@total_paid_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">مقابل: <strong><%= number_with_precision(@total_paid_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+    <div class="payment-summary-card remaining">
+      <p class="payment-summary-label">⚠️ المتبقي (ل.س)</p>
+      <p class="payment-summary-value remaining"><%= number_with_precision(@total_remaining_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">مقابل: <strong><%= number_with_precision(@total_remaining_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+    <div class="payment-summary-card pending">
+      <p class="payment-summary-label">📄 إجمالي العقود (ل.س)</p>
+      <p class="payment-summary-value pending"><%= number_with_precision(@total_contract_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">مقابل: <strong><%= number_with_precision(@total_contract_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="font-bold mb-3 text-lg">🚗 حسب الحالة</h3>
+      <% @by_status.each do |status, count| %>
+        <div class="flex justify-between border-b py-1">
+          <span><%= { "draft" => "مسودة", "published" => "منشور", "rented" => "مؤجّر", "sold" => "مُباع" }[status] %></span>
+          <span class="font-bold"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="font-bold mb-3 text-lg">🏷️ حسب الماركة</h3>
+      <% @by_brand.sort_by { |_, c| -c }.each do |brand, count| %>
+        <div class="flex justify-between border-b py-1">
+          <span><%= brand %></span>
+          <span class="font-bold"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="font-bold mb-3 text-lg">💵 القيمة والمتوسطات</h3>
+      <p class="text-lg font-bold text-blue-700">
+        <%= number_with_precision(@total_value_syp.to_f, precision: 0, delimiter: ",") %> ل.س
+      </p>
+      <% if @total_value_usd.to_f > 0 %>
+        <p class="text-lg font-bold text-green-700">
+          <%= number_with_precision(@total_value_usd.to_f, precision: 0, delimiter: ",") %> $
+        </p>
+      <% end %>
+      <p class="text-sm mt-2">متوسط المسافة: <strong><%= @avg_mileage.to_f.round(0) %> كم</strong></p>
+    </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow mb-6">
+    <h3 class="font-bold mb-4 text-lg">🆕 آخر 10 سيارات</h3>
+    <% if @recent.any? %>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b bg-gray-50">
+            <th class="text-right p-2 font-bold">العنوان</th>
+            <th class="text-right p-2 font-bold">الماركة</th>
+            <th class="text-right p-2 font-bold">السنة</th>
+            <th class="text-right p-2 font-bold">السعر</th>
+            <th class="text-right p-2 font-bold">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent.each do |c| %>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="p-2"><%= link_to c.title, car_path(c), class: "text-blue-700 hover:underline font-semibold" %></td>
+              <td class="p-2"><%= c.brand %> <%= c.car_model %></td>
+              <td class="p-2"><%= c.year %></td>
+              <td class="p-2 font-bold"><%= number_with_precision(c.price, precision: 0, delimiter: ",") %> <%= c.currency %></td>
+              <td class="p-2"><span class="badge badge-gray"><%= c.status_ar %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p>لا توجد سيارات بعد</p>
+    <% end %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= link_to "➕ إضافة سيارة", new_car_path, class: "btn btn-primary" %>
+    <%= link_to "🚗 كل السيارات", cars_path, class: "btn btn-gray" %>
+  </div>
+</div>

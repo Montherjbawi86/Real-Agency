@@ -1,0 +1,117 @@
+<%= form_with model: @car, class: "space-y-4" do |f| %>
+  <% if @car.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <ul>
+        <% @car.errors.full_messages.each do |m| %>
+          <li>• <%= m %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title, "عنوان الإعلان" %>
+    <%= f.text_field :title, class: "border p-2 w-full rounded" %>
+  </div>
+
+  <div>
+    <%= f.label :description, "الوصف" %>
+    <%= f.text_area :description, rows: 5, class: "border p-2 w-full rounded" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <%= f.label :brand, "الماركة" %>
+      <%= f.text_field :brand, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :car_model, "الموديل" %>
+      <%= f.text_field :car_model, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :year, "السنة" %>
+      <%= f.number_field :year, min: 1950, max: Date.current.year + 1, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :city_id, "المدينة" %>
+      <%= f.collection_select :city_id, City.all, :id, :name_ar, {}, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :price, "السعر" %>
+      <div class="flex gap-2">
+        <%= f.number_field :price, class: "border p-2 w-full rounded" %>
+        <%= f.select :currency, [["ل.س","SYP"],["$","USD"]], {}, class: "border p-2 rounded" %>
+      </div>
+    </div>
+    <div>
+      <%= f.label :mileage, "المسافة (كم)" %>
+      <%= f.number_field :mileage, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :fuel_type, "نوع الوقود" %>
+      <%= f.select :fuel_type, [["بنزين","petrol"],["ديزل","diesel"],["هجين","hybrid"],["كهربائي","electric"],["غاز","gas"]], {}, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :transmission, "ناقل الحركة" %>
+      <%= f.select :transmission, [["عادي","manual"],["أوتوماتيك","automatic"]], {}, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :condition, "الحالة" %>
+      <%= f.select :condition, [["جديد","new_car"],["مستعمل","used"],["معتمد","certified"]], {}, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :body_type, "نوع الهيكل" %>
+      <%= f.select :body_type, [["سيدان","sedan"],["دفع رباعي","suv"],["هاتشباك","hatchback"],["بيك أب","pickup"],["فان","van"],["كوبيه","coupe"],["مكشوفة","convertible"],["ستيشن","wagon"]], {}, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :color, "اللون" %>
+      <%= f.text_field :color, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :doors, "عدد الأبواب" %>
+      <%= f.number_field :doors, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :seats, "عدد المقاعد" %>
+      <%= f.number_field :seats, class: "border p-2 w-full rounded" %>
+    </div>
+    <div>
+      <%= f.label :engine_size, "سعة المحرك (سي سي)" %>
+      <%= f.number_field :engine_size, class: "border p-2 w-full rounded" %>
+    </div>
+  </div>
+
+  <fieldset class="border p-3 rounded">
+    <legend class="font-bold">المزايا</legend>
+    <div class="grid grid-cols-3 gap-2">
+      <% Car::FEATURES.each do |field, label| %>
+        <label class="flex items-center gap-2">
+          <%= f.check_box field %>
+          <%= label %>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= f.label :youtube_url, "🎥 رابط فيديو يوتيوب (اختياري)", class: "block mb-1 font-semibold" %>
+    <%= f.url_field :youtube_url,
+        class: "input",
+        placeholder: "https://www.youtube.com/watch?v=..." %>
+    <p class="text-xs text-black mt-1">
+      💡 الصق رابط يوتيوب وسيظهر الفيديو داخل صفحة السيارة.
+    </p>
+  </div>
+
+  <div>
+    <%= f.label :cover_image, "صورة الغلاف", class: "block mb-1 font-semibold" %>
+    <%= f.file_field :cover_image, class: "input" %>
+  </div>
+
+  <div>
+    <%= f.label :images, "صور إضافية" %>
+    <%= f.file_field :images, multiple: true, class: "border p-2 w-full rounded" %>
+  </div>
+
+  <%= f.submit "حفظ", class: "bg-blue-600 text-white px-6 py-2 rounded" %>
+<% end %>

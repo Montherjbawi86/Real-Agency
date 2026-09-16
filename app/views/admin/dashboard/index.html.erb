@@ -1,0 +1,101 @@
+<div dir="rtl">
+  <h1 class="page-title mb-6">🛡️ لوحة الإدارة</h1>
+
+  <!-- Quick actions -->
+  <div class="flex flex-wrap gap-3 mb-6">
+    <%= link_to "💳 طلبات الدفع", admin_payment_requests_path, class: "btn btn-primary" %>
+    <%= link_to "🏢 الوكالات", admin_agencies_path, class: "btn btn-outline" %>
+    <%= link_to "🏘️ العقارات", admin_properties_path, class: "btn btn-outline" %>
+    <%= link_to "🚗 السيارات", admin_cars_path, class: "btn btn-outline" %>
+    <%= link_to "👥 المستخدمون", admin_users_path, class: "btn btn-outline" %>
+    <%= link_to "📋 الاشتراكات", admin_subscriptions_path, class: "btn btn-outline" %>
+    <%= link_to "🎯 الخطط", admin_plans_path, class: "btn btn-outline" %>
+    <%= link_to "⚙️ الإعدادات", admin_settings_path, class: "btn btn-outline" %>
+  </div>
+
+  <div class="report-stats-row mb-6">
+    <div class="report-stat" style="border-right-color:#d97706; flex: 1;">
+      <p class="report-stat-label">⏳ طلبات معلقة</p>
+      <p class="report-stat-value" style="color:#b45309;"><%= @pending_requests.count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#059669; flex: 1;">
+      <p class="report-stat-label">✅ مقبولة اليوم</p>
+      <p class="report-stat-value" style="color:#047857;"><%= @approved_today.count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#2563eb; flex: 1;">
+      <p class="report-stat-label">👥 الوكلاء</p>
+      <p class="report-stat-value" style="color:#1d4ed8;"><%= @total_agents %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#7c3aed; flex: 1;">
+      <p class="report-stat-label">📋 اشتراكات نشطة</p>
+      <p class="report-stat-value" style="color:#6d28d9;"><%= @active_subs %></p>
+    </div>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">💰 الإيراد (ل.س)</h4>
+      <p class="text-2xl font-bold text-green-700"><%= number_with_precision(@total_revenue_syp, precision: 0, delimiter: ",") %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">💵 الإيراد ($)</h4>
+      <p class="text-2xl font-bold text-blue-700"><%= number_with_precision(@total_revenue_usd, precision: 0, delimiter: ",") %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">👥 المستخدمون</h4>
+      <p class="text-2xl font-bold"><%= @total_users %></p>
+    </div>
+  </div>
+
+  <!-- Pending agencies -->
+  <% if @pending_agencies_list.any? %>
+    <h2 class="section-heading">🏢 وكالات بانتظار الموافقة</h2>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>الوكالة</th><th>المالك</th><th>المدينة</th><th>التاريخ</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% @pending_agencies_list.each do |a| %>
+            <tr>
+              <td>#<%= a.id %></td>
+              <td class="font-semibold"><%= a.name %></td>
+              <td><%= a.user.display_name %></td>
+              <td><%= a.city&.name_ar %></td>
+              <td><%= a.created_at.strftime("%Y-%m-%d") %></td>
+              <td><%= link_to "مراجعة", admin_agency_path(a), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <h2 class="section-heading">⏳ طلبات معلقة</h2>
+  <% if @pending_requests.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>الوكيل</th><th>الخطة</th><th>المبلغ</th><th>التاريخ</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% @pending_requests.limit(10).each do |r| %>
+            <tr>
+              <td>#<%= r.id %></td>
+              <td class="font-semibold"><%= r.user.display_name %></td>
+              <td><%= r.plan.name_ar %></td>
+              <td class="font-bold"><%= number_with_precision(r.amount, precision: 0, delimiter: ",") %> <%= r.currency %></td>
+              <td><%= r.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+              <td><%= link_to "مراجعة", admin_payment_request_path(r), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <p class="empty-title">لا توجد طلبات معلقة</p>
+    </div>
+  <% end %>
+</div>

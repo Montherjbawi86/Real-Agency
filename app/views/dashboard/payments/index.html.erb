@@ -1,0 +1,114 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💰 الدفعات</h1>
+      <p class="page-subtitle">إدارة ومتابعة كل الدفعات</p>
+    </div>
+    <%= link_to "➕ دفعة جديدة", new_dashboard_payment_path, class: "btn btn-primary" %>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <%= link_to dashboard_payments_path,
+        class: "filter-tab #{'active' if params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to dashboard_payments_path(status: "paid"),
+        class: "filter-tab #{'active' if params[:status] == 'paid'}" do %>
+      ✅ مدفوعة <span class="filter-count"><%= @counts[:paid] %></span>
+    <% end %>
+    <%= link_to dashboard_payments_path(status: "pending"),
+        class: "filter-tab #{'active' if params[:status] == 'pending'}" do %>
+      ⏳ معلقة <span class="filter-count"><%= @counts[:pending] %></span>
+    <% end %>
+    <%= link_to dashboard_payments_path(status: "overdue"),
+        class: "filter-tab #{'active' if params[:status] == 'overdue'}" do %>
+      ⚠️ متأخرة <span class="filter-count"><%= @counts[:overdue] %></span>
+    <% end %>
+  </div>
+
+  <!-- Search -->
+  <div class="filter-card">
+    <%= form_with url: dashboard_payments_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+
+      <%= text_field_tag :q, params[:q],
+          placeholder: "🔍 بحث بالاسم أو رقم الدفعة",
+          class: "input", style: "grid-column: span 2;" %>
+
+      <%= select_tag :currency,
+          options_for_select([["ل.س","SYP"],["دولار","USD"]], params[:currency]),
+          include_blank: "💱 كل العملات", class: "input" %>
+
+      <%= select_tag :sort,
+          options_for_select([
+            ["الأحدث أولاً", "newest"],
+            ["الأقرب استحقاقاً", "due_soon"],
+            ["المبلغ (الأعلى)", "amount_high"]
+          ], params[:sort]),
+          class: "input" %>
+
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <% if params[:q].present? || params[:sort].present? || params[:currency].present? %>
+          <%= link_to "مسح", dashboard_payments_path, class: "btn btn-gray" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @payments.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>#</th><th>الطرف الثاني</th><th>العقار / السيارة</th>
+            <th>القيمة</th><th>الاستحقاق</th><th>الدفع</th><th>الحالة</th><th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @payments.each do |p| %>
+            <tr>
+              <td>#<%= p.id %></td>
+              <td class="font-semibold"><%= p.party&.full_name || "—" %></td>
+              <td>
+                <% if p.contract&.property&.building %>
+                  <span class="badge badge-blue text-xs">🏢 <%= p.contract.property.building.name %></span>
+                  <div class="text-sm">🚪 <%= p.contract.property.unit_number %></div>
+                <% elsif p.contract&.car %>
+                  🚗 <%= p.contract.car.brand %> <%= p.contract.car.car_model %>
+                <% else %>
+                  <%= p.contract&.property&.title || "—" %>
+                <% end %>
+              </td>
+              <td class="font-bold"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td><%= p.due_on %></td>
+              <td><%= p.paid_on %></td>
+              <td><span class="badge <%= p.status_badge_class %>"><%= p.status_ar %></span></td>
+              <td>
+                <div class="flex flex-wrap gap-1">
+                  <% unless p.paid? %>
+                    <%= button_to "✅ دفع", mark_paid_dashboard_payment_path(p), method: :patch, class: "btn btn-success btn-sm" %>
+                  <% end %>
+                  <%= link_to "🧾 إيصال", receipt_dashboard_payment_path(p), target: "_blank", class: "btn btn-primary btn-sm" %>
+                  <%= link_to "📄 PDF", pdf_dashboard_payment_path(p), class: "btn btn-danger btn-sm" %>
+                  <%= link_to "تعديل", edit_dashboard_payment_path(p), class: "btn btn-warning btn-sm" %>
+                  <%= button_to "حذف", dashboard_payment_path(p), method: :delete, data: { turbo_confirm: "متأكد؟" }, class: "btn btn-danger btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-black mt-3">عرض <%= @payments.size %> دفعة</p>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">💰</div>
+      <h3 class="empty-title">لا توجد دفعات</h3>
+      <div class="mt-4">
+        <%= link_to "➕ دفعة جديدة", new_dashboard_payment_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

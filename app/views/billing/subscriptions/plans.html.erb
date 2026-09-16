@@ -1,0 +1,53 @@
+<div dir="rtl" class="container-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🚀 اختر خطتك</h1>
+      <p class="page-subtitle">ترقى للحصول على إعلانات أكثر</p>
+    </div>
+    <%= link_to "← اشتراكي", billing_subscription_path, class: "btn btn-gray" %>
+  </div>
+
+  <div class="plans-grid">
+    <% @plans.each do |plan| %>
+      <% is_current = plan.id == @current_plan&.id %>
+      <div class="plan-card <%= 'plan-card-current' if is_current %>">
+        <% if is_current %>
+          <div class="plan-badge-current">خطتك الحالية</div>
+        <% end %>
+        <% if plan.slug == "pro" %>
+          <div class="plan-badge-popular">الأكثر شعبية</div>
+        <% end %>
+
+        <h3 class="plan-name"><%= plan.name_ar %></h3>
+        <p class="plan-name-en"><%= plan.name %></p>
+
+        <div class="plan-price">
+          <% if plan.free? %>
+            <span class="plan-price-value">مجاناً</span>
+          <% else %>
+            <span class="plan-price-value"><%= number_with_precision(plan.price_syp, precision: 0, delimiter: ",") %></span>
+            <span class="plan-price-currency">ل.س / شهر</span>
+            <span class="plan-price-secondary">أو <%= number_with_precision(plan.price_usd, precision: 0, delimiter: ",") %> $</span>
+          <% end %>
+        </div>
+
+        <ul class="plan-features">
+          <% plan.features_list.each do |feature| %>
+            <li>✅ <%= feature %></li>
+          <% end %>
+        </ul>
+
+        <div class="plan-footer">
+          <% if is_current %>
+            <button class="btn btn-gray btn-block" disabled>خطتك الحالية</button>
+          <% else %>
+            <%= button_to "🚀 اختر هذه الخطة",
+                billing_upgrade_subscription_path(plan_id: plan.id),
+                method: :post,
+                class: "btn btn-primary btn-block btn-lg" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

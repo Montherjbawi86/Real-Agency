@@ -1,0 +1,103 @@
+<div dir="rtl" class="container-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💳 اشتراكك</h1>
+      <p class="page-subtitle">إدارة خطتك وإعلاناتك</p>
+    </div>
+    <%= link_to "🚀 ترقية الخطة", billing_plans_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="billing-hero">
+    <div class="billing-hero-inner">
+      <div>
+        <p class="billing-hero-label">خطتك الحالية</p>
+        <h2 class="billing-hero-plan"><%= @plan.name_ar %></h2>
+        <p class="billing-hero-desc">
+          <%= @plan.max_listings_label %> — <%= @plan.duration_label %>
+        </p>
+      </div>
+      <div class="billing-hero-count">
+        <p class="billing-hero-label">الإعلانات المستخدمة</p>
+        <p class="billing-hero-big"><%= @listings %> / <%= @plan.unlimited? ? "∞" : @plan.max_listings %></p>
+      </div>
+    </div>
+
+    <% if @plan.unlimited? %>
+      <p class="billing-hero-progress-label">♾️ غير محدود</p>
+    <% else %>
+      <div class="progress-bar" style="height: 12px; background: rgba(255,255,255,0.2);">
+        <div class="progress-fill" style="width: <%= [(@listings.to_f / @plan.max_listings * 100).round, 100].min %>%;"></div>
+      </div>
+      <p class="billing-hero-progress-label">
+        متبقٍ: <strong><%= @remaining %></strong> إعلان
+        <% if @remaining && @remaining <= 3 %>
+          <span style="color:#fbbf24;">⚠️ على وشك النفاد</span>
+        <% end %>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">📌 الحالة</h4>
+      <p class="font-bold text-lg">
+        <span class="badge <%= @subscription&.status_badge_class || 'badge-gray' %>">
+          <%= @subscription&.status_ar || "بدون اشتراك" %>
+        </span>
+      </p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 البداية</h4>
+      <p class="font-bold"><%= @subscription&.starts_on&.strftime("%Y-%m-%d") || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 الانتهاء</h4>
+      <p class="font-bold">
+        <%= @subscription&.ends_on&.strftime("%Y-%m-%d") || "—" %>
+        <% if @subscription&.expires_soon? %>
+          <span class="badge badge-yellow ml-2">قريباً</span>
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <% if @remaining && @remaining.is_a?(Integer) && @remaining <= 3 %>
+    <div class="alert-cta">
+      <h3>⚠️ أنت على وشك الوصول للحد الأقصى</h3>
+      <p>قم بالترقية الآن للحصول على المزيد من الإعلانات</p>
+      <%= link_to "🚀 ترقية الخطة", billing_plans_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  <% end %>
+
+  <h3 class="section-heading">📄 آخر طلبات الدفع</h3>
+  <% if @requests.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>#</th><th>الخطة</th><th>المبلغ</th><th>طريقة الدفع</th>
+            <th>التاريخ</th><th>الحالة</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @requests.each do |r| %>
+            <tr>
+              <td>#<%= r.id %></td>
+              <td><%= r.plan.name_ar %></td>
+              <td class="font-bold"><%= number_with_precision(r.amount, precision: 0, delimiter: ",") %> <%= r.currency %></td>
+              <td><%= r.payment_method_ar %></td>
+              <td><%= r.transfer_date %></td>
+              <td><span class="badge <%= r.status_badge_class %>"><%= r.status_ar %></span></td>
+              <td><%= link_to "عرض", billing_payment_request_path(r), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">💳</div>
+      <p class="empty-title">لا توجد طلبات دفع بعد</p>
+    </div>
+  <% end %>
+</div>

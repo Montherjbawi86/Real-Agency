@@ -1,0 +1,114 @@
+<%
+  # Calculate preview
+  check_in_val  = @record.check_in&.strftime("%H:%M") || "08:00"
+  check_out_val = @record.check_out&.strftime("%H:%M") || "16:00"
+  rate          = @worker.hourly_rate || @worker.daily_rate || 0
+  currency      = @worker.currency
+%>
+
+<%= form_with model: @record,
+    url: dashboard_worker_attendance_records_path(@worker),
+    class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+
+  <% if @record.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @record.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <!-- Worker info -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <p class="font-bold text-blue-900 mb-1"><%= @worker.full_name %></p>
+    <p class="text-sm text-blue-800">
+      <%= @worker.pay_type_ar %> — <%= @worker.rate_label %>
+    </p>
+    <% if @worker.pay_type == "hourly" %>
+      <p class="text-xs text-blue-800 mt-1">
+        ⏰ ساعات العمل: <%= @worker.working_hours_per_day %>/يوم — 
+        الإضافي: <%= @worker.overtime_multiplier %>×
+      </p>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :work_date, "📅 التاريخ", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :work_date, class: "input", required: true, value: @record.work_date || Date.current %>
+    </div>
+    <div>
+      <%= f.label :status, "📌 الحالة", class: "block mb-1 font-semibold" %>
+      <%= f.select :status,
+          [["حاضر","present"],["غائب","absent"],["متأخر","late"],
+           ["نصف يوم","half_day"],["إجازة","leave"],["عطلة","holiday"],["مرض","sick"]],
+          {}, class: "input" %>
+    </div>
+  </div>
+
+  <!-- Work hours -->
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :check_in, "🕐 ساعة الحضور", class: "block mb-1 font-semibold" %>
+      <%= f.time_field :check_in, class: "input", value: check_in_val %>
+    </div>
+    <div>
+      <%= f.label :check_out, "🕐 ساعة الخروج", class: "block mb-1 font-semibold" %>
+      <%= f.time_field :check_out, class: "input", value: check_out_val %>
+    </div>
+  </div>
+
+  <!-- Live preview -->
+  <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <p class="font-bold text-amber-900 mb-2">💰 احتساب اليوم</p>
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <p class="text-black">الساعات المحسوبة:</p>
+        <p class="font-bold" id="hours-preview">8.00</p>
+      </div>
+      <div>
+        <p class="text-black">الإضافي:</p>
+        <p class="font-bold text-orange-700" id="overtime-preview">0.00</p>
+      </div>
+    </div>
+    <p class="text-xs text-amber-800 mt-2">
+      💡 تُحسب تلقائياً عند الحفظ. ساعة العمل الأساسية: <%= @worker.working_hours_per_day %> ساعة
+    </p>
+  </div>
+
+  <div>
+    <%= f.label :notes, "📝 ملاحظات", class: "block mb-1 font-semibold" %>
+    <%= f.text_area :notes, rows: 2, class: "input" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ الحضور", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_worker_attendance_records_path(@worker), class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const checkIn  = document.querySelector("input[name='attendance_record[check_in]']");
+    const checkOut = document.querySelector("input[name='attendance_record[check_out]']");
+    const standard = <%= @worker.working_hours_per_day || 8 %>;
+
+    function updatePreview() {
+      if (!checkIn.value || !checkOut.value) return;
+      const [inH, inM]   = checkIn.value.split(":").map(Number);
+      const [outH, outM] = checkOut.value.split(":").map(Number);
+      const inMinutes  = inH * 60 + inM;
+      const outMinutes = outH * 60 + outM;
+      let diffMinutes  = outMinutes - inMinutes;
+      if (diffMinutes < 0) diffMinutes += 24 * 60;
+
+      const hours = (diffMinutes / 60).toFixed(2);
+      const overtime = Math.max(0, diffMinutes / 60 - standard).toFixed(2);
+
+      document.getElementById("hours-preview").textContent = hours;
+      document.getElementById("overtime-preview").textContent = overtime;
+    }
+
+    checkIn?.addEventListener("change", updatePreview);
+    checkOut?.addEventListener("change", updatePreview);
+    updatePreview();
+  });
+</script>

@@ -1,0 +1,95 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        💵 رواتب <%= @worker&.full_name %>
+      </h1>
+      <p class="page-subtitle">
+        <% if @worker %>
+          <%= @worker.position_ar %> — الراتب الشهري: <%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %> <%= @worker.currency %>
+        <% else %>
+          كل دفعات العمال
+        <% end %>
+      </p>
+    </div>
+    <% if @worker %>
+      <%= link_to "➕ تسجيل دفعة", new_dashboard_worker_worker_payment_path(@worker), class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <% if @worker %>
+    <!-- Summary cards -->
+    <div class="report-stats-row mb-6">
+      <div class="report-stat" style="border-right-color:#2563eb;">
+        <p class="report-stat-label">💰 الراتب الشهري</p>
+        <p class="report-stat-value"><%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %></p>
+      </div>
+      <div class="report-stat" style="border-right-color:#059669;">
+        <p class="report-stat-label">✅ مدفوع هذا الشهر</p>
+        <p class="report-stat-value" style="color:#047857;"><%= number_with_precision(@worker.paid_for_month, precision: 0, delimiter: ",") %></p>
+      </div>
+      <div class="report-stat" style="border-right-color:#d97706;">
+        <p class="report-stat-label">⚠️ متبقي هذا الشهر</p>
+        <p class="report-stat-value" style="color:#b45309;"><%= number_with_precision(@worker.remaining_for_month, precision: 0, delimiter: ",") %></p>
+      </div>
+      <div class="report-stat" style="border-right-color:#7c3aed;">
+        <p class="report-stat-label">📊 إجمالي المدفوع</p>
+        <p class="report-stat-value" style="color:#6d28d9;"><%= number_with_precision(@worker.total_paid, precision: 0, delimiter: ",") %></p>
+      </div>
+    </div>
+
+    <!-- Status banner -->
+    <div class="sub-banner sub-banner-<%= @worker.month_fully_paid? ? 'success' : (@worker.paid_for_month > 0 ? 'warning' : 'danger') %>">
+      <div>
+        <p class="sub-banner-title"><%= @worker.current_month_status_ar %> — هذا الشهر</p>
+        <p class="sub-banner-sub">
+          الراتب: <%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %> <%= @worker.currency %>
+          — المدفوع: <%= number_with_precision(@worker.paid_for_month, precision: 0, delimiter: ",") %>
+          — المتبقي: <%= number_with_precision(@worker.remaining_for_month, precision: 0, delimiter: ",") %>
+        </p>
+      </div>
+      <% unless @worker.month_fully_paid? %>
+        <%= link_to "💵 دفع الآن", new_dashboard_worker_worker_payment_path(@worker), class: "btn btn-success" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Payments table -->
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr>
+          <% unless @worker %><th>العامل</th><% end %>
+          <th>#</th>
+          <th>المبلغ</th>
+          <th>عن شهر</th>
+          <th>تاريخ الدفع</th>
+          <th>طريقة</th>
+          <th>ملاحظات</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @payments.each do |p| %>
+          <tr>
+            <% unless @worker %>
+              <td class="font-semibold"><%= p.worker.full_name %></td>
+            <% end %>
+            <td>#<%= p.id %></td>
+            <td class="font-bold"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+            <td><%= p.for_month&.strftime("%Y-%m") || "—" %></td>
+            <td><%= p.paid_on %></td>
+            <td><span class="badge badge-gray"><%= p.payment_method_ar %></span></td>
+            <td class="text-sm"><%= p.notes %></td>
+            <td>
+              <%= button_to "🗑️", dashboard_worker_payment_path(p), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "متأكد؟" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @payments.empty? %>
+          <tr><td colspan="8" class="text-center py-8">لا توجد دفعات بعد</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

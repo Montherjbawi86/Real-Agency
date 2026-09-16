@@ -1,0 +1,83 @@
+<div dir="rtl" class="max-w-3xl mx-auto">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💳 طلب دفع #<%= @request.id %></h1>
+      <p class="page-subtitle"><%= @request.user.display_name %> — <%= @request.user.phone %></p>
+    </div>
+    <%= link_to "← رجوع", admin_payment_requests_path, class: "btn btn-gray" %>
+  </div>
+
+  <div class="card p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="font-bold text-lg">الحالة</span>
+      <span class="badge <%= @request.status_badge_class %> text-base px-4 py-2"><%= @request.status_ar %></span>
+    </div>
+
+    <div class="report-info-grid">
+      <div class="report-info-card">
+        <h4 class="report-info-title">👤 الوكيل</h4>
+        <p class="font-bold"><%= @request.user.display_name %></p>
+        <p class="text-sm"><%= @request.user.email %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">📋 الخطة</h4>
+        <p class="font-bold"><%= @request.plan.name_ar %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">💰 المبلغ</h4>
+        <p class="font-bold text-xl text-green-700"><%= number_with_precision(@request.amount, precision: 0, delimiter: ",") %> <%= @request.currency %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">💳 طريقة الدفع</h4>
+        <p class="font-bold"><%= @request.payment_method_ar %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">🔢 رقم الحوالة</h4>
+        <p class="font-bold"><%= @request.reference_number.presence || "—" %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">📅 التاريخ</h4>
+        <p class="font-bold"><%= @request.transfer_date %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">👤 المرسل</h4>
+        <p class="font-bold"><%= @request.sender_name.presence || "—" %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">📞 هاتف المرسل</h4>
+        <p class="font-bold"><%= @request.sender_phone.presence || "—" %></p>
+      </div>
+    </div>
+  </div>
+
+  <% if @request.proof_image.attached? %>
+    <div class="card p-6 mb-6">
+      <h4 class="report-info-title">📸 صورة الإيصال</h4>
+      <%= link_to url_for(@request.proof_image), target: "_blank" do %>
+        <%= image_tag @request.proof_image, class: "w-full max-w-lg rounded-lg border shadow" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @request.pending? %>
+    <div class="card p-6">
+      <h3 class="font-bold text-lg mb-4">✅ اتخاذ إجراء</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form_with url: approve_admin_payment_request_path(@request), method: :patch, local: true do %>
+            <label class="block mb-2 font-semibold">ملاحظات (اختياري)</label>
+            <%= text_field_tag :notes, nil, class: "input mb-3" %>
+            <%= submit_tag "✅ قبول وتفعيل", class: "btn btn-success btn-lg btn-block", data: { turbo_confirm: "هل تريد القبول؟" } %>
+          <% end %>
+        </div>
+        <div>
+          <%= form_with url: reject_admin_payment_request_path(@request), method: :patch, local: true do %>
+            <label class="block mb-2 font-semibold">سبب الرفض</label>
+            <%= text_field_tag :notes, nil, class: "input mb-3" %>
+            <%= submit_tag "❌ رفض", class: "btn btn-danger btn-lg btn-block", data: { turbo_confirm: "هل أنت متأكد؟" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

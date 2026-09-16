@@ -1,0 +1,72 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">➕ تسجيل حضور</h1>
+      <p class="page-subtitle">
+        <%= @worker.full_name %> — <%= @worker.pay_type_ar %>
+      </p>
+    </div>
+    <%= link_to "← رجوع", dashboard_worker_attendance_records_path(@worker), class: "btn btn-gray" %>
+  </div>
+
+  <%= form_with model: @record,
+      url: dashboard_worker_attendance_records_path(@worker),
+      class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+
+    <% if @record.errors.any? %>
+      <div class="bg-red-100 p-3 rounded">
+        <% @record.errors.full_messages.each do |m| %>
+          <p>• <%= m %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p class="font-bold text-blue-900 mb-1"><%= @worker.full_name %></p>
+      <p class="text-sm text-blue-800">
+        الوظيفة: <strong><%= @worker.position_ar %></strong>
+        — ساعات العمل اليومية: <strong><%= @worker.working_hours_per_day %> ساعة</strong>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :work_date, "📅 التاريخ", class: "block mb-1 font-semibold" %>
+        <%= f.date_field :work_date, class: "input", required: true,
+            value: @record.work_date || Date.current %>
+      </div>
+      <div>
+        <%= f.label :status, "📌 الحالة", class: "block mb-1 font-semibold" %>
+        <%= f.select :status,
+            [["حاضر","present"],["غائب","absent"],["متأخر","late"],
+             ["نصف يوم","half_day"],["إجازة","leave"],["عطلة","holiday"],["مرض","sick"]],
+            {}, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :check_in, "🕐 ساعة الحضور", class: "block mb-1 font-semibold" %>
+        <%= f.time_field :check_in, class: "input",
+            value: @record.check_in&.strftime("%H:%M") || "08:00" %>
+      </div>
+      <div>
+        <%= f.label :check_out, "🕐 ساعة الخروج", class: "block mb-1 font-semibold" %>
+        <%= f.time_field :check_out, class: "input",
+            value: @record.check_out&.strftime("%H:%M") || "16:00" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :notes, "📝 ملاحظات", class: "block mb-1 font-semibold" %>
+      <%= f.text_area :notes, rows: 2, class: "input" %>
+    </div>
+
+    <p class="text-sm text-black">
+      💡 <strong>عدد الساعات</strong> و<strong>الساعات الإضافية</strong> تُحسب تلقائياً
+      (الساعات فوق <%= @worker.working_hours_per_day %> تُحسب كإضافي).
+    </p>
+
+    <div class="flex gap-3">
+      <%= f.submit "💾 حفظ الحضور", class: "btn btn-primary btn-lg" %>
+      <%= link_to "إلغاء", dashboard_worker_attendance_records_path(@worker), class: "btn btn-gray btn-lg" %>
+    </div>
+  <% end %>
+</div>

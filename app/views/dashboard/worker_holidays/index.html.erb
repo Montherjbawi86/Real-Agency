@@ -1,0 +1,52 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏖️ الإجازات <%= @worker ? "— #{@worker.full_name}" : "" %></h1>
+      <p class="page-subtitle">
+        <%= @worker ? @worker.position_ar : "جميع العمال" %>
+      </p>
+    </div>
+    <% if @worker %>
+      <div class="flex gap-2">
+        <%= link_to "➕ تسجيل إجازة", new_dashboard_worker_worker_holiday_path(@worker), class: "btn btn-primary" %>
+        <%= link_to "← رجوع", dashboard_workers_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr>
+          <% unless @worker %><th>العامل</th><% end %>
+          <th>التاريخ</th>
+          <th>النوع</th>
+          <th>مدفوعة؟</th>
+          <th>ملاحظات</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @holidays.each do |h| %>
+          <tr>
+            <% unless @worker %><td class="font-semibold"><%= h.worker.full_name %></td><% end %>
+            <td><%= h.holiday_date %></td>
+            <td><span class="badge badge-blue"><%= h.holiday_type_ar %></span></td>
+            <td>
+              <span class="badge <%= h.paid ? 'badge-green' : 'badge-gray' %>">
+                <%= h.paid ? "✅ مدفوعة" : "❌ غير مدفوعة" %>
+              </span>
+            </td>
+            <td class="text-sm"><%= h.notes %></td>
+            <td>
+              <%= button_to "🗑️", dashboard_worker_holiday_path(h), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "متأكد؟" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @holidays.empty? %>
+          <tr><td colspan="6" class="text-center py-8">لا توجد إجازات</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🚪 إدارة وحدات <%= @building.name %></h1>
+      <p class="page-subtitle"><%= @properties.count %> وحدة</p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "➕ وحدة واحدة", new_property_path(building_id: @building.id), class: "btn btn-primary" %>
+      <%= link_to "🏢 تفاصيل البناء", dashboard_building_path(@building), class: "btn btn-gray" %>
+    </div>
+  </div>
+
+  <!-- Bulk create form -->
+  <div class="card p-6 mb-6">
+    <h3 class="font-bold mb-4 text-lg">⚡ إنشاء وحدات بالجملة</h3>
+    <%= form_with url: bulk_create_units_dashboard_building_path(@building), method: :post, class: "grid grid-cols-2 md:grid-cols-4 gap-3" do %>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">عدد الطوابق</label>
+        <input type="number" name="floors" min="1" max="50" value="<%= @building.floors_count || 3 %>" class="input" required>
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">وحدات لكل طابق</label>
+        <input type="number" name="units_per_floor" min="1" max="20" value="<%= @building.units_per_floor || 4 %>" class="input" required>
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">نوع الوحدة</label>
+        <select name="property_type" class="input">
+          <option value="apartment">شقة</option>
+          <option value="shop">محل تجاري</option>
+          <option value="office">مكتب</option>
+        </select>
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">نوع العرض</label>
+        <select name="listing_type" class="input">
+          <option value="rent">إيجار</option>
+          <option value="sale">بيع</option>
+        </select>
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">السعر (ل.س)</label>
+        <input type="number" name="price" value="1000000" class="input">
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">المساحة (م²)</label>
+        <input type="number" name="size" value="120" class="input">
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">الغرف</label>
+        <input type="number" name="rooms" value="3" class="input">
+      </div>
+      <div>
+        <label class="block mb-1 text-sm font-semibold">الحمامات</label>
+        <input type="number" name="bathrooms" value="2" class="input">
+      </div>
+      <div class="md:col-span-4">
+        <button type="submit" class="btn btn-success btn-lg w-full">
+          ⚡ إنشاء الوحدات (طوابق × وحدات)
+        </button>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Units list -->
+  <% if @properties.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr><th>#</th><th>رقم الوحدة</th><th>النوع</th><th>الطابق</th><th>المساحة</th><th>السعر</th><th>الحالة</th><th>إجراءات</th></tr>
+        </thead>
+        <tbody>
+          <% @properties.each do |p| %>
+            <tr>
+              <td>#<%= p.id %></td>
+              <td class="font-semibold"><%= p.unit_number || "—" %></td>
+              <td><%= p.property_type_ar %></td>
+              <td><%= p.floor %></td>
+              <td><%= p.size %> م²</td>
+              <td class="font-bold"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td><span class="badge badge-gray"><%= p.status_ar %></span></td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "عرض", property_path(p), class: "btn btn-primary btn-sm" %>
+                  <%= link_to "تعديل", edit_property_path(p), class: "btn btn-warning btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🚪</div>
+      <h3 class="empty-title">لا توجد وحدات بعد</h3>
+      <p class="empty-sub">استخدم الأداة أعلاه لإنشاء الوحدات دفعة واحدة</p>
+    </div>
+  <% end %>
+</div>

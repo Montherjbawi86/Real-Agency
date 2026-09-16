@@ -1,0 +1,119 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📄 عقد #<%= @contract.id %></h1>
+      <p class="page-subtitle"><%= @contract.kind_ar %> — <%= @contract.status_ar %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "📄 PDF", pdf_dashboard_contract_path(@contract), class: "btn btn-danger", target: "_blank" %>
+      <%= link_to "✏️ تعديل", edit_dashboard_contract_path(@contract), class: "btn btn-warning" %>
+      <%= link_to "رجوع", dashboard_contracts_path, class: "btn btn-gray" %>
+    </div>
+  </div>
+
+  <!-- Building banner -->
+  <% if @contract.property&.building %>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="stat-mini-icon" style="background:#dbeafe;">🏢</div>
+        <div>
+          <p class="text-sm text-blue-900 font-semibold">البناء</p>
+          <p class="text-lg font-bold text-blue-900">
+            <%= link_to @contract.property.building.name, dashboard_building_path(@contract.property.building), class: "hover:underline" %>
+          </p>
+        </div>
+      </div>
+      <div class="text-left">
+        <p class="text-sm text-blue-800">رقم الوحدة</p>
+        <p class="text-xl font-bold text-blue-900"><%= @contract.property.unit_number.presence || "—" %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="payment-summary">
+    <div class="payment-summary-card paid">
+      <p class="payment-summary-label">✅ المدفوع</p>
+      <p class="payment-summary-value paid">
+        <%= number_with_precision(@contract.paid_amount, precision: 0, delimiter: ",") %>
+        <span class="text-base"><%= @contract.currency %></span>
+      </p>
+    </div>
+    <div class="payment-summary-card pending">
+      <p class="payment-summary-label">⏳ المعلّق</p>
+      <p class="payment-summary-value pending">
+        <%= number_with_precision(@contract.pending_amount, precision: 0, delimiter: ",") %>
+        <span class="text-base"><%= @contract.currency %></span>
+      </p>
+    </div>
+    <div class="payment-summary-card remaining">
+      <p class="payment-summary-label">⚠️ المتبقي</p>
+      <p class="payment-summary-value remaining">
+        <%= number_with_precision(@contract.remaining_amount, precision: 0, delimiter: ",") %>
+        <span class="text-base"><%= @contract.currency %></span>
+      </p>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-6">
+    <div class="flex justify-between items-center mb-2">
+      <span class="font-bold">نسبة الإنجاز</span>
+      <span class="font-bold text-blue-700"><%= @contract.progress_percent %>%</span>
+    </div>
+    <div class="progress-bar" style="height: 12px;">
+      <div class="progress-fill" style="width: <%= @contract.progress_percent %>%;"></div>
+    </div>
+    <p class="text-sm mt-2">
+      <strong>الإجمالي:</strong> <%= number_with_precision(@contract.amount, precision: 0, delimiter: ",") %> <%= @contract.currency %>
+    </p>
+  </div>
+
+  <div class="specs-grid mb-6">
+    <div class="spec-item"><span class="spec-label">الطرف الثاني</span><span class="spec-value"><%= @contract.party&.full_name || "—" %></span></div>
+    <div class="spec-item"><span class="spec-label">الهاتف</span><span class="spec-value"><%= @contract.party&.phone || "—" %></span></div>
+    <div class="spec-item"><span class="spec-label">الموضوع</span><span class="spec-value"><%= @contract.subject_label %></span></div>
+    <div class="spec-item"><span class="spec-label">من</span><span class="spec-value"><%= @contract.start_date %></span></div>
+    <div class="spec-item"><span class="spec-label">إلى</span><span class="spec-value"><%= @contract.end_date %></span></div>
+    <div class="spec-item"><span class="spec-label">الحالة</span><span class="spec-value"><%= @contract.status_ar %></span></div>
+  </div>
+
+  <% if @contract.notes.present? %>
+    <div class="card p-4 mb-6">
+      <h3 class="font-bold mb-2">📝 ملاحظات</h3>
+      <p><%= @contract.notes %></p>
+    </div>
+  <% end %>
+
+  <div class="page-header">
+    <h2 class="detail-section-title">💰 الدفعات المرتبطة</h2>
+    <%= link_to "➕ إضافة دفعة", new_dashboard_payment_path(contract_id: @contract.id), class: "btn btn-primary" %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>المبلغ</th><th>الاستحقاق</th><th>الدفع</th><th>طريقة</th><th>الحالة</th><th>إجراءات</th></tr>
+      </thead>
+      <tbody>
+        <% @contract.payments.order(due_on: :desc).each do |p| %>
+          <tr>
+            <td>#<%= p.id %></td>
+            <td class="font-bold"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+            <td><%= p.due_on %></td>
+            <td><%= p.paid_on %></td>
+            <td><span class="badge badge-gray"><%= { cash: "نقداً", bank: "بنك", sham_cash: "شام كاش", haram: "هرم", other: "أخرى" }[p.payment_method.to_sym] %></span></td>
+            <td><span class="badge <%= p.status_badge_class %>"><%= p.status_ar %></span></td>
+            <td>
+              <% unless p.paid? %>
+                <%= button_to "✅ دفع", mark_paid_dashboard_payment_path(p), method: :patch, class: "btn btn-success btn-sm" %>
+              <% end %>
+              <%= link_to "تعديل", edit_dashboard_payment_path(p), class: "btn btn-warning btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @contract.payments.empty? %>
+          <tr><td colspan="7" class="text-center py-8 text-black">لا توجد دفعات — أضف أول دفعة</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

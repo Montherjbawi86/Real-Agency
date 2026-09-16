@@ -1,0 +1,11 @@
+<div class="space-y-2">
+  <%- if controller_name != 'sessions' %>
+    <p><%= link_to "لديك حساب؟ سجّل الدخول", new_session_path(resource_name) %></p>
+  <% end %>
+  <%- if devise_mapping.registerable? && controller_name != 'registrations' %>
+    <p><%= link_to "ليس لديك حساب؟ أنشئ حساباً", new_registration_path(resource_name) %></p>
+  <% end %>
+  <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+    <p><%= link_to "نسيت كلمة المرور؟", new_password_path(resource_name) %></p>
+  <% end %>
+</div>

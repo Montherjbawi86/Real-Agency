@@ -1,0 +1,231 @@
+<div dir="rtl" class="animate-fade-in">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏢 <%= @agency.name %></h1>
+      <p class="page-subtitle"><%= @agency.kind_ar %> — <%= @agency.city.name_ar %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "✏️ تعديل", edit_dashboard_agency_path, class: "btn btn-warning" %>
+    </div>
+  </div>
+
+  <!-- Completeness -->
+  <% c = @agency.completeness %>
+  <div class="card p-4 mb-6">
+    <div class="flex items-center justify-between mb-2">
+      <span class="font-bold">📊 اكتمال الملف الشخصي</span>
+      <span class="font-bold text-blue-700"><%= c[:percent] %>%</span>
+    </div>
+    <div class="progress-bar" style="height: 10px;">
+      <div class="progress-fill" style="width: <%= c[:percent] %>%;"></div>
+    </div>
+    <% if c[:missing].any? %>
+      <p class="text-xs text-black mt-2">
+        ناقص: <strong><%= c[:missing].map { |k| t("agency_fields.#{k}", default: k.humanize) }.join("، ") %></strong>
+      </p>
+    <% end %>
+  </div>
+
+  <!-- Hero -->
+  <div class="agency-hero mb-6">
+    <div class="agency-hero-bg"></div>
+    <div class="agency-hero-content">
+      <div class="agency-logo">
+        <% if @agency.logo.attached? %>
+          <%= image_tag @agency.logo, class: "agency-logo-img" %>
+        <% else %>
+          <div class="agency-logo-placeholder">🏢</div>
+        <% end %>
+      </div>
+      <div class="agency-hero-info">
+        <h2 class="agency-hero-name"><%= @agency.name %></h2>
+        <p class="agency-hero-kind">
+          <span class="badge <%= @agency.car? ? 'badge-blue' : 'badge-green' %>">
+            <%= @agency.car? ? "🚗 سيارات" : "🏘️ عقارات" %>
+          </span>
+          <span class="badge badge-gray">📍 <%= @agency.city.name_ar %></span>
+          <% if @agency.verified? %>
+            <span class="badge badge-green">✅ موثّق</span>
+          <% else %>
+            <span class="badge badge-yellow">⏳ غير موثّق</span>
+          <% end %>
+          <% if @agency.years_in_business %>
+            <span class="badge badge-blue">🏆 <%= @agency.years_in_business %> سنوات خبرة</span>
+          <% end %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <h3 class="section-heading">📞 التواصل</h3>
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">📞 الهاتف</h4>
+      <p class="font-bold text-lg mb-1"><%= link_to @agency.phone, "tel:#{@agency.phone}", class: "text-blue-700 hover:underline" %></p>
+      <% if @agency.secondary_phone.present? %>
+        <p class="text-sm"><a href="tel:<%= @agency.secondary_phone %>" class="text-blue-700 hover:underline"><%= @agency.secondary_phone %></a></p>
+      <% end %>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">💬 واتساب</h4>
+      <% if @agency.whatsapp.present? %>
+        <a href="<%= @agency.whatsapp_link %>" target="_blank" class="btn btn-success btn-sm">💬 فتح واتساب</a>
+        <p class="text-sm mt-2"><%= @agency.whatsapp %></p>
+      <% else %>
+        <p class="text-black">—</p>
+      <% end %>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📧 البريد</h4>
+      <% if @agency.email.present? %>
+        <p><a href="mailto:<%= @agency.email %>" class="text-blue-700 hover:underline"><%= @agency.email %></a></p>
+      <% else %><p class="text-black">—</p><% end %>
+      <% if @agency.website.present? %>
+        <p class="mt-1 text-sm"><a href="<%= @agency.website %>" target="_blank" class="text-blue-700 hover:underline">🌐 <%= @agency.website %></a></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-6">
+    <h4 class="report-info-title">📍 العنوان</h4>
+    <p class="text-black"><%= @agency.address.presence || "غير محدد" %></p>
+  </div>
+
+  <!-- Legal / Business -->
+  <h3 class="section-heading">⚖️ المعلومات القانونية</h3>
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">🆔 الرقم الضريبي</h4>
+      <p class="font-bold"><%= @agency.tax_number.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📜 السجل التجاري</h4>
+      <p class="font-bold"><%= @agency.commercial_registry.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📄 الرخصة التجارية</h4>
+      <p class="font-bold"><%= @agency.commercial_license.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🎓 الترخيص المهني</h4>
+      <p class="font-bold"><%= @agency.professional_license.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🏢 رقم تسجيل الشركة</h4>
+      <p class="font-bold"><%= @agency.company_registration.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">👤 المفوّض بالتوقيع</h4>
+      <p class="font-bold"><%= @agency.authorized_person.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 تاريخ التأسيس</h4>
+      <p class="font-bold"><%= @agency.founded_on&.strftime("%Y-%m-%d") || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">👥 عدد الموظفين</h4>
+      <p class="font-bold"><%= @agency.employees_count.presence || "—" %></p>
+    </div>
+  </div>
+
+  <!-- Bank -->
+  <% if @agency.bank_name.present? || @agency.iban.present? %>
+    <h3 class="section-heading">🏦 المعلومات البنكية</h3>
+    <div class="report-info-grid mb-6">
+      <div class="report-info-card">
+        <h4 class="report-info-title">🏦 البنك</h4>
+        <p class="font-bold"><%= @agency.bank_name.presence || "—" %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">👤 صاحب الحساب</h4>
+        <p class="font-bold"><%= @agency.account_holder.presence || "—" %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">🔢 رقم الحساب</h4>
+        <p class="font-bold"><%= @agency.bank_account.presence || "—" %></p>
+      </div>
+      <div class="report-info-card">
+        <h4 class="report-info-title">🌍 IBAN</h4>
+        <p class="font-bold"><%= @agency.iban.presence || "—" %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Documents -->
+  <% if @agency.commercial_registry_file.attached? || @agency.license_file.attached? || @agency.tax_file.attached? %>
+    <h3 class="section-heading">📎 المستندات المرفوعة</h3>
+    <div class="report-info-grid mb-6">
+      <% if @agency.commercial_registry_file.attached? %>
+        <div class="report-info-card">
+          <h4 class="report-info-title">📜 السجل التجاري</h4>
+          <%= link_to "تحميل", url_for(@agency.commercial_registry_file), target: "_blank", class: "btn btn-primary btn-sm" %>
+        </div>
+      <% end %>
+      <% if @agency.license_file.attached? %>
+        <div class="report-info-card">
+          <h4 class="report-info-title">📄 الترخيص</h4>
+          <%= link_to "تحميل", url_for(@agency.license_file), target: "_blank", class: "btn btn-primary btn-sm" %>
+        </div>
+      <% end %>
+      <% if @agency.tax_file.attached? %>
+        <div class="report-info-card">
+          <h4 class="report-info-title">🆔 الرقم الضريبي</h4>
+          <%= link_to "تحميل", url_for(@agency.tax_file), target: "_blank", class: "btn btn-primary btn-sm" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Description -->
+  <% if @agency.description.present? %>
+    <h3 class="section-heading">📝 نبذة</h3>
+    <div class="card p-4 mb-6">
+      <p class="text-black leading-relaxed"><%= simple_format(@agency.description) %></p>
+    </div>
+  <% end %>
+
+  <!-- Social media (ONLY ONE COPY) -->
+  <% if @agency.facebook_url.present? || @agency.instagram_url.present? || @agency.tiktok_url.present? || @agency.youtube_url.present? || @agency.twitter_url.present? || @agency.telegram_url.present? %>
+    <h3 class="section-heading">📱 حسابات التواصل الاجتماعي</h3>
+    <div class="report-info-grid mb-6">
+      <% if @agency.facebook_url.present? %>
+        <a href="<%= @agency.facebook_url %>" target="_blank" class="social-btn social-facebook" style="width:100%; justify-content:center;">📘 فيسبوك</a>
+      <% end %>
+      <% if @agency.instagram_url.present? %>
+        <a href="<%= @agency.instagram_url %>" target="_blank" class="social-btn social-instagram" style="width:100%; justify-content:center;">📷 إنستغرام</a>
+      <% end %>
+      <% if @agency.tiktok_url.present? %>
+        <a href="<%= @agency.tiktok_url %>" target="_blank" class="social-btn social-tiktok" style="width:100%; justify-content:center;">🎵 تيك توك</a>
+      <% end %>
+      <% if @agency.youtube_url.present? %>
+        <a href="<%= @agency.youtube_url %>" target="_blank" class="social-btn" style="width:100%; justify-content:center; background:#ff0000;">🎥 يوتيوب</a>
+      <% end %>
+      <% if @agency.twitter_url.present? %>
+        <a href="<%= @agency.twitter_url %>" target="_blank" class="social-btn social-x" style="width:100%; justify-content:center;">𝕏 تويتر</a>
+      <% end %>
+      <% if @agency.telegram_url.present? %>
+        <a href="<%= @agency.telegram_url %>" target="_blank" class="social-btn social-telegram" style="width:100%; justify-content:center;">✈️ تيليجرام</a>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Quick Actions -->
+  <div class="card p-6">
+    <h3 class="detail-section-title">⚡ إجراءات سريعة</h3>
+    <div class="flex flex-wrap gap-3 mt-4">
+      <% if @agency.car? %>
+        <%= link_to "➕ إضافة سيارة", new_car_path, class: "btn btn-primary" %>
+        <%= link_to "🚗 قائمة السيارات", cars_path, class: "btn btn-outline" %>
+      <% else %>
+        <%= link_to "➕ إضافة عقار", new_property_path, class: "btn btn-primary" %>
+        <%= link_to "🏢 الأبنية", dashboard_buildings_path, class: "btn btn-outline" %>
+      <% end %>
+      <%= link_to "📄 العقود", dashboard_contracts_path, class: "btn btn-outline" %>
+      <%= link_to "💰 الدفعات", dashboard_payments_path, class: "btn btn-outline" %>
+    </div>
+  </div>
+
+</div>

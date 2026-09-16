@@ -1,0 +1,56 @@
+<div dir="rtl" class="max-w-3xl mx-auto">
+  <div class="page-header">
+    <h1 class="page-title">⚙️ الإعدادات العامة</h1>
+  </div>
+
+  <%= form_with url: admin_settings_path, method: :patch, class: "bg-white p-6 rounded-xl shadow space-y-4" do %>
+    <h3 class="agency-section-title">🏢 معلومات المنصة</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= label_tag "settings[platform_name]", "اسم المنصة", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[platform_name]", @settings["platform_name"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[payment_whatsapp]", "واتساب الدفع", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[payment_whatsapp]", @settings["payment_whatsapp"], class: "input" %>
+      </div>
+    </div>
+
+    <h3 class="agency-section-title mt-6">🏦 معلومات الدفع</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= label_tag "settings[bank_name]", "اسم البنك", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[bank_name]", @settings["bank_name"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[bank_account]", "رقم الحساب", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[bank_account]", @settings["bank_account"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[iban]", "IBAN", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[iban]", @settings["iban"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[account_holder]", "صاحب الحساب", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[account_holder]", @settings["account_holder"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[sham_cash_number]", "شام كاش", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[sham_cash_number]", @settings["sham_cash_number"], class: "input" %>
+      </div>
+      <div>
+        <%= label_tag "settings[haram_number]", "هرم", class: "block mb-1 font-semibold" %>
+        <%= text_field_tag "settings[haram_number]", @settings["haram_number"], class: "input" %>
+      </div>
+    </div>
+
+    <div>
+      <%= label_tag "settings[payment_instructions]", "تعليمات الدفع", class: "block mb-1 font-semibold" %>
+      <%= text_area_tag "settings[payment_instructions]", @settings["payment_instructions"], rows: 3, class: "input" %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= submit_tag "💾 حفظ الإعدادات", class: "btn btn-primary btn-lg" %>
+    </div>
+  <% end %>
+</div>

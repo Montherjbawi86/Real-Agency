@@ -1,0 +1,239 @@
+<div dir="rtl">
+
+  <section class="hero">
+    <div class="hero-blob hero-blob-top"></div>
+    <div class="hero-blob hero-blob-bottom"></div>
+
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="hero-badge">✨ منصة سورية موثوقة</span>
+
+        <h1 class="hero-title">
+          ابحث عن
+          <span class="hero-title-amber">عقارك</span>
+          أو
+          <span class="hero-title-emerald">سيارتك</span>
+          <br>في كل سوريا
+        </h1>
+
+        <p class="hero-subtitle">
+          منصة تجمع أفضل وكلاء العقارات والسيارات في مكان واحد
+        </p>
+
+        <div class="search-box">
+          <%= form_with url: home_search_path, method: :get do %>
+            <div class="search-tabs">
+              <label class="search-tab">
+                <input type="radio" name="type" value="property" class="search-tab-input" checked>
+                <div class="search-tab-label">🏘️ عقارات</div>
+              </label>
+              <label class="search-tab">
+                <input type="radio" name="type" value="car" class="search-tab-input">
+                <div class="search-tab-label">🚗 سيارات</div>
+              </label>
+            </div>
+
+            <div class="search-fields">
+              <div class="search-select-wrap">
+                <span class="search-select-icon">📍</span>
+                <%= select_tag :city_id,
+                    options_from_collection_for_select(@cities, :id, :name_ar),
+                    include_blank: "كل المدن",
+                    class: "input" %>
+              </div>
+
+              <div class="search-select-wrap">
+                <span class="search-select-icon">🏠</span>
+                <%= select_tag :property_type,
+                    options_for_select([
+                      ["شقة","apartment"],["فيلا","villa"],["أرض","land"],
+                      ["محل تجاري","shop"],["مكتب","office"]
+                    ]),
+                    include_blank: "كل الأنواع",
+                    class: "input" %>
+              </div>
+
+              <div class="search-select-wrap">
+                <span class="search-select-icon">💰</span>
+                <%= select_tag :listing_type,
+                    options_for_select([["للبيع","sale"],["للإيجار","rent"]]),
+                    include_blank: "بيع / إيجار",
+                    class: "input" %>
+              </div>
+
+              <button type="submit" class="search-btn">🔍 ابحث الآن</button>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="hero-quick-links">
+          <span>بحث سريع:</span>
+          <%= link_to "شقق للبيع", properties_path(type: "apartment", listing: "sale"), class: "hero-quick-link" %>
+          <%= link_to "فلل",       properties_path(type: "villa"),                          class: "hero-quick-link" %>
+          <%= link_to "سيارات",    cars_path,                                               class: "hero-quick-link" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-bar">
+    <div class="stats-inner">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <p class="stat-value stat-value-blue"><%= @properties_count %></p>
+          <p class="stat-label">🏘️ عقار متاح</p>
+        </div>
+        <div class="stat-item" style="animation-delay:50ms;">
+          <p class="stat-value stat-value-emerald"><%= @cars_count %></p>
+          <p class="stat-label">🚗 سيارة متاحة</p>
+        </div>
+        <div class="stat-item" style="animation-delay:100ms;">
+          <p class="stat-value stat-value-amber"><%= @agents_count %></p>
+          <p class="stat-label">🤝 وكيل موثوق</p>
+        </div>
+        <div class="stat-item" style="animation-delay:150ms;">
+          <p class="stat-value stat-value-indigo"><%= @cities_count %></p>
+          <p class="stat-label">🏙️ محافظة</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="categories-section">
+    <div class="categories-grid">
+
+      <div class="category-card category-card-property">
+        <div class="category-head">
+          <div class="category-icon category-icon-property">🏘️</div>
+          <%= link_to "العقارات", properties_path, class: "category-title" %>
+        </div>
+        <p class="category-desc">شقق، فلل، أراضٍ، محلات، مكاتب</p>
+        <div class="category-actions">
+          <%= link_to "شقق للبيع",   properties_path(type: "apartment", listing: "sale"), class: "category-chip" %>
+          <%= link_to "فلل للإيجار", properties_path(type: "villa", listing: "rent"),     class: "category-chip" %>
+          <%= link_to "أراضٍ",       properties_path(type: "land"),                       class: "category-chip" %>
+          <%= link_to "الكل ←",      properties_path,                                     class: "category-chip-primary" %>
+        </div>
+      </div>
+
+      <div class="category-card category-card-car">
+        <div class="category-head">
+          <div class="category-icon category-icon-car">🚗</div>
+          <%= link_to "السيارات", cars_path, class: "category-title" %>
+        </div>
+        <p class="category-desc">سيارات جديدة ومستعملة</p>
+        <div class="category-actions">
+          <%= link_to "سيدان",     cars_path(body_type: "sedan"),  class: "category-chip" %>
+          <%= link_to "دفع رباعي", cars_path(body_type: "suv"),    class: "category-chip" %>
+          <%= link_to "بيك أب",    cars_path(body_type: "pickup"), class: "category-chip" %>
+          <%= link_to "الكل ←",    cars_path,                      class: "category-chip-primary" %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="recent-section">
+    <div class="recent-head">
+      <div>
+        <h2 class="recent-title">🏘️ أحدث العقارات</h2>
+        <p class="recent-sub">آخر العقارات المضافة على المنصة</p>
+      </div>
+      <%= link_to "عرض الكل ←", properties_path, class: "recent-link-blue" %>
+    </div>
+
+    <div class="recent-grid">
+      <% @recent_properties.each_with_index do |p, i| %>
+        <div class="listing-card" style="animation-delay: <%= i * 60 %>ms;">
+          <div class="listing-image-wrap">
+            <% if p.cover_image.attached? %>
+              <%= image_tag p.cover_image, class: "listing-image" %>
+            <% else %>
+              <div class="listing-image-placeholder">🏠</div>
+            <% end %>
+            <div class="listing-badges-tr">
+              <span class="badge <%= p.sale? ? 'badge-purple' : 'badge-blue' %>">
+                <%= p.sale? ? "💰 للبيع" : "🔑 للإيجار" %>
+              </span>
+            </div>
+            <div class="listing-price-badge">
+              <span class="listing-price-value"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %></span>
+              <span class="listing-price-currency"><%= p.currency %></span>
+            </div>
+          </div>
+          <div class="listing-body">
+            <h3 class="listing-title"><%= link_to p.title, property_path(p) %></h3>
+            <p class="listing-sub">📍 <%= p.city.name_ar %> — <%= p.property_type_ar %></p>
+            <div class="listing-features">
+              <span>📐 <%= p.size %> م²</span>
+              <% if p.rooms.to_i > 0 %><span>🛏️ <%= p.rooms %></span><% end %>
+              <% if p.bathrooms.to_i > 0 %><span>🚿 <%= p.bathrooms %></span><% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="recent-section-alt">
+    <div class="container mx-auto px-6">
+      <div class="recent-head">
+        <div>
+          <h2 class="recent-title">🚗 أحدث السيارات</h2>
+          <p class="recent-sub">آخر السيارات المضافة على المنصة</p>
+        </div>
+        <%= link_to "عرض الكل ←", cars_path, class: "recent-link-emerald" %>
+      </div>
+
+      <div class="recent-grid">
+        <% @recent_cars.each_with_index do |c, i| %>
+          <div class="listing-card" style="animation-delay: <%= i * 60 %>ms;">
+            <div class="listing-image-wrap">
+              <% if c.cover_image.attached? %>
+                <%= image_tag c.cover_image, class: "listing-image" %>
+              <% else %>
+                <div class="listing-image-placeholder">🚗</div>
+              <% end %>
+              <div class="listing-badges-tr">
+                <span class="badge <%= c.new_car? ? 'badge-green' : (c.certified? ? 'badge-blue' : 'badge-yellow') %>">
+                  <%= c.condition_ar %>
+                </span>
+              </div>
+              <div class="listing-price-badge">
+                <span class="listing-price-value"><%= number_with_precision(c.price, precision: 0, delimiter: ",") %></span>
+                <span class="listing-price-currency"><%= c.currency %></span>
+              </div>
+            </div>
+            <div class="listing-body">
+              <h3 class="listing-title"><%= link_to c.title, car_path(c) %></h3>
+              <p class="listing-sub"><%= c.brand %> <%= c.car_model %> — <%= c.year %></p>
+              <p class="listing-sub">📍 <%= c.city.name_ar %></p>
+              <div class="listing-features">
+                <span>🛣️ <%= number_with_delimiter(c.mileage) %> كم</span>
+                <span>⛽ <%= c.fuel_type_ar %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-box">
+      <div class="cta-blob cta-blob-top"></div>
+      <div class="cta-blob cta-blob-bottom"></div>
+      <div class="cta-content">
+        <h2 class="cta-title">هل أنت وكيل عقارات أو سيارات؟</h2>
+        <p class="cta-sub">
+          انضم إلى منصتنا واعرض عقاراتك وسياراتك لآلاف العملاء في كل سوريا
+        </p>
+        <div class="cta-actions">
+          <%= link_to "سجّل كـ وكيل", new_user_registration_path, class: "cta-btn-primary" %>
+          <%= link_to "تصفح المنصة", properties_path,             class: "cta-btn-secondary" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

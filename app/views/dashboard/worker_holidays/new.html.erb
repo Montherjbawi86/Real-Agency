@@ -1,0 +1,48 @@
+<div dir="rtl" class="max-w-2xl mx-auto">
+  <div class="page-header">
+    <h1 class="page-title">➕ تسجيل إجازة</h1>
+    <%= link_to "← رجوع", dashboard_worker_worker_holidays_path(@worker), class: "btn btn-gray" %>
+  </div>
+
+  <%= form_with model: @holiday, url: dashboard_worker_worker_holidays_path(@worker), class: "bg-white p-6 rounded-xl shadow space-y-4" do |f| %>
+    <% if @holiday.errors.any? %>
+      <div class="bg-red-100 p-3 rounded">
+        <% @holiday.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+      </div>
+    <% end %>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p class="font-bold text-blue-900"><%= @worker.full_name %></p>
+      <p class="text-sm text-blue-800"><%= @worker.position_ar %></p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :holiday_date, "📅 التاريخ", class: "block mb-1 font-semibold" %>
+        <%= f.date_field :holiday_date, class: "input", required: true %>
+      </div>
+      <div>
+        <%= f.label :holiday_type, "🏖️ النوع", class: "block mb-1 font-semibold" %>
+        <%= f.select :holiday_type,
+            [["عطلة رسمية","official"],["إجازة سنوية","vacation"],["إجازة مرضية","sick"],
+             ["إجازة شخصية","personal"],["ظرف طارئ","emergency"],["بدون راتب","unpaid"]],
+            {}, class: "input" %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= f.check_box :paid, checked: @holiday.paid %>
+      <%= f.label :paid, "✅ إجازة مدفوعة الأجر" %>
+    </div>
+
+    <div>
+      <%= f.label :notes, "📝 ملاحظات", class: "block mb-1 font-semibold" %>
+      <%= f.text_area :notes, rows: 2, class: "input" %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+      <%= link_to "إلغاء", dashboard_worker_worker_holidays_path(@worker), class: "btn btn-gray btn-lg" %>
+    </div>
+  <% end %>
+</div>

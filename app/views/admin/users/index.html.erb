@@ -1,0 +1,84 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">👥 المستخدمون</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to admin_users_path, class: "filter-tab #{'active' if params[:role].blank? && params[:admin].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to admin_users_path(role: "buyer"), class: "filter-tab #{'active' if params[:role] == 'buyer'}" do %>
+      👤 مشترون <span class="filter-count"><%= @counts[:buyers] %></span>
+    <% end %>
+    <%= link_to admin_users_path(role: "property_agent"), class: "filter-tab #{'active' if params[:role] == 'property_agent'}" do %>
+      🏘️ وكلاء عقارات <span class="filter-count"><%= @counts[:property] %></span>
+    <% end %>
+    <%= link_to admin_users_path(role: "car_agent"), class: "filter-tab #{'active' if params[:role] == 'car_agent'}" do %>
+      🚗 وكلاء سيارات <span class="filter-count"><%= @counts[:car] %></span>
+    <% end %>
+    <%= link_to admin_users_path(admin: 1), class: "filter-tab #{'active' if params[:admin] == '1'}" do %>
+      🛡️ مشرفون <span class="filter-count"><%= @counts[:admins] %></span>
+    <% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: admin_users_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :role,  params[:role]  if params[:role].present? %>
+      <%= hidden_field_tag :admin, params[:admin] if params[:admin].present? %>
+      <%= text_field_tag :q, params[:q],
+          placeholder: "🔍 بحث بالاسم أو البريد أو الهاتف",
+          class: "input", style: "grid-column: span 3;" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", admin_users_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr>
+          <th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th>
+          <th>الدور</th><th>الخطة</th><th>الإعلانات</th><th>الحالة</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |u| %>
+          <tr>
+            <td>#<%= u.id %></td>
+            <td class="font-semibold"><%= u.display_name %></td>
+            <td class="text-sm"><%= u.email %></td>
+            <td><%= u.phone %></td>
+            <td>
+              <span class="badge <%= { 'buyer' => 'badge-gray', 'property_agent' => 'badge-blue', 'car_agent' => 'badge-green' }[u.role] %>">
+                <%= { 'buyer' => '👤 مشتري', 'property_agent' => '🏘️ عقارات', 'car_agent' => '🚗 سيارات' }[u.role] %>
+              </span>
+            </td>
+            <td>
+              <% if u.agent? %>
+                <span class="badge badge-blue text-xs"><%= u.current_plan&.name_ar %></span>
+              <% else %>—<% end %>
+            </td>
+            <td>
+              <% if u.agent? %><%= u.listings_count %><% else %>—<% end %>
+            </td>
+            <td>
+              <% if u.admin? %>
+                <span class="badge badge-red">🛡️ مشرف</span>
+              <% elsif u.agency&.verified? %>
+                <span class="badge badge-green">✅ موثّق</span>
+              <% else %>
+                <span class="badge badge-gray">عادي</span>
+              <% end %>
+            </td>
+            <td><%= link_to "عرض", admin_user_path(u), class: "btn btn-primary btn-sm" %></td>
+          </tr>
+        <% end %>
+        <% if @users.empty? %>
+          <tr><td colspan="9" class="text-center py-8">لا يوجد مستخدمون</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

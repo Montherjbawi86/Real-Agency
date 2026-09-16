@@ -1,0 +1,72 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🧑‍💼 <%= @customer.full_name %></h1>
+      <p class="page-subtitle">عميل #<%= @customer.id %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "تعديل", edit_dashboard_customer_path(@customer), class: "btn btn-warning" %>
+      <%= link_to "رجوع", dashboard_customers_path, class: "btn btn-gray" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="spec-item"><span class="spec-label">الهاتف</span><span class="spec-value"><%= @customer.phone %></span></div>
+    <div class="spec-item"><span class="spec-label">الرقم الوطني</span><span class="spec-value"><%= @customer.national_id || "—" %></span></div>
+    <div class="spec-item"><span class="spec-label">العنوان</span><span class="spec-value"><%= @customer.address || "—" %></span></div>
+  </div>
+
+  <% if @customer.notes.present? %>
+    <div class="card p-4 mb-6">
+      <h3 class="font-bold mb-2">📝 ملاحظات</h3>
+      <p><%= @customer.notes %></p>
+    </div>
+  <% end %>
+
+  <h2 class="detail-section-title">📄 العقود</h2>
+  <div class="card overflow-hidden mb-6">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>النوع</th><th>الموضوع</th><th>المدة</th><th>المبلغ</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>
+        <% @customer.contracts.each do |c| %>
+          <tr>
+            <td>#<%= c.id %></td>
+            <td><span class="badge <%= c.sale? ? 'badge-purple' : 'badge-blue' %>"><%= c.kind_ar %></span></td>
+            <td><%= c.subject&.try(:title) || "—" %></td>
+            <td class="text-xs"><%= c.start_date %> → <%= c.end_date %></td>
+            <td class="font-bold"><%= number_with_precision(c.amount, precision: 0, delimiter: ",") %> <%= c.currency %></td>
+            <td><span class="badge badge-gray"><%= c.status_ar %></span></td>
+          </tr>
+        <% end %>
+        <% if @customer.contracts.empty? %>
+          <tr><td colspan="6" class="text-center py-6">لا توجد عقود</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="detail-section-title">💰 الدفعات</h2>
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>المبلغ</th><th>الاستحقاق</th><th>الدفع</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>
+        <% @customer.payments.each do |p| %>
+          <tr>
+            <td>#<%= p.id %></td>
+            <td class="font-bold"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+            <td><%= p.due_on %></td>
+            <td><%= p.paid_on %></td>
+            <td><span class="badge <%= p.paid? ? 'badge-green' : (p.due_on < Date.current ? 'badge-red' : 'badge-yellow') %>"><%= p.status %></span></td>
+          </tr>
+        <% end %>
+        <% if @customer.payments.empty? %>
+          <tr><td colspan="5" class="text-center py-6">لا توجد دفعات</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

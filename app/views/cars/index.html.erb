@@ -1,0 +1,135 @@
+<div dir="rtl" class="container-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🚗 السيارات المتاحة</h1>
+      <p class="page-subtitle">سيارات جديدة ومستعملة من وكلاء موثوقين</p>
+    </div>
+    <% if user_signed_in? && current_user.car_agent? %>
+      <%= link_to "➕ أضف سيارة", new_car_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <!-- Quick filter tabs -->
+  <div class="filter-tabs">
+    <%= link_to cars_path,
+        class: "filter-tab #{'active' if params[:condition].blank? && params[:body_type].blank?}" do %>
+      الكل
+    <% end %>
+    <%= link_to cars_path(condition: "new_car"),
+        class: "filter-tab #{'active' if params[:condition] == 'new_car'}" do %>
+      🆕 جديد
+    <% end %>
+    <%= link_to cars_path(condition: "used"),
+        class: "filter-tab #{'active' if params[:condition] == 'used'}" do %>
+      🚙 مستعمل
+    <% end %>
+    <%= link_to cars_path(condition: "certified"),
+        class: "filter-tab #{'active' if params[:condition] == 'certified'}" do %>
+      ✅ معتمد
+    <% end %>
+  </div>
+
+  <!-- Search + filters -->
+  <%= render "shared/subscription_banner" %>
+
+  <div class="filter-card">
+    <%= form_with url: cars_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :condition, params[:condition] if params[:condition].present? %>
+
+      <%= text_field_tag :q, params[:q],
+          placeholder: "🔍 بحث بالماركة أو الموديل أو العنوان",
+          class: "input", style: "grid-column: span 2;" %>
+
+      <%= select_tag :brand,
+          options_for_select(@brands || [], params[:brand]),
+          include_blank: "🏷️ كل الماركات", class: "input" %>
+
+      <%= select_tag :body_type,
+          options_for_select([
+            ["🚗 سيدان","sedan"],["🚙 دفع رباعي","suv"],["🚕 هاتشباك","hatchback"],
+            ["🛻 بيك أب","pickup"],["🚐 فان","van"],["🏎️ كوبيه","coupe"],
+            ["🚘 مكشوفة","convertible"],["🚖 ستيشن","wagon"]
+          ], params[:body_type]),
+          include_blank: "🚗 كل الأنواع", class: "input" %>
+
+      <%= select_tag :fuel_type,
+          options_for_select([
+            ["⛽ بنزين","petrol"],["🛢️ ديزل","diesel"],["⚡ هجين","hybrid"],
+            ["🔌 كهربائي","electric"],["💨 غاز","gas"]
+          ], params[:fuel_type]),
+          include_blank: "⛽ كل أنواع الوقود", class: "input" %>
+
+      <%= select_tag :sort,
+          options_for_select([
+            ["الأحدث أولاً", "newest"],
+            ["السعر (الأعلى)", "price_high"],
+            ["السعر (الأدنى)", "price_low"],
+            ["السنة (الأحدث)", "year_new"],
+            ["المسافة (الأقل)", "mileage"]
+          ], params[:sort]),
+          class: "input" %>
+
+      <%= select_tag :city_id,
+          options_from_collection_for_select(City.order(:name_ar), :id, :name_ar, params[:city_id]),
+          include_blank: "🏙️ كل المدن", class: "input" %>
+
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", cars_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @cars.any? %>
+    <div class="listings-grid">
+      <% @cars.each_with_index do |c, i| %>
+        <div class="listing-card" style="animation-delay:<%= i*50 %>ms;">
+          <div class="listing-image-wrap">
+            <% if c.cover_image.attached? %>
+              <%= image_tag c.cover_image, class: "listing-image" %>
+            <% else %>
+              <div class="listing-image-placeholder">🚗</div>
+            <% end %>
+            <div class="listing-badges-tr">
+              <span class="badge <%= c.new_car? ? 'badge-green' : (c.certified? ? 'badge-blue' : 'badge-yellow') %>">
+                <%= c.condition_ar %>
+              </span>
+              <span class="badge badge-gray"><%= c.body_type_ar %></span>
+            </div>
+            <div class="listing-price-badge">
+              <span class="listing-price-value"><%= number_with_precision(c.price, precision: 0, delimiter: ",") %></span>
+              <span class="listing-price-currency"><%= c.currency %></span>
+            </div>
+          </div>
+          <div class="listing-body">
+            <h3 class="listing-title"><%= link_to c.title, car_path(c) %></h3>
+            <p class="listing-sub"><%= c.brand %> <%= c.car_model %> — <%= c.year %></p>
+            <p class="listing-sub">📍 <%= c.city.name_ar %></p>
+            <div class="listing-features">
+              <span>🛣️ <%= number_with_delimiter(c.mileage) %> كم</span>
+              <span>⛽ <%= c.fuel_type_ar %></span>
+              <span>⚙️ <%= c.transmission_ar %></span>
+            </div>
+            <div class="listing-footer">
+              <%= link_to "التفاصيل ←", car_path(c), class: "btn btn-outline btn-sm" %>
+              <div class="flex items-center gap-1">
+                <button type="button"
+                        onclick="navigator.clipboard.writeText('<%= car_url(c) %>'); this.textContent='✓'; setTimeout(()=>this.textContent='🔗', 1500);"
+                        class="text-gray-500 hover:text-blue-600 p-1"
+                        title="نسخ الرابط">🔗</button>
+                <span class="text-xs text-black"><%= time_ago_in_words(c.created_at) %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <p class="text-sm text-black mt-4">عرض <%= @cars.size %> سيارة</p>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-title">لا توجد سيارات متاحة</h3>
+      <p class="empty-sub">جرب تغيير معايير البحث</p>
+    </div>
+  <% end %>
+</div>

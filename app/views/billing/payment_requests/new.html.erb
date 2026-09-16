@@ -1,0 +1,100 @@
+<div dir="rtl" class="container-page max-w-3xl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💳 إتمام الدفع</h1>
+      <p class="page-subtitle">خطة <%= @plan.name_ar %> — <%= number_with_precision(@plan.price_syp, precision: 0, delimiter: ",") %> ل.س</p>
+    </div>
+  </div>
+
+  <div class="card p-6 mb-6">
+    <h3 class="agency-section-title">1️⃣ أرسل المبلغ على أحد الحسابات التالية</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div class="payment-info-box">
+        <p class="payment-info-label">🏦 حوالة بنكية</p>
+        <p class="payment-info-value"><%= @settings["bank_name"] %></p>
+        <p class="payment-info-detail">رقم الحساب: <strong><%= @settings["bank_account"] %></strong></p>
+        <p class="payment-info-detail">IBAN: <strong><%= @settings["iban"] %></strong></p>
+        <p class="payment-info-detail">صاحب الحساب: <%= @settings["account_holder"] %></p>
+      </div>
+      <div class="payment-info-box">
+        <p class="payment-info-label">💳 شام كاش</p>
+        <p class="payment-info-value"><%= @settings["sham_cash_number"] %></p>
+        <p class="payment-info-detail">💬 واتساب للتواصل: <%= @settings["payment_whatsapp"] %></p>
+        <p class="payment-info-detail">📱 هرم: <%= @settings["haram_number"] %></p>
+      </div>
+    </div>
+
+    <div class="alert-info mt-4">
+      <p>💡 <strong>ملاحظة:</strong> <%= @settings["payment_instructions"] %></p>
+    </div>
+  </div>
+
+  <%= form_with model: @request, url: billing_payment_requests_path, multipart: true, class: "card p-6 space-y-4" do |f| %>
+    <%= hidden_field_tag "payment_request[subscription_id]", @subscription.id %>
+
+    <h3 class="agency-section-title">2️⃣ أدخل تفاصيل الحوالة</h3>
+
+    <% if @request.errors.any? %>
+      <div class="bg-red-100 border border-red-300 p-4 rounded">
+        <% @request.errors.full_messages.each do |m| %>
+          <p class="text-red-800">• <%= m %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :amount, "💰 المبلغ المرسل", class: "block mb-1 font-semibold" %>
+        <%= f.number_field :amount, class: "input", required: true, step: "1000" %>
+      </div>
+      <div>
+        <%= f.label :currency, "💱 العملة", class: "block mb-1 font-semibold" %>
+        <%= f.select :currency, [["ل.س","SYP"],["$ USD","USD"]], {}, class: "input" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :payment_method, "💳 طريقة الدفع", class: "block mb-1 font-semibold" %>
+      <%= f.select :payment_method, [
+        ["حوالة بنكية","bank_transfer"],
+        ["شام كاش","sham_cash"],
+        ["هرم","haram"],
+        ["تسليم نقدي","cash_delivery"],
+        ["أخرى","other"]
+      ], {}, class: "input" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :reference_number, "🔢 رقم الحوالة (اختياري)", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :reference_number, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :transfer_date, "📅 تاريخ الحوالة", class: "block mb-1 font-semibold" %>
+        <%= f.date_field :transfer_date, class: "input", value: @request.transfer_date || Date.current %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :sender_name, "👤 اسم المرسل", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :sender_name, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :sender_phone, "📞 رقم هاتف المرسل", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :sender_phone, class: "input" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :proof_image, "📸 صورة الإيصال / لقطة الحوالة *", class: "block mb-1 font-semibold" %>
+      <%= f.file_field :proof_image, class: "input", accept: "image/*", required: true %>
+      <p class="text-xs text-black mt-1">ارفع صورة واضحة للإيصال أو لقطة شاشة للحوالة</p>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "📤 إرسال الطلب للمراجعة", class: "btn btn-primary btn-lg" %>
+      <%= link_to "إلغاء", billing_subscription_path, class: "btn btn-gray btn-lg" %>
+    </div>
+  <% end %>
+</div>

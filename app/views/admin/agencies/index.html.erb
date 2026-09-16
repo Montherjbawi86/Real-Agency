@@ -1,0 +1,65 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">🏢 الوكالات</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to admin_agencies_path, class: "filter-tab #{'active' if params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to admin_agencies_path(status: "pending"), class: "filter-tab #{'active' if params[:status] == 'pending'}" do %>
+      ⏳ معلقة <span class="filter-count"><%= @counts[:pending] %></span>
+    <% end %>
+    <%= link_to admin_agencies_path(status: "approved"), class: "filter-tab #{'active' if params[:status] == 'approved'}" do %>
+      ✅ موافق عليها <span class="filter-count"><%= @counts[:approved] %></span>
+    <% end %>
+    <%= link_to admin_agencies_path(status: "rejected"), class: "filter-tab #{'active' if params[:status] == 'rejected'}" do %>
+      ❌ مرفوضة <span class="filter-count"><%= @counts[:rejected] %></span>
+    <% end %>
+    <%= link_to admin_agencies_path(status: "suspended"), class: "filter-tab #{'active' if params[:status] == 'suspended'}" do %>
+      ⏸️ موقوفة <span class="filter-count"><%= @counts[:suspended] %></span>
+    <% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: admin_agencies_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+      <%= text_field_tag :q, params[:q], placeholder: "🔍 بحث بالاسم أو الهاتف أو الرقم الضريبي", class: "input", style: "grid-column: span 3;" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", admin_agencies_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>الاسم</th><th>النوع</th><th>المدينة</th><th>الهاتف</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @agencies.each do |a| %>
+          <tr>
+            <td>#<%= a.id %></td>
+            <td class="font-semibold"><%= a.name %></td>
+            <td><span class="badge <%= a.car? ? 'badge-blue' : 'badge-green' %>"><%= a.car? ? "🚗" : "🏘️" %></span></td>
+            <td><%= a.city&.name_ar %></td>
+            <td><%= a.phone %></td>
+            <td><span class="badge <%= a.approval_badge_class %>"><%= a.approval_status_ar %></span></td>
+            <td>
+              <div class="flex gap-1">
+                <%= link_to "عرض", admin_agency_path(a), class: "btn btn-primary btn-sm" %>
+                <% if a.pending_approval? %>
+                  <%= button_to "✅", approve_admin_agency_path(a), method: :patch, class: "btn btn-success btn-sm" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @agencies.empty? %>
+          <tr><td colspan="7" class="text-center py-8">لا توجد وكالات</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,152 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💰 كشف راتب <%= @worker.full_name %></h1>
+      <p class="page-subtitle">
+        <%= @month.strftime("%B %Y") %> — <%= @worker.pay_type_ar %>
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "📅 الحضور", dashboard_worker_attendance_records_path(@worker), class: "btn btn-outline" %>
+      <%= link_to "💵 تسجيل دفعة", new_dashboard_worker_worker_payment_path(@worker), class: "btn btn-primary" %>
+      <%= link_to "← رجوع", dashboard_workers_path, class: "btn btn-gray" %>
+    </div>
+  </div>
+
+  <!-- Big numbers -->
+  <div class="billing-hero mb-6">
+    <div class="billing-hero-inner">
+      <div>
+        <p class="billing-hero-label">الراتب الصافي المستحق</p>
+        <h2 class="billing-hero-plan"><%= number_with_precision(@net_salary, precision: 0, delimiter: ",") %> <%= @worker.currency %></h2>
+        <p class="billing-hero-desc">
+          <%= @worker.pay_type_ar %> — <%= @worker.rate_label %>
+        </p>
+      </div>
+      <div class="billing-hero-count">
+        <p class="billing-hero-label">المتبقي للدفع</p>
+        <p class="billing-hero-big" style="color:<%= @remaining >= 0 ? '#fbbf24' : '#f87171' %>;">
+          <%= number_with_precision(@remaining, precision: 0, delimiter: ",") %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance summary -->
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 أيام الحضور</h4>
+      <p class="text-2xl font-bold text-green-700"><%= @days_present %></p>
+      <p class="text-xs text-black mt-1">
+        من <%= @worker.working_days_per_month || 26 %> يوم متوقع
+      </p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">❌ أيام الغياب</h4>
+      <p class="text-2xl font-bold text-red-700"><%= @days_absent %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🕐 ساعات العمل</h4>
+      <p class="text-2xl font-bold text-blue-700"><%= @hours_worked.round(1) %></p>
+      <p class="text-xs text-black mt-1">
+        متوقع: <%= (@worker.working_hours_per_day || 8) * (@worker.working_days_per_month || 26) %>
+      </p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">⏰ ساعات إضافية</h4>
+      <p class="text-2xl font-bold text-orange-700"><%= @overtime_hours.round(1) %></p>
+    </div>
+  </div>
+
+  <!-- Detailed breakdown -->
+  <div class="card p-6 mb-6">
+    <h3 class="detail-section-title">📊 تفصيل الراتب</h3>
+    <table class="table-clean">
+      <tbody>
+        <tr>
+          <td class="font-semibold">
+            💰 الراتب الأساسي
+            <div class="text-xs text-black font-normal mt-1">
+              <%= case @worker.pay_type
+                  when "monthly" then "راتب شهري ثابت"
+                  when "daily"   then "#{@days_present} يوم × #{@worker.daily_rate}"
+                  when "hourly"  then "#{@hours_worked.round(1)} ساعة × #{@worker.hourly_rate}"
+                  else "إجمالي المشروع"
+                  end %>
+            </div>
+          </td>
+          <td class="text-left font-bold"><%= number_with_precision(@calculated, precision: 0, delimiter: ",") %> <%= @worker.currency %></td>
+        </tr>
+        <tr>
+          <td class="font-semibold">
+            ⏰ الوقت الإضافي
+            <div class="text-xs text-black font-normal mt-1">
+              <%= @overtime_hours.round(2) %> ساعة × 
+              <%= number_with_precision(@worker.overtime_hourly_rate, precision: 2) %> × 
+              <%= @worker.overtime_multiplier %>
+            </div>
+          </td>
+          <td class="text-left font-bold text-green-700">+ <%= number_with_precision(@overtime, precision: 0, delimiter: ",") %></td>
+        </tr>
+        <% if @advances > 0 %>
+          <tr>
+            <td class="font-semibold">💸 السلف المسحوبة</td>
+            <td class="text-left font-bold text-red-700">− <%= number_with_precision(@advances, precision: 0, delimiter: ",") %></td>
+          </tr>
+        <% end %>
+        <tr style="background:#f0fdf4;">
+          <td class="font-bold text-lg">📌 الصافي المستحق</td>
+          <td class="text-left font-bold text-lg text-green-700"><%= number_with_precision(@net_salary, precision: 0, delimiter: ",") %> <%= @worker.currency %></td>
+        </tr>
+        <tr>
+          <td class="font-semibold">✅ المدفوع فعلياً</td>
+          <td class="text-left font-bold"><%= number_with_precision(@paid, precision: 0, delimiter: ",") %></td>
+        </tr>
+        <tr style="background:<%= @remaining >= 0 ? '#fef2f2' : '#fef3c7' %>;">
+          <td class="font-bold text-lg">
+            <% if @remaining > 1 %>⚠️ المتبقي للدفع
+            <% elsif @remaining < -1 %>💰 دفع زائد (خصم من الشهر القادم)
+            <% else %>✅ تم الدفع بالكامل
+            <% end %>
+          </td>
+          <td class="text-left font-bold text-lg <%= @remaining > 1 ? 'text-red-700' : (@remaining < -1 ? 'text-amber-700' : 'text-green-700') %>">
+            <%= number_with_precision(@remaining, precision: 0, delimiter: ",") %> <%= @worker.currency %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Days detail -->
+  <h3 class="section-heading">📅 تفاصيل الحضور</h3>
+  <% records = @worker.attendance_records.in_month(@month).recent %>
+  <% if records.any? %>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead>
+          <tr><th>التاريخ</th><th>الحضور</th><th>الخروج</th><th>ساعات</th><th>إضافي</th><th>الحالة</th></tr>
+        </thead>
+        <tbody>
+          <% records.each do |r| %>
+            <tr>
+              <td><%= r.work_date.strftime("%Y-%m-%d") %></td>
+              <td><%= r.check_in&.strftime("%H:%M") || "—" %></td>
+              <td><%= r.check_out&.strftime("%H:%M") || "—" %></td>
+              <td><%= r.total_hours %></td>
+              <td class="<%= r.overtime_hours.to_f > 0 ? 'text-orange-600 font-bold' : '' %>"><%= r.overtime_hours %></td>
+              <td><span class="badge <%= r.status_badge_class %>"><%= r.status_ar %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <p class="empty-title">لا يوجد سجل حضور لهذا الشهر</p>
+      <div class="mt-4">
+        <%= link_to "➕ تسجيل حضور", new_dashboard_worker_attendance_record_path(@worker), class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

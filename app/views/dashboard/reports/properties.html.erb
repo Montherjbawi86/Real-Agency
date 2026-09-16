@@ -1,0 +1,182 @@
+<div dir="rtl" class="text-black animate-fade-in">
+  <h1 class="page-title mb-6">📈 تقارير العقارات</h1>
+
+  <!-- Stats row (flex, not grid) -->
+  <div class="report-stats-row">
+    <div class="report-stat" style="border-right-color:#6b7280;">
+      <p class="report-stat-label">📦 الإجمالي</p>
+      <p class="report-stat-value"><%= @total_count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#059669;">
+      <p class="report-stat-label">✅ منشور</p>
+      <p class="report-stat-value" style="color:#047857;"><%= @published_count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#2563eb;">
+      <p class="report-stat-label">🔑 مؤجّر</p>
+      <p class="report-stat-value" style="color:#1d4ed8;"><%= @rented_count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#7c3aed;">
+      <p class="report-stat-label">💰 مُباع</p>
+      <p class="report-stat-value" style="color:#6d28d9;"><%= @sold_count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#d97706;">
+      <p class="report-stat-label">📝 مسودة</p>
+      <p class="report-stat-value" style="color:#b45309;"><%= @draft_count %></p>
+    </div>
+  </div>
+
+  <!-- Financial summary -->
+  <h2 class="section-heading">💵 الملخص المالي</h2>
+  <div class="payment-summary">
+    <div class="payment-summary-card paid">
+      <p class="payment-summary-label">✅ المدفوع (ل.س)</p>
+      <p class="payment-summary-value paid"><%= number_with_precision(@total_paid_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">بالدولار: <strong><%= number_with_precision(@total_paid_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+    <div class="payment-summary-card remaining">
+      <p class="payment-summary-label">⚠️ المتبقي (ل.س)</p>
+      <p class="payment-summary-value remaining"><%= number_with_precision(@total_remaining_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">بالدولار: <strong><%= number_with_precision(@total_remaining_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+    <div class="payment-summary-card pending">
+      <p class="payment-summary-label">📄 إجمالي العقود (ل.س)</p>
+      <p class="payment-summary-value pending"><%= number_with_precision(@total_contract_syp.to_f, precision: 0, delimiter: ",") %></p>
+      <p class="text-sm text-black mt-1">بالدولار: <strong><%= number_with_precision(@total_contract_usd.to_f, precision: 0, delimiter: ",") %> $</strong></p>
+    </div>
+  </div>
+
+  <!-- Values + averages -->
+  <div class="report-info-grid">
+    <div class="report-info-card">
+      <h3 class="report-info-title">🏷️ نوع العرض</h3>
+      <div class="report-info-row">
+        <span>للبيع</span>
+        <span class="font-bold text-purple-700"><%= @sale_count %></span>
+      </div>
+      <div class="report-info-row">
+        <span>للإيجار</span>
+        <span class="font-bold text-blue-700"><%= @rent_count %></span>
+      </div>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">💵 قيمة العقارات المعروضة</h3>
+      <p class="text-xl font-bold text-blue-700 mb-1">
+        <%= number_with_precision(@total_value_syp.to_f, precision: 0, delimiter: ",") %> ل.س
+      </p>
+      <% if @total_value_usd.to_f > 0 %>
+        <p class="text-lg font-bold text-green-700">
+          <%= number_with_precision(@total_value_usd.to_f, precision: 0, delimiter: ",") %> $
+        </p>
+      <% end %>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">📊 متوسطات</h3>
+      <p class="text-sm">متوسط السعر (ل.س): <strong><%= number_with_precision(@avg_price_syp.to_f, precision: 0, delimiter: ",") %></strong></p>
+      <p class="text-sm">متوسط المساحة: <strong><%= @avg_size.to_f.round(1) %> م²</strong></p>
+      <p class="text-sm">متوسط الغرف: <strong><%= @avg_rooms.to_f.round(1) %></strong></p>
+    </div>
+  </div>
+
+  <!-- Breakdowns -->
+  <div class="report-info-grid">
+    <div class="report-info-card">
+      <h3 class="report-info-title">🏠 حسب النوع</h3>
+      <% @by_type.each do |type, count| %>
+        <div class="report-info-row">
+          <span><%= { "apartment" => "شقة", "villa" => "فيلا", "land" => "أرض",
+                       "shop" => "محل تجاري", "office" => "مكتب", "building" => "بناء",
+                       "warehouse" => "مستودع", "farm" => "مزرعة" }[type] %></span>
+          <span class="font-bold"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">🏙️ حسب المدينة</h3>
+      <% @by_city.sort_by { |_, c| -c }.each do |city_id, count| %>
+        <div class="report-info-row">
+          <span><%= @city_names[city_id] || "-" %></span>
+          <span class="font-bold"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="report-info-card">
+      <h3 class="report-info-title">📌 حسب الحالة</h3>
+      <% @by_status.each do |status, count| %>
+        <div class="report-info-row">
+          <span><%= { "draft" => "مسودة", "published" => "منشور",
+                       "rented" => "مؤجّر", "sold" => "مُباع" }[status] %></span>
+          <span class="font-bold"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  
+<% if @total_buildings > 0 %>
+  <h2 class="section-heading">🏢 الأبنية والوحدات</h2>
+  <div class="report-stats-row mb-6">
+    <div class="report-stat" style="border-right-color:#0ea5e9; flex: 1;">
+      <p class="report-stat-label">🏢 عدد الأبنية</p>
+      <p class="report-stat-value" style="color:#0369a1;"><%= @total_buildings %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#8b5cf6; flex: 1;">
+      <p class="report-stat-label">🚪 وحدات داخل أبنية</p>
+      <p class="report-stat-value" style="color:#6d28d9;"><%= @total_units_in_buildings %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#6b7280; flex: 1;">
+      <p class="report-stat-label">🏘️ عقارات مستقلة</p>
+      <p class="report-stat-value"><%= @standalone_properties %></p>
+    </div>
+  </div>
+
+  <div class="report-info-card mb-6">
+    <h3 class="report-info-title">📋 توزيع الوحدات على الأبنية</h3>
+    <% @by_building.each do |name, count| %>
+      <div class="report-info-row">
+        <span><%= name %></span>
+        <span class="font-bold"><%= count %> وحدة</span>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+  <!-- Recent -->
+  <div class="report-info-card mb-6">
+    <h3 class="report-info-title">🆕 آخر 10 عقارات</h3>
+    <% if @recent.any? %>
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>العنوان</th><th>النوع</th><th>المدينة</th><th>السعر</th><th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent.each do |p| %>
+            <tr>
+              <td><%= link_to p.title, property_path(p), class: "text-blue-700 hover:underline font-semibold" %></td>
+              <td><%= p.property_type_ar %></td>
+              <td><%= p.city&.name_ar %></td>
+              <td class="font-bold"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td>
+                <span class="badge <%= { 'published' => 'badge-green', 'rented' => 'badge-blue', 'sold' => 'badge-purple' }[p.status] || 'badge-gray' %>">
+                  <%= p.status_ar %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="text-black">لا توجد عقارات بعد</p>
+    <% end %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= link_to "➕ إضافة عقار", new_property_path, class: "btn btn-primary" %>
+    <%= link_to "🏠 كل العقارات", properties_path, class: "btn btn-gray" %>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<div dir="rtl" class="max-w-4xl mx-auto">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><%= @car.title %></h1>
+      <p class="page-subtitle"><%= @car.user.display_name %> — <%= @car.city&.name_ar %></p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <%= link_to "✏️ تعديل", edit_admin_car_path(@car), class: "btn btn-warning" %>
+      <%= link_to "عرض عام", car_path(@car), target: "_blank", class: "btn btn-outline" %>
+      <%= link_to "← رجوع", admin_cars_path, class: "btn btn-gray" %>
+      <%= button_to "🗑️ حذف", admin_car_path(@car), method: :delete, class: "btn btn-danger", data: { turbo_confirm: "سيتم الحذف نهائياً. متأكد؟" } %>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-6">
+    <h3 class="font-bold mb-3">⚡ إجراءات النشر</h3>
+    <div class="flex gap-3">
+      <% if @car.published? %>
+        <%= button_to "⏸️ إلغاء النشر", unpublish_admin_car_path(@car), method: :patch, class: "btn btn-warning" %>
+      <% else %>
+        <%= button_to "✅ نشر", publish_admin_car_path(@car), method: :patch, class: "btn btn-success" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">💰 السعر</h4>
+      <p class="font-bold"><%= number_with_precision(@car.price, precision: 0, delimiter: ",") %> <%= @car.currency %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📅 السنة</h4>
+      <p class="font-bold"><%= @car.year %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🛣️ المسافة</h4>
+      <p class="font-bold"><%= number_with_delimiter(@car.mileage) %> كم</p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">⛽ الوقود</h4>
+      <p class="font-bold"><%= @car.fuel_type_ar %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">⚙️ ناقل الحركة</h4>
+      <p class="font-bold"><%= @car.transmission_ar %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📌 الحالة</h4>
+      <p><span class="badge badge-gray"><%= @car.status_ar %></span></p>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <h4 class="report-info-title">📝 الوصف</h4>
+    <p><%= simple_format @car.description %></p>
+  </div>
+</div>

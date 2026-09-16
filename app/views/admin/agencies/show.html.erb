@@ -1,0 +1,149 @@
+<div dir="rtl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏢 <%= @agency.name %></h1>
+      <p class="page-subtitle">
+        <%= @agency.kind_ar %> — <%= @agency.city&.name_ar %>
+        <span class="badge <%= @agency.approval_badge_class %> ml-2"><%= @agency.approval_status_ar %></span>
+      </p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <%= link_to "✏️ تعديل", edit_admin_agency_path(@agency), class: "btn btn-warning" %>
+      <%= link_to "← رجوع", admin_agencies_path, class: "btn btn-gray" %>
+      <%= button_to "🗑️ حذف", admin_agency_path(@agency), method: :delete, class: "btn btn-danger", data: { turbo_confirm: "سيتم حذف الوكالة نهائياً. متأكد؟" } %>
+    </div>
+  </div>
+
+  <!-- Approval actions -->
+  <% if @agency.pending_approval? %>
+    <div class="card p-4 mb-6">
+      <h3 class="font-bold mb-3">⚖️ إجراء الموافقة</h3>
+      <div class="flex flex-wrap gap-3">
+        <%= button_to "✅ موافقة وتوثيق",
+            approve_admin_agency_path(@agency),
+            method: :patch,
+            class: "btn btn-success btn-lg",
+            data: { turbo_confirm: "الموافقة على الوكالة؟" } %>
+
+        <%= form_with url: reject_admin_agency_path(@agency), method: :patch, class: "flex gap-2 items-center" do %>
+          <%= text_field_tag :reason, nil, placeholder: "سبب الرفض (اختياري)", class: "input" %>
+          <%= submit_tag "❌ رفض", class: "btn btn-danger", data: { turbo_confirm: "رفض الوكالة؟" } %>
+        <% end %>
+      </div>
+    </div>
+  <% elsif @agency.approved? %>
+    <div class="alert-success mb-6">
+      <p>✅ <strong>الوكالة موافق عليها</strong></p>
+      <% if @agency.approved_at %>
+        <p class="text-sm">تمت الموافقة بتاريخ: <%= @agency.approved_at.strftime("%Y-%m-%d %H:%M") %></p>
+      <% end %>
+    </div>
+    <div class="card p-4 mb-6">
+      <h3 class="font-bold mb-3">إجراءات إضافية</h3>
+      <%= form_with url: suspend_admin_agency_path(@agency), method: :patch, class: "flex gap-2 items-center" do %>
+        <%= text_field_tag :reason, nil, placeholder: "سبب الإيقاف", class: "input" %>
+        <%= submit_tag "⏸️ إيقاف الوكالة", class: "btn btn-danger", data: { turbo_confirm: "إيقاف الوكالة؟" } %>
+      <% end %>
+    </div>
+  <% elsif @agency.rejected? || @agency.suspended? %>
+    <div class="alert-error mb-6">
+      <p>❌ <strong><%= @agency.approval_status_ar %></strong></p>
+      <% if @agency.rejection_reason.present? %>
+        <p>السبب: <%= @agency.rejection_reason %></p>
+      <% end %>
+      <div class="mt-3">
+        <%= button_to "✅ الموافقة الآن", approve_admin_agency_path(@agency), method: :patch, class: "btn btn-success" %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Details -->
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">👤 المالك</h4>
+      <p class="font-bold"><%= @agency.user.display_name %></p>
+      <p class="text-sm"><%= @agency.user.email %></p>
+      <p class="text-sm"><%= @agency.user.phone %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📞 الهاتف</h4>
+      <p class="font-bold"><%= @agency.phone %></p>
+      <% if @agency.whatsapp.present? %>
+        <p class="text-sm">💬 واتساب: <%= @agency.whatsapp %></p>
+      <% end %>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🆔 الرقم الضريبي</h4>
+      <p class="font-bold"><%= @agency.tax_number.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📜 السجل التجاري</h4>
+      <p class="font-bold"><%= @agency.commercial_registry.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📄 الرخصة التجارية</h4>
+      <p class="font-bold"><%= @agency.commercial_license.presence || "—" %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🎓 الترخيص المهني</h4>
+      <p class="font-bold"><%= @agency.professional_license.presence || "—" %></p>
+    </div>
+  </div>
+
+  <!-- Documents -->
+  <% if @agency.commercial_registry_file.attached? || @agency.license_file.attached? || @agency.tax_file.attached? %>
+    <h3 class="section-heading">📎 المستندات</h3>
+    <div class="flex flex-wrap gap-3 mb-6">
+      <% if @agency.commercial_registry_file.attached? %>
+        <%= link_to "📜 السجل التجاري", url_for(@agency.commercial_registry_file), target: "_blank", class: "btn btn-primary" %>
+      <% end %>
+      <% if @agency.license_file.attached? %>
+        <%= link_to "📄 الترخيص", url_for(@agency.license_file), target: "_blank", class: "btn btn-primary" %>
+      <% end %>
+      <% if @agency.tax_file.attached? %>
+        <%= link_to "🆔 الرقم الضريبي", url_for(@agency.tax_file), target: "_blank", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Listings -->
+  <% if @properties.present? %>
+    <h3 class="section-heading">🏘️ آخر العقارات</h3>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead><tr><th>#</th><th>العنوان</th><th>السعر</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          <% @properties.each do |p| %>
+            <tr>
+              <td>#<%= p.id %></td>
+              <td><%= p.title %></td>
+              <td><%= number_with_precision(p.price, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td><span class="badge badge-gray"><%= p.status_ar %></span></td>
+              <td><%= link_to "عرض", admin_property_path(p), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <% if @cars.present? %>
+    <h3 class="section-heading">🚗 آخر السيارات</h3>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead><tr><th>#</th><th>العنوان</th><th>السعر</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          <% @cars.each do |c| %>
+            <tr>
+              <td>#<%= c.id %></td>
+              <td><%= c.title %></td>
+              <td><%= number_with_precision(c.price, precision: 0, delimiter: ",") %> <%= c.currency %></td>
+              <td><span class="badge badge-gray"><%= c.status_ar %></span></td>
+              <td><%= link_to "عرض", admin_car_path(c), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

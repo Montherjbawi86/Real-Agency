@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "سوريا للعقارات والسيارات" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Open Graph / Social Preview -->
+    <meta property="og:site_name" content="سوريا للعقارات والسيارات">
+    <meta property="og:type" content="<%= content_for?(:og_type) ? yield(:og_type) : 'website' %>">
+    <meta property="og:title" content="<%= content_for?(:og_title) ? yield(:og_title) : 'سوريا للعقارات والسيارات' %>">
+    <meta property="og:description" content="<%= content_for?(:og_description) ? yield(:og_description) : 'منصة تجمع أفضل وكلاء العقارات والسيارات في سوريا' %>">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <% if content_for?(:og_image) %>
+      <meta property="og:image" content="<%= yield(:og_image) %>">
+      <meta name="twitter:image" content="<%= yield(:og_image) %>">
+    <% end %>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:og_title) ? yield(:og_title) : 'سوريا للعقارات والسيارات' %>">
+    <meta name="twitter:description" content="<%= content_for?(:og_description) ? yield(:og_description) : 'منصة تجمع أفضل وكلاء العقارات والسيارات' %>">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  </head>
+  <body class="flex flex-col min-h-screen" style="background:#f9fafb;">
+    <%= render "shared/navbar" %>
+
+    <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
+    <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
+
+    <% show_sidebar = user_signed_in? && current_user.agent? &&
+                     ((current_user.property_agent? && controller_name == "properties") ||
+                      (current_user.car_agent?      && controller_name == "cars")) %>
+
+    <% if show_sidebar %>
+      <div class="dash-layout">
+        <%= render "dashboard/shared/sidebar" %>
+        <main class="dash-main">
+          <div class="dash-content"><%= yield %></div>
+        </main>
+      </div>
+    <% else %>
+      <main class="flex-1"><%= yield %></main>
+    <% end %>
+
+    <%= render "shared/footer" %>
+  </body>
+</html>

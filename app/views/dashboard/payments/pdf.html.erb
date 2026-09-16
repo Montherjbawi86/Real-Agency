@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: 'Arial', 'Helvetica', sans-serif; direction: rtl; color: #111; font-size: 13px; }
+    h1 { font-size: 26px; text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; }
+    .sub { text-align: center; color: #555; margin-bottom: 25px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    td { padding: 8px 12px; border: 1px solid #e5e7eb; }
+    td:first-child { background: #f9fafb; font-weight: bold; width: 35%; }
+    .amount { background: #eff6ff; text-align: center; font-size: 20px; font-weight: bold; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    .footer { text-align: center; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 40px; font-size: 11px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>إيصال دفع</h1>
+  <div class="sub">
+    رقم الإيصال: #<%= @payment.id %><br>
+    التاريخ: <%= (@payment.paid_on || Date.current).strftime("%Y-%m-%d") %>
+  </div>
+
+  <table>
+    <tr><td>اسم الدافع</td><td><%= @payment.party&.full_name %></td></tr>
+    <tr><td>رقم الهاتف</td><td><%= @payment.party&.phone %></td></tr>
+    <% if @payment.contract %>
+      <tr><td>رقم العقد</td><td>#<%= @payment.contract.id %></td></tr>
+      <tr><td>الموضوع</td><td><%= @payment.contract.subject&.try(:title) %></td></tr>
+    <% end %>
+    <tr><td>تاريخ الاستحقاق</td><td><%= @payment.due_on %></td></tr>
+    <tr><td>طريقة الدفع</td><td><%= { cash: "نقداً", bank: "حوالة بنكية", sham_cash: "شام كاش", haram: "هرم", other: "أخرى" }[@payment.payment_method.to_sym] %></td></tr>
+    <tr><td>الحالة</td><td><%= @payment.paid? ? "مدفوعة" : "معلقة" %></td></tr>
+  </table>
+
+  <div class="amount">
+    المبلغ الإجمالي: <%= @payment.amount.to_i %>
+    <%= { "SYP" => "ل.س", "USD" => "$" }[@payment.currency] %>
+  </div>
+
+  <div class="footer">
+    سوريا للعقارات والسيارات<br>
+    info@syria-agencies.sy | 011 123 4567
+  </div>
+</body>
+</html>

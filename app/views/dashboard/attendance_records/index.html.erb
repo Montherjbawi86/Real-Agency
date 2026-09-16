@@ -1,0 +1,207 @@
+<%
+  month = @month || Date.current
+  is_worker_view = @worker.present?
+%>
+
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        📅 سجل الحضور<% if is_worker_view %> — <%= @worker.full_name %><% end %>
+      </h1>
+      <p class="page-subtitle">
+        <% if is_worker_view %>
+          <%= @worker.pay_type_ar %> — <%= @worker.position_ar %>
+        <% else %>
+          جميع العمال — <%= month.strftime("%B %Y") %>
+        <% end %>
+      </p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <% if is_worker_view %>
+        <%= link_to "➕ تسجيل حضور", new_dashboard_worker_attendance_record_path(@worker), class: "btn btn-primary" %>
+        <%= link_to "💰 كشف الراتب", dashboard_payroll_path(@worker, month: month.strftime("%Y-%m-%d")), class: "btn btn-success" %>
+        <%= link_to "← رجوع للعمال", dashboard_workers_path, class: "btn btn-gray" %>
+      <% else %>
+        <%= link_to "👷 العمال", dashboard_workers_path, class: "btn btn-gray" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Month picker -->
+  <div class="filter-card">
+    <%= form_with url: is_worker_view ? dashboard_worker_attendance_records_path(@worker) : dashboard_attendance_records_path,
+        method: :get, class: "flex gap-3 items-center flex-wrap" do %>
+      <div>
+        <%= label_tag :month, "📅 الشهر", class: "block text-sm font-semibold mb-1" %>
+        <%= month_field_tag :month, month.strftime("%Y-%m"), class: "input", onchange: "this.form.submit()" %>
+      </div>
+      <% if !is_worker_view %>
+        <div class="flex-1">
+          <%= label_tag :q, "🔍 بحث", class: "block text-sm font-semibold mb-1" %>
+          <%= text_field_tag :q, params[:q], placeholder: "اسم العامل، الهاتف، أو ملاحظة", class: "input" %>
+        </div>
+        <div>
+          <%= label_tag :status, "📌 الحالة", class: "block text-sm font-semibold mb-1" %>
+          <%= select_tag :status, options_for_select([
+              ["الكل", nil], ["حاضر", "present"], ["غائب", "absent"],
+              ["متأخر", "late"], ["إجازة", "leave"], ["عطلة", "holiday"], ["مرض", "sick"]
+            ], params[:status]), class: "input", onchange: "this.form.submit()" %>
+        </div>
+        <div>
+          <%= label_tag :sort, "⬆️ ترتيب", class: "block text-sm font-semibold mb-1" %>
+          <%= select_tag :sort, options_for_select([
+              ["الأحدث أولاً", nil], ["الأقدم أولاً", "oldest"],
+              ["ساعات (الأكثر)", "hours"], ["إضافي (الأكثر)", "overtime"]
+            ], params[:sort]), class: "input", onchange: "this.form.submit()" %>
+        </div>
+        <div class="pt-5">
+          <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+          <%= link_to "مسح", dashboard_attendance_records_path, class: "btn btn-gray" %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="report-stats-row mb-6">
+    <div class="report-stat" style="border-right-color:#059669; flex: 1;">
+      <p class="report-stat-label">✅ أيام الحضور</p>
+      <p class="report-stat-value" style="color:#047857;">
+        <%= is_worker_view ? (@summary&.dig(:present) || 0) : (@month_totals&.dig(:present) || 0) %>
+      </p>
+    </div>
+    <div class="report-stat" style="border-right-color:#dc2626; flex: 1;">
+      <p class="report-stat-label">❌ أيام الغياب</p>
+      <p class="report-stat-value" style="color:#b91c1c;">
+        <%= is_worker_view ? (@summary&.dig(:absent) || 0) : (@month_totals&.dig(:absent) || 0) %>
+      </p>
+    </div>
+    <div class="report-stat" style="border-right-color:#2563eb; flex: 1;">
+      <p class="report-stat-label">🕐 ساعات العمل</p>
+      <p class="report-stat-value" style="color:#1d4ed8;">
+        <%= (is_worker_view ? (@summary&.dig(:hours) || 0) : (@month_totals&.dig(:hours) || 0)).to_f.round(1) %>
+      </p>
+    </div>
+    <div class="report-stat" style="border-right-color:#d97706; flex: 1;">
+      <p class="report-stat-label">⏰ ساعات إضافية</p>
+      <p class="report-stat-value" style="color:#b45309;">
+        <%= (is_worker_view ? (@summary&.dig(:overtime) || 0) : (@month_totals&.dig(:overtime) || 0)).to_f.round(1) %>
+      </p>
+    </div>
+  </div>
+
+  <!-- Per-worker summary (only global view) -->
+  <% if !is_worker_view && @worker_summaries.present? %>
+    <h3 class="section-heading">📊 ملخص العمال لهذا الشهر</h3>
+    <div class="card overflow-hidden mb-6">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>العامل</th>
+            <th>النوع</th>
+            <th>أيام حضور</th>
+            <th>أيام غياب</th>
+            <th>ساعات</th>
+            <th>إضافي</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @worker_summaries.each do |s| %>
+            <tr>
+              <td class="font-semibold"><%= s[:worker].full_name %></td>
+              <td><span class="badge badge-blue"><%= s[:worker].pay_type_ar %></span></td>
+              <td class="text-green-700 font-bold"><%= s[:present] %></td>
+              <td class="text-red-700 font-bold"><%= s[:absent] %></td>
+              <td><%= s[:hours].round(1) %></td>
+              <td class="<%= s[:overtime] > 0 ? 'text-orange-600 font-bold' : '' %>"><%= s[:overtime].round(1) %></td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "📅 تفاصيل", dashboard_worker_attendance_records_path(s[:worker], month: month.strftime("%Y-%m-%d")), class: "btn btn-outline btn-sm" %>
+                  <%= link_to "➕", new_dashboard_worker_attendance_record_path(s[:worker]), class: "btn btn-primary btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <!-- Records list -->
+  <h3 class="section-heading">📋 سجل الحضور التفصيلي</h3>
+  <% if (@records || []).any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <% unless is_worker_view %><th>العامل</th><% end %>
+            <th>التاريخ</th>
+            <th>الحضور</th>
+            <th>الخروج</th>
+            <th>الساعات</th>
+            <th>إضافي</th>
+            <th>الحالة</th>
+            <th>ملاحظات</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @records.each do |r| %>
+            <tr>
+              <% unless is_worker_view %>
+                <td class="font-semibold">
+                  <%= link_to r.worker.full_name, dashboard_worker_attendance_records_path(r.worker), class: "text-blue-700 hover:underline" %>
+                </td>
+              <% end %>
+              <td><%= r.work_date.strftime("%Y-%m-%d (%a)") %></td>
+              <td><%= r.check_in&.strftime("%H:%M") || "—" %></td>
+              <td><%= r.check_out&.strftime("%H:%M") || "—" %></td>
+              <td><%= r.total_hours || "—" %></td>
+              <td class="<%= r.overtime_hours.to_f > 0 ? 'text-orange-600 font-bold' : '' %>">
+                <%= r.overtime_hours || "—" %>
+              </td>
+              <td><span class="badge <%= r.status_badge_class %>"><%= r.status_ar %></span></td>
+              <td class="text-sm max-w-xs truncate"><%= r.notes %></td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "✏️", edit_dashboard_attendance_record_path(r), class: "btn btn-warning btn-sm" %>
+                  <%= button_to "🗑️", dashboard_attendance_record_path(r), method: :delete,
+                      class: "btn btn-danger btn-sm",
+                      data: { turbo_confirm: "متأكد؟" } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-sm text-black mt-3">
+      عرض <%= @records.size %> سجل لشهر <strong><%= month.strftime("%B %Y") %></strong>
+      <% if params[:q].present? %> لـ "<strong><%= params[:q] %></strong>"<% end %>
+    </p>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3 class="empty-title">لا يوجد سجل حضور لهذا الشهر</h3>
+      <p class="empty-sub">
+        <% if !is_worker_view %>
+          اختر عاملًا وسجّل حضوره
+        <% else %>
+          ابدأ بتسجيل الحضور اليومي
+        <% end %>
+      </p>
+      <% if is_worker_view %>
+        <div class="mt-4">
+          <%= link_to "➕ تسجيل حضور", new_dashboard_worker_attendance_record_path(@worker), class: "btn btn-primary" %>
+        </div>
+      <% else %>
+        <div class="mt-4">
+          <%= link_to "👷 اذهب للعمال", dashboard_workers_path, class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

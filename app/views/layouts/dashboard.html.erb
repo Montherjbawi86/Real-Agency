@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>لوحة التحكم — سوريا للعقارات والسيارات</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  </head>
+  <body class="flex flex-col min-h-screen <%= "#{controller_path.tr('/', '-')}-#{action_name}" %>" style="background:#f9fafb;">
+    <%= render "shared/navbar" %>
+
+    <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
+    <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
+
+    <div class="dash-layout">
+      <%= render "dashboard/shared/sidebar" %>
+      <div class="dash-main">
+        <header class="dash-header">
+          <h1 class="dash-header-title">
+            <%= current_user.property_agent? ? "🎛️ لوحة تحكم العقارات" : "🎛️ لوحة تحكم السيارات" %>
+          </h1>
+          <div class="flex gap-2">
+            <% if current_user.admin? %>
+              <a href="/admin" class="btn btn-danger btn-sm" style="background:#dc2626;">
+                🛡️ لوحة الإدارة
+              </a>
+            <% end %>
+            <%= link_to "الموقع العام ←", root_path, class: "btn btn-outline btn-sm" %>
+          </div>
+        </header>
+        <main class="dash-content">
+          <%= render "shared/subscription_banner" %>
+          <%= yield %>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">📋 الاشتراكات</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to admin_subscriptions_path, class: "filter-tab #{'active' if params[:status].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to admin_subscriptions_path(status: "active"), class: "filter-tab #{'active' if params[:status] == 'active'}" do %>
+      ✅ نشطة <span class="filter-count"><%= @counts[:active] %></span>
+    <% end %>
+    <%= link_to admin_subscriptions_path(status: "pending"), class: "filter-tab #{'active' if params[:status] == 'pending'}" do %>
+      ⏳ معلقة <span class="filter-count"><%= @counts[:pending] %></span>
+    <% end %>
+    <%= link_to admin_subscriptions_path(status: "expired"), class: "filter-tab #{'active' if params[:status] == 'expired'}" do %>
+      📅 منتهية <span class="filter-count"><%= @counts[:expired] %></span>
+    <% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: admin_subscriptions_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+      <%= text_field_tag :q, params[:q], placeholder: "🔍 بحث بالاسم أو البريد", class: "input", style: "grid-column: span 3;" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <%= link_to "مسح", admin_subscriptions_path, class: "btn btn-gray" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>المستخدم</th><th>الخطة</th><th>الحالة</th><th>البداية</th><th>الانتهاء</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @subscriptions.each do |s| %>
+          <tr>
+            <td>#<%= s.id %></td>
+            <td class="font-semibold"><%= s.user.display_name %></td>
+            <td><%= s.plan.name_ar %></td>
+            <td><span class="badge <%= s.status_badge_class %>"><%= s.status_ar %></span></td>
+            <td><%= s.starts_on || "—" %></td>
+            <td><%= s.ends_on || "—" %></td>
+            <td><%= link_to "عرض", admin_subscription_path(s), class: "btn btn-primary btn-sm" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

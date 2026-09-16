@@ -1,0 +1,128 @@
+<aside dir="rtl" class="dash-sidebar">
+  <h2 class="dash-sidebar-title">🏢 لوحة التحكم</h2>
+
+  <nav class="dash-nav">
+
+    <% if current_user.admin? %>
+      <a href="/admin" class="dash-nav-link" style="background:linear-gradient(to left, #dc2626, #991b1b); color:#fff; font-weight:700; margin-bottom:0.5rem;">
+        🛡️ لوحة الإدارة
+      </a>
+    <% end %>
+
+    <%= link_to "📊 الرئيسية", dashboard_root_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_root_path)}" %>
+
+    <%= link_to "🏢 الوكالة", dashboard_agency_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_agency_path)}" %>
+
+    <% if current_user.agent? %>
+      <%
+        sub = current_user.current_subscription
+        sub_badge = if current_user.current_plan&.max_listings.to_i.zero?
+          "♾️"
+        elsif sub&.expires_soon?
+          "⏰"
+        else
+          current_user.listings_remaining.to_s
+        end
+      %>
+      <%= link_to billing_subscription_path, class: "dash-nav-link #{'active' if current_page?(billing_subscription_path)}" do %>
+        💳 الاشتراك
+        <span class="badge <%= sub&.expires_soon? ? 'badge-yellow' : 'badge-blue' %> text-xs"><%= sub_badge %></span>
+      <% end %>
+    <% end %>
+
+    <div class="dash-nav-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- LISTINGS -->
+    <!-- ============================================================ -->
+    <% if current_user.property_agent? %>
+      <span class="dash-nav-label">🏘️ العقارات</span>
+      <%= link_to "🏢 الأبنية", dashboard_buildings_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_buildings_path)}" %>
+      <%= link_to "🏘️ قائمة العقارات", properties_path,
+          class: "dash-nav-link #{'active' if current_page?(properties_path)}" %>
+      <%= link_to "➕ إضافة عقار", new_property_path,
+          class: "dash-nav-link #{'active' if current_page?(new_property_path)}" %>
+
+      <span class="dash-nav-label">👥 العملاء والمستأجرون</span>
+      <%= link_to "👤 المستأجرون", dashboard_tenants_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_tenants_path)}" %>
+    <% else %>
+      <span class="dash-nav-label">🚗 السيارات</span>
+      <%= link_to "🚘 قائمة السيارات", dashboard_cars_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_cars_path)}" %>
+      <%= link_to "➕ إضافة سيارة", new_car_path,
+          class: "dash-nav-link #{'active' if current_page?(new_car_path)}" %>
+
+      <span class="dash-nav-label">🧑‍💼 العملاء</span>
+      <%= link_to "🧑‍💼 قائمة العملاء", dashboard_customers_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_customers_path)}" %>
+      <%= link_to "➕ إضافة عميل", new_dashboard_customer_path,
+          class: "dash-nav-link #{'active' if current_page?(new_dashboard_customer_path)}" %>
+    <% end %>
+
+    <div class="dash-nav-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- CONTRACTS & PAYMENTS -->
+    <!-- ============================================================ -->
+    <span class="dash-nav-label">📄 العقود والدفعات</span>
+    <%= link_to "📄 العقود", dashboard_contracts_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_contracts_path)}" %>
+    <%= link_to "💰 الدفعات", dashboard_payments_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_payments_path)}" %>
+
+    <div class="dash-nav-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- WORKERS (Grouped) -->
+    <!-- ============================================================ -->
+    <% worker_section_active = controller_name.in?(%w[workers payrolls attendance_records worker_payments worker_holidays salary_advances]) %>
+    <span class="dash-nav-label">👷 العمال والرواتب</span>
+
+    <%= link_to "👷 قائمة العمال", dashboard_workers_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_workers_path)}" %>
+
+    <%= link_to "🕐 سجل الحضور", dashboard_attendance_records_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_attendance_records_path)}" %>
+
+    <%= link_to "💵 دفعات الرواتب", dashboard_worker_payments_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_worker_payments_path)}" %>
+
+    <%= link_to "🏖️ الإجازات", dashboard_worker_holidays_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_worker_holidays_path)}" %>
+
+    <%= link_to "💸 السلف", dashboard_salary_advances_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_salary_advances_path)}" %>
+
+    <div class="dash-nav-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- MAINTENANCE -->
+    <!-- ============================================================ -->
+    <span class="dash-nav-label">🔧 الصيانة</span>
+    <%= link_to "🔧 أعمال الصيانة", dashboard_maintenances_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_maintenances_path)}" %>
+    <%= link_to "➕ إضافة صيانة", new_dashboard_maintenance_path,
+        class: "dash-nav-link #{'active' if current_page?(new_dashboard_maintenance_path)}" %>
+
+    <div class="dash-nav-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- REPORTS -->
+    <!-- ============================================================ -->
+    <span class="dash-nav-label">📈 التقارير</span>
+    <% if current_user.property_agent? %>
+      <%= link_to "📊 تقارير العقارات", dashboard_reports_properties_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_reports_properties_path)}" %>
+    <% else %>
+      <%= link_to "📊 تقارير السيارات", dashboard_reports_cars_path,
+          class: "dash-nav-link #{'active' if current_page?(dashboard_reports_cars_path)}" %>
+    <% end %>
+    <%= link_to "💵 التقارير المالية", dashboard_reports_financials_path,
+        class: "dash-nav-link #{'active' if current_page?(dashboard_reports_financials_path)}" %>
+
+  </nav>
+</aside>

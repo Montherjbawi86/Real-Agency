@@ -1,0 +1,60 @@
+<% if user_signed_in? && current_user.agent? %>
+  <%
+    remaining = current_user.listings_remaining
+    plan      = current_user.current_plan
+    sub       = current_user.current_subscription
+    unlimited = plan&.unlimited?
+    no_sub    = sub.nil? || !sub.active_now?
+  %>
+
+  <% if no_sub %>
+    <div class="sub-banner sub-banner-danger">
+      <div>
+        <p class="sub-banner-title">⚠️ لا يوجد اشتراك نشط</p>
+        <p class="sub-banner-sub">لا يمكنك إضافة إعلانات جديدة. قم بترقية خطتك للمتابعة.</p>
+      </div>
+      <%= link_to "🚀 ترقية الخطة", billing_plans_path, class: "btn btn-primary" %>
+    </div>
+
+  <% elsif unlimited %>
+    <div class="sub-banner sub-banner-success">
+      <div>
+        <p class="sub-banner-title">♾️ خطة <%= plan.name_ar %> — إعلانات غير محدودة</p>
+        <p class="sub-banner-sub">استمتع بإضافة إعلانات غير محدودة</p>
+      </div>
+      <%= link_to "إدارة الاشتراك", billing_subscription_path, class: "btn btn-outline btn-sm" %>
+    </div>
+
+  <% elsif remaining.to_i == 0 %>
+    <div class="sub-banner sub-banner-danger">
+      <div>
+        <p class="sub-banner-title">🚫 وصلت للحد الأقصى</p>
+        <p class="sub-banner-sub">استخدمت <%= current_user.listings_count %> من <%= plan.max_listings %> إعلان — قم بالترقية لمواصلة الإضافة</p>
+      </div>
+      <%= link_to "🚀 ترقية الخطة", billing_plans_path, class: "btn btn-primary" %>
+    </div>
+
+  <% elsif remaining.to_i <= 3 %>
+    <div class="sub-banner sub-banner-warning">
+      <div>
+        <p class="sub-banner-title">⚠️ على وشك النفاد</p>
+        <p class="sub-banner-sub">متبقٍ <%= remaining %> من <%= plan.max_listings %> إعلان في خطتك</p>
+      </div>
+      <%= link_to "🚀 ترقية", billing_plans_path, class: "btn btn-warning" %>
+    </div>
+
+  <% else %>
+    <div class="sub-banner sub-banner-info">
+      <div>
+        <p class="sub-banner-title">
+          💳 خطة <%= plan.name_ar %>
+        </p>
+        <p class="sub-banner-sub">
+          استخدمت <%= current_user.listings_count %> من <%= plan.max_listings %>
+          (متبقٍ <%= remaining %>)
+        </p>
+      </div>
+      <%= link_to "إدارة الاشتراك", billing_subscription_path, class: "btn btn-outline btn-sm" %>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,51 @@
+<%= form_with model: [:admin, @plan], class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+  <% if @plan.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @plan.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div><%= f.label :name, "الاسم (EN)", class: "block mb-1 font-semibold" %><%= f.text_field :name, class: "input", required: true %></div>
+    <div><%= f.label :name_ar, "الاسم (عربي)", class: "block mb-1 font-semibold" %><%= f.text_field :name_ar, class: "input", required: true %></div>
+  </div>
+
+  <div>
+    <%= f.label :slug, "الـ Slug (بالإنجليزية بدون مسافات)", class: "block mb-1 font-semibold" %>
+    <%= f.text_field :slug, class: "input", required: true %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div><%= f.label :price_syp, "السعر (ل.س)", class: "block mb-1 font-semibold" %><%= f.number_field :price_syp, class: "input", step: "1000" %></div>
+    <div><%= f.label :price_usd, "السعر ($)", class: "block mb-1 font-semibold" %><%= f.number_field :price_usd, class: "input", step: "1" %></div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :max_listings, "أقصى إعلانات (0 = غير محدود)", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :max_listings, class: "input", min: 0 %>
+    </div>
+    <div>
+      <%= f.label :duration_days, "المدة بالأيام (0 = دائم)", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :duration_days, class: "input", min: 0 %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :features, "المزايا (سطر لكل ميزة)", class: "block mb-1 font-semibold" %>
+    <%= f.text_area :features, rows: 6, class: "input", placeholder: "حتى 20 إعلان\nظهور أساسي\nدعم عبر البريد" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div><%= f.label :position, "الترتيب", class: "block mb-1 font-semibold" %><%= f.number_field :position, class: "input" %></div>
+    <div class="flex items-center gap-2 pt-6">
+      <%= f.check_box :active %>
+      <%= f.label :active, "نشط" %>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", admin_plans_path, class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>

@@ -1,0 +1,233 @@
+<% content_for :title, @car.title %>
+<% content_for :og_type, "product" %>
+<% content_for :og_title, @car.title %>
+<% content_for :og_description, "#{@car.brand} #{@car.car_model} (#{@car.year}) — #{number_with_precision(@car.price, precision: 0, delimiter: ',')} #{@car.currency}" %>
+<% if @car.cover_image.attached? %>
+  <% content_for :og_image, url_for(@car.cover_image) %>
+<% end %>
+
+<div dir="rtl" class="detail-page">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <%= link_to "الرئيسية", root_path %>
+    <span>›</span>
+    <%= link_to "السيارات", cars_path %>
+    <span>›</span>
+    <span class="breadcrumb-current"><%= @car.title %></span>
+  </div>
+
+  <!-- Hero image -->
+  <div class="detail-hero">
+    <% if @car.cover_image.attached? %>
+      <%= image_tag @car.cover_image, class: "detail-hero-img" %>
+    <% elsif @car.images.attached? %>
+      <%= image_tag @car.images.first, class: "detail-hero-img" %>
+    <% else %>
+      <div class="detail-hero-placeholder">🚗</div>
+    <% end %>
+    <div class="detail-hero-overlay"></div>
+    <div class="detail-hero-badges">
+      <span class="badge <%= @car.new_car? ? 'badge-green' : (@car.certified? ? 'badge-blue' : 'badge-yellow') %>">
+        <%= @car.condition_ar %>
+      </span>
+      <span class="badge badge-gray"><%= @car.body_type_ar %></span>
+      <span class="badge badge-purple"><%= @car.fuel_type_ar %></span>
+      <span class="badge badge-blue"><%= @car.status_ar %></span>
+    </div>
+  </div>
+
+  <!-- YouTube video -->
+  <% if @car.youtube_embed_url.present? %>
+    <div class="youtube-embed">
+      <iframe src="<%= @car.youtube_embed_url %>"
+              title="<%= @car.title %>"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"></iframe>
+    </div>
+  <% end %>
+
+  <% if user_signed_in? && @car.user == current_user %>
+    <%= render "shared/subscription_banner" %>
+  <% end %>
+
+  <!-- Share buttons -->
+  <div class="card p-4 mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+      <h3 class="font-bold">📤 شارك هذا الإعلان</h3>
+      <% if user_signed_in? && @car.user == current_user %>
+        <a href="#" class="btn btn-primary btn-sm"
+           onclick="event.preventDefault(); document.getElementById('share-modal-<%= @car.id %>').style.display='block';">
+          📣 انشر على حسابك (نص جاهز) ←
+        </a>
+      <% end %>
+    </div>
+    <%= render "shared/social_share",
+        url: request.original_url,
+        text: @car.share_text %>
+  </div>
+
+  <% if user_signed_in? && @car.user == current_user %>
+    <%= render "shared/share_modal", subject: @car, host: request.host_with_port %>
+  <% end %>
+
+  <!-- Two-column layout -->
+  <div class="detail-grid">
+
+    <!-- LEFT: Content -->
+    <div class="detail-content">
+
+      <h1 class="detail-title"><%= @car.title %></h1>
+
+      <p class="detail-location">
+        🚘 <%= @car.brand %> <%= @car.car_model %> — <%= @car.year %>
+      </p>
+      <p class="detail-location">📍 <%= @car.city.name_ar %></p>
+
+      <div class="detail-meta">
+        <span class="detail-meta-item">🗓️ <%= time_ago_in_words(@car.created_at) %> مضت</span>
+        <span class="detail-meta-item">👤 <%= @car.user.display_name %></span>
+        <span class="detail-meta-item">🔖 #<%= @car.id %></span>
+      </div>
+
+      <!-- Feature grid -->
+      <div class="detail-features">
+        <div class="detail-feature">
+          <div class="detail-feature-icon">📅</div>
+          <div>
+            <div class="detail-feature-label">السنة</div>
+            <div class="detail-feature-value"><%= @car.year %></div>
+          </div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">🛣️</div>
+          <div>
+            <div class="detail-feature-label">المسافة</div>
+            <div class="detail-feature-value"><%= number_with_delimiter(@car.mileage) %> كم</div>
+          </div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">⛽</div>
+          <div>
+            <div class="detail-feature-label">الوقود</div>
+            <div class="detail-feature-value"><%= @car.fuel_type_ar %></div>
+          </div>
+        </div>
+        <div class="detail-feature">
+          <div class="detail-feature-icon">⚙️</div>
+          <div>
+            <div class="detail-feature-label">ناقل الحركة</div>
+            <div class="detail-feature-value"><%= @car.transmission_ar %></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <section class="detail-block">
+        <h2 class="detail-section-title">📝 الوصف</h2>
+        <div class="detail-description"><%= simple_format @car.description %></div>
+      </section>
+
+      <!-- Full specs -->
+      <section class="detail-block">
+        <h2 class="detail-section-title">🔧 المواصفات الكاملة</h2>
+        <div class="specs-grid">
+          <div class="spec-item"><span class="spec-label">الماركة</span><span class="spec-value"><%= @car.brand %></span></div>
+          <div class="spec-item"><span class="spec-label">الموديل</span><span class="spec-value"><%= @car.car_model %></span></div>
+          <div class="spec-item"><span class="spec-label">السنة</span><span class="spec-value"><%= @car.year %></span></div>
+          <div class="spec-item"><span class="spec-label">المسافة</span><span class="spec-value"><%= number_with_delimiter(@car.mileage) %> كم</span></div>
+          <div class="spec-item"><span class="spec-label">الوقود</span><span class="spec-value"><%= @car.fuel_type_ar %></span></div>
+          <div class="spec-item"><span class="spec-label">ناقل الحركة</span><span class="spec-value"><%= @car.transmission_ar %></span></div>
+          <div class="spec-item"><span class="spec-label">الحالة</span><span class="spec-value"><%= @car.condition_ar %></span></div>
+          <div class="spec-item"><span class="spec-label">الهيكل</span><span class="spec-value"><%= @car.body_type_ar %></span></div>
+          <div class="spec-item"><span class="spec-label">اللون</span><span class="spec-value"><%= @car.color %></span></div>
+          <% if @car.doors.present? %>
+            <div class="spec-item"><span class="spec-label">الأبواب</span><span class="spec-value"><%= @car.doors %></span></div>
+          <% end %>
+          <% if @car.seats.present? %>
+            <div class="spec-item"><span class="spec-label">المقاعد</span><span class="spec-value"><%= @car.seats %></span></div>
+          <% end %>
+          <% if @car.engine_size.present? %>
+            <div class="spec-item"><span class="spec-label">سعة المحرك</span><span class="spec-value"><%= @car.engine_size %> سي سي</span></div>
+          <% end %>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <% if @car.active_features.any? %>
+        <section class="detail-block">
+          <h2 class="detail-section-title">✨ المزايا والإضافات</h2>
+          <div class="amenities-grid">
+            <% @car.active_features.each do |_, label| %>
+              <div class="amenity-chip">✅ <%= label %></div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <!-- Gallery -->
+      <% if @car.images.attached? %>
+        <section class="detail-block">
+          <h2 class="detail-section-title">🖼️ معرض الصور</h2>
+          <div class="detail-gallery">
+            <% @car.images.each do |img| %>
+              <%= link_to img, target: "_blank" do %><%= image_tag img %><% end %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+    </div>
+
+    <!-- RIGHT: Sticky Sidebar -->
+    <aside class="detail-sidebar">
+
+      <div class="detail-sidebar-card">
+        <div class="detail-sidebar-price">
+          <span class="detail-sidebar-price-value">
+            <%= number_with_precision(@car.price, precision: 0, delimiter: ",") %>
+          </span>
+          <span class="detail-sidebar-price-currency"><%= @car.currency %></span>
+        </div>
+        <p class="detail-sidebar-price-type">سعر البيع</p>
+
+        <hr class="detail-sidebar-divider">
+
+        <div class="detail-sidebar-contact">
+          <p class="detail-sidebar-contact-name"><%= @car.user.display_name %></p>
+          <% if @car.user.phone.present? %>
+            <p class="detail-sidebar-contact-phone">📞 <%= @car.user.phone %></p>
+          <% end %>
+        </div>
+
+        <% if @car.user.phone.present? %>
+          <a href="https://wa.me/963<%= @car.user.phone.to_s.sub(/^0/, '').sub(/^\+963/, '') %>?text=<%= ERB::Util.url_encode("مرحباً، أنا مهتم بالسيارة: #{@car.title} (##{@car.id})") %>"
+             target="_blank" class="btn btn-success btn-block btn-lg">💬 تواصل واتساب</a>
+        <% end %>
+        <a href="tel:<%= @car.user.phone %>" class="btn btn-primary btn-block btn-lg mt-2">📞 اتصل الآن</a>
+      </div>
+
+      <% if user_signed_in? && @car.user == current_user %>
+        <div class="detail-sidebar-card">
+          <h3 class="detail-sidebar-title">⚙️ إدارة السيارة</h3>
+          <div class="detail-sidebar-actions">
+            <%= link_to "تعديل", edit_car_path(@car), class: "btn btn-warning btn-block" %>
+            <% unless @car.published? %>
+              <%= button_to "نشر", publish_car_path(@car), method: :patch, class: "btn btn-success btn-block" %>
+            <% end %>
+            <% unless @car.rented? %>
+              <%= button_to "تأجير", mark_rented_car_path(@car), method: :patch, class: "btn btn-primary btn-block" %>
+            <% end %>
+            <% unless @car.sold? %>
+              <%= button_to "بيع", mark_sold_car_path(@car), method: :patch, class: "btn btn-gray btn-block" %>
+            <% end %>
+            <%= button_to "حذف", @car, method: :delete, data: { turbo_confirm: "متأكد؟" }, class: "btn btn-danger btn-block" %>
+          </div>
+        </div>
+      <% end %>
+
+    </aside>
+
+  </div>
+</div>

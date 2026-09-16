@@ -1,0 +1,53 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏢 الأبنية</h1>
+      <p class="page-subtitle">أدر الأبنية والوحدات داخلها</p>
+    </div>
+    <%= link_to "➕ إضافة بناء", new_dashboard_building_path, class: "btn btn-primary" %>
+  </div>
+
+  <% if @buildings.any? %>
+    <div class="listings-grid">
+      <% @buildings.each do |b| %>
+        <div class="listing-card">
+          <div class="listing-image-wrap">
+            <% if b.cover_image.attached? %>
+              <%= image_tag b.cover_image, class: "listing-image" %>
+            <% else %>
+              <div class="listing-image-placeholder">🏢</div>
+            <% end %>
+            <div class="listing-badges-tr">
+              <span class="badge <%= b.status_badge_class %>"><%= b.status_ar %></span>
+            </div>
+            <div class="listing-price-badge">
+              <span class="listing-price-value"><%= b.total_units %></span>
+              <span class="listing-price-currency">وحدة</span>
+            </div>
+          </div>
+          <div class="listing-body">
+            <h3 class="listing-title"><%= link_to b.name, dashboard_building_path(b) %></h3>
+            <p class="listing-sub">📍 <%= b.city.name_ar %></p>
+            <div class="listing-features">
+              <span>🏗️ <%= b.floors_count || 0 %> طوابق</span>
+              <span>✅ <%= b.available_units %> متاح</span>
+              <span>🔑 <%= b.rented_units %> مؤجّر</span>
+            </div>
+            <div class="listing-footer">
+              <%= link_to "الوحدات ←", manage_units_dashboard_building_path(b), class: "btn btn-outline btn-sm" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">🏢</div>
+      <h3 class="empty-title">لا توجد أبنية بعد</h3>
+      <p class="empty-sub">ابدأ بإنشاء أول بناء لإدارة الشقق والوحدات</p>
+      <div class="mt-4">
+        <%= link_to "➕ إضافة بناء", new_dashboard_building_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

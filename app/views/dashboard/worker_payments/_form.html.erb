@@ -1,0 +1,56 @@
+<%= form_with model: @payment, url: dashboard_worker_worker_payments_path(@worker), class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+  <% if @payment.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @payment.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <p class="font-bold text-blue-900 mb-1"><%= @worker.full_name %></p>
+    <p class="text-sm text-blue-800">
+      الراتب الشهري: <strong><%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %> <%= @worker.currency %></strong>
+    </p>
+    <p class="text-sm text-blue-800">
+      متبقي هذا الشهر: <strong><%= number_with_precision(@worker.remaining_for_month, precision: 0, delimiter: ",") %></strong>
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :amount, "💰 المبلغ", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :amount, class: "input", required: true, step: "1000" %>
+    </div>
+    <div>
+      <%= f.label :currency, "💱 العملة", class: "block mb-1 font-semibold" %>
+      <%= f.select :currency, [["ل.س","SYP"],["$","USD"]], {}, class: "input" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :for_month, "📅 عن شهر", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :for_month, class: "input", value: @payment.for_month || Date.current.beginning_of_month %>
+    </div>
+    <div>
+      <%= f.label :paid_on, "📅 تاريخ الدفع", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :paid_on, class: "input", value: @payment.paid_on || Date.current %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :payment_method, "💳 طريقة الدفع", class: "block mb-1 font-semibold" %>
+    <%= f.select :payment_method,
+        [["نقداً","cash"],["بنك","bank"],["شام كاش","sham_cash"],["هرم","haram"],["أخرى","other"]],
+        {}, class: "input" %>
+  </div>
+
+  <div>
+    <%= f.label :notes, "📝 ملاحظات", class: "block mb-1 font-semibold" %>
+    <%= f.text_area :notes, rows: 2, class: "input" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ الدفعة", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_worker_worker_payments_path(@worker), class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>

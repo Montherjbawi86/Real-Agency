@@ -1,0 +1,126 @@
+<div dir="rtl" class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">👷 العمال والرواتب</h1>
+      <p class="page-subtitle">إدارة العمال ورواتبهم الشهرية</p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "🕐 سجل الحضور", dashboard_attendance_records_path, class: "btn btn-outline" %>
+      <%= link_to "➕ إضافة عامل", new_dashboard_worker_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to dashboard_workers_path, class: "filter-tab #{'active' if params[:status].blank? && params[:pay_type].blank?}" do %>
+      الكل <span class="filter-count"><%= @counts[:all] %></span>
+    <% end %>
+    <%= link_to dashboard_workers_path(status: "active"), class: "filter-tab #{'active' if params[:status] == 'active'}" do %>
+      ✅ نشطون <span class="filter-count"><%= @counts[:active] %></span>
+    <% end %>
+    <%= link_to dashboard_workers_path(status: "inactive"), class: "filter-tab #{'active' if params[:status] == 'inactive'}" do %>
+      ⏸️ موقوفون <span class="filter-count"><%= @counts[:inactive] %></span>
+    <% end %>
+    <%= link_to dashboard_workers_path(pay_type: "monthly"), class: "filter-tab #{'active' if params[:pay_type] == 'monthly'}" do %>📅 شهري<% end %>
+    <%= link_to dashboard_workers_path(pay_type: "daily"),   class: "filter-tab #{'active' if params[:pay_type] == 'daily'}" do %>📆 يومي<% end %>
+    <%= link_to dashboard_workers_path(pay_type: "hourly"),  class: "filter-tab #{'active' if params[:pay_type] == 'hourly'}" do %>🕐 بالساعة<% end %>
+  </div>
+
+  <div class="filter-card">
+    <%= form_with url: dashboard_workers_path, method: :get, class: "filter-grid" do %>
+      <%= hidden_field_tag :status,   params[:status]   if params[:status].present? %>
+      <%= hidden_field_tag :pay_type, params[:pay_type] if params[:pay_type].present? %>
+      <%= text_field_tag :q, params[:q], placeholder: "🔍 بحث بالاسم، الهاتف، الوظيفة، أو الرقم الوطني", class: "input", style: "grid-column: span 2;" %>
+      <%= select_tag :sort,
+          options_for_select([
+            ["الأحدث أولاً", "newest"], ["الأقدم أولاً", "oldest"], ["الاسم (أ-ي)", "name"],
+            ["الراتب (الأعلى)", "salary_high"], ["الراتب (الأدنى)", "salary_low"]
+          ], params[:sort]), class: "input" %>
+      <div class="flex gap-2">
+        <%= submit_tag "🔍 بحث", class: "btn btn-success" %>
+        <% if params[:q].present? || params[:sort].present? %>
+          <%= link_to "مسح", dashboard_workers_path, class: "btn btn-gray" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="report-stats-row mb-6">
+    <div class="report-stat" style="border-right-color:#2563eb; flex: 1;">
+      <p class="report-stat-label">👷 الإجمالي</p>
+      <p class="report-stat-value"><%= current_user.workers.count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#059669; flex: 1;">
+      <p class="report-stat-label">✅ نشطون</p>
+      <p class="report-stat-value" style="color:#047857;"><%= current_user.workers.active.count %></p>
+    </div>
+    <div class="report-stat" style="border-right-color:#d97706; flex: 1;">
+      <p class="report-stat-label">💰 إجمالي الرواتب المتوقعة</p>
+      <p class="report-stat-value" style="color:#b45309;">
+        <%= number_with_precision(current_user.workers.active.sum { |w| w.expected_monthly_salary }, precision: 0, delimiter: ",") %>
+      </p>
+    </div>
+    <div class="report-stat" style="border-right-color:#7c3aed; flex: 1;">
+      <p class="report-stat-label">📊 مدفوع هذا الشهر</p>
+      <p class="report-stat-value" style="color:#6d28d9;">
+        <%= number_with_precision(current_user.worker_payments.for_month(Date.current).sum(:amount), precision: 0, delimiter: ",") %>
+      </p>
+    </div>
+  </div>
+
+  <% if @workers.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th>الاسم</th><th>الوظيفة</th><th>النوع</th>
+            <th>الراتب المتوقع</th><th>مدفوع هذا الشهر</th><th>المتبقي</th>
+            <th>الحالة</th><th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @workers.each do |w| %>
+            <tr>
+              <td class="font-semibold"><%= w.full_name %></td>
+              <td><%= w.position_ar %></td>
+              <td><span class="badge badge-blue"><%= w.pay_type_ar %></span></td>
+              <td class="font-bold">
+                <%= number_with_precision(w.expected_monthly_salary, precision: 0, delimiter: ",") %>
+                <%= w.currency %>
+                <% if w.pay_type == "hourly" && w.hourly_rate.present? %>
+                  <div class="text-xs text-black">(<%= w.hourly_rate %>/ساعة)</div>
+                <% elsif w.pay_type == "daily" && w.daily_rate.present? %>
+                  <div class="text-xs text-black">(<%= w.daily_rate %>/يوم)</div>
+                <% end %>
+              </td>
+              <td class="text-green-700 font-bold"><%= number_with_precision(w.paid_for_month, precision: 0, delimiter: ",") %></td>
+              <td class="<%= w.remaining_for_month > 0 ? 'text-red-700 font-bold' : (w.remaining_for_month < 0 ? 'text-amber-700 font-bold' : 'text-gray-500') %>">
+                <%= number_with_precision(w.remaining_for_month, precision: 0, delimiter: ",") %>
+              </td>
+              <td><span class="badge <%= w.current_month_badge_class %>"><%= w.current_month_status_ar %></span></td>
+              <td>
+                <div class="flex flex-wrap gap-1">
+                  <%= link_to "💰", dashboard_payroll_path(w), class: "btn btn-success btn-sm", title: "كشف الراتب" %>
+                  <%= link_to "📅", dashboard_worker_attendance_records_path(w), class: "btn btn-outline btn-sm", title: "الحضور" %>
+                  <%= link_to "🏖️", dashboard_worker_worker_holidays_path(w), class: "btn btn-outline btn-sm", title: "الإجازات" %>
+                  <%= link_to "💸", dashboard_worker_salary_advances_path(w), class: "btn btn-outline btn-sm", title: "السلف" %>
+                  <%= link_to "💵", dashboard_worker_worker_payments_path(w), class: "btn btn-primary btn-sm", title: "الدفعات" %>
+                  <%= link_to "✏️", edit_dashboard_worker_path(w), class: "btn btn-warning btn-sm", title: "تعديل" %>
+                  <%= button_to w.active ? "⏸️" : "▶️", toggle_active_dashboard_worker_path(w), method: :patch, class: "btn btn-gray btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-sm text-black mt-3">عرض <%= @workers.size %> عامل</p>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">👷</div>
+      <h3 class="empty-title">لا يوجد عمال</h3>
+      <div class="mt-4">
+        <%= link_to "➕ إضافة عامل", new_dashboard_worker_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>

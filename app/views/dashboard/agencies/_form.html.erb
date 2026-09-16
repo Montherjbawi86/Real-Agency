@@ -1,0 +1,189 @@
+<%
+  # Singular route: use explicit url
+  form_url = @agency.persisted? ? dashboard_agency_path : dashboard_agency_path
+  form_method = @agency.persisted? ? :patch : :post
+%>
+
+<%= form_with model: @agency, url: form_url, method: form_method,
+    class: "space-y-6 max-w-3xl",
+    data: { turbo: false } do |f| %>
+
+  <% if @agency.errors.any? %>
+    <div class="bg-red-100 border border-red-300 p-4 rounded-xl">
+      <p class="font-bold text-red-900 mb-2">يوجد <%= @agency.errors.size %> خطأ:</p>
+      <% @agency.errors.full_messages.each do |m| %>
+        <p class="text-sm text-red-800">• <%= m %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- BASIC INFO -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">📋 المعلومات الأساسية</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :name, "🏢 اسم الوكالة *", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :name, class: "input", required: true %>
+      </div>
+      <div>
+        <%= f.label :city_id, "🏙️ المدينة *", class: "block mb-1 font-semibold" %>
+        <%= f.collection_select :city_id, City.order(:name_ar), :id, :name_ar, { prompt: "— اختر —" }, class: "input", required: true %>
+      </div>
+      <div>
+        <%= f.label :phone, "📞 الهاتف الرئيسي *", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :phone, class: "input", required: true, placeholder: "011 123 4567" %>
+      </div>
+      <div>
+        <%= f.label :secondary_phone, "📞 هاتف ثانوي", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :secondary_phone, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :whatsapp, "💬 واتساب", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :whatsapp, class: "input", placeholder: "09xxxxxxxx" %>
+      </div>
+      <div>
+        <%= f.label :email, "📧 البريد الإلكتروني", class: "block mb-1 font-semibold" %>
+        <%= f.email_field :email, class: "input", placeholder: "info@agency.sy" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :website, "🌐 الموقع الإلكتروني", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :website, class: "input", placeholder: "https://agency.sy" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :address, "📍 العنوان التفصيلي", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :address, class: "input" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGAL -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">⚖️ المعلومات القانونية والتجارية</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :tax_number, "🆔 الرقم الضريبي", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :tax_number, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :commercial_registry, "📜 رقم السجل التجاري", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :commercial_registry, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :commercial_license, "📄 رقم الرخصة التجارية", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :commercial_license, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :professional_license, "🎓 الترخيص المهني", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :professional_license, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :company_registration, "🏢 رقم تسجيل الشركة", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :company_registration, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :founded_on, "📅 تاريخ التأسيس", class: "block mb-1 font-semibold" %>
+        <%= f.date_field :founded_on, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :authorized_person, "👤 المفوّض بالتوقيع", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :authorized_person, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :employees_count, "👥 عدد الموظفين", class: "block mb-1 font-semibold" %>
+        <%= f.number_field :employees_count, class: "input", min: 0 %>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANK -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">🏦 المعلومات البنكية</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :bank_name, "🏦 اسم البنك", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :bank_name, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :account_holder, "👤 صاحب الحساب", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :account_holder, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :bank_account, "🔢 رقم الحساب", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :bank_account, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :iban, "🌍 IBAN", class: "block mb-1 font-semibold" %>
+        <%= f.text_field :iban, class: "input" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">📝 نبذة عن الوكالة</h3>
+    <%= f.text_area :description, rows: 4, class: "input" %>
+  </div>
+
+  <!-- SOCIAL MEDIA -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">📱 حسابات التواصل الاجتماعي</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :facebook_url, "📘 فيسبوك", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :facebook_url, class: "input", placeholder: "https://facebook.com/yourpage" %>
+      </div>
+      <div>
+        <%= f.label :instagram_url, "📷 إنستغرام", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :instagram_url, class: "input", placeholder: "https://instagram.com/youraccount" %>
+      </div>
+      <div>
+        <%= f.label :tiktok_url, "🎵 تيك توك", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :tiktok_url, class: "input", placeholder: "https://tiktok.com/@youraccount" %>
+      </div>
+      <div>
+        <%= f.label :youtube_url, "🎥 يوتيوب (قناة)", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :youtube_url, class: "input", placeholder: "https://youtube.com/@yourchannel" %>
+      </div>
+      <div>
+        <%= f.label :twitter_url, "𝕏 تويتر / X", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :twitter_url, class: "input", placeholder: "https://x.com/youraccount" %>
+      </div>
+      <div>
+        <%= f.label :telegram_url, "✈️ تيليجرام", class: "block mb-1 font-semibold" %>
+        <%= f.url_field :telegram_url, class: "input", placeholder: "https://t.me/yourchannel" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILES -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="agency-section-title">📎 الملفات والشعار</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :logo, "🖼️ شعار الوكالة", class: "block mb-1 font-semibold" %>
+        <%= f.file_field :logo, class: "input", accept: "image/*" %>
+        <% if @agency.logo.attached? %>
+          <div class="mt-2"><%= image_tag @agency.logo, class: "w-20 h-20 rounded-lg object-cover" %></div>
+        <% end %>
+      </div>
+      <div>
+        <%= f.label :commercial_registry_file, "📜 صورة السجل التجاري", class: "block mb-1 font-semibold" %>
+        <%= f.file_field :commercial_registry_file, class: "input", accept: "image/*,application/pdf" %>
+      </div>
+      <div>
+        <%= f.label :license_file, "📄 صورة الترخيص", class: "block mb-1 font-semibold" %>
+        <%= f.file_field :license_file, class: "input", accept: "image/*,application/pdf" %>
+      </div>
+      <div>
+        <%= f.label :tax_file, "🆔 صورة الرقم الضريبي", class: "block mb-1 font-semibold" %>
+        <%= f.file_field :tax_file, class: "input", accept: "image/*,application/pdf" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_agency_path, class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>

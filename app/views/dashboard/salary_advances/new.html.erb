@@ -1,0 +1,50 @@
+<div dir="rtl" class="max-w-2xl mx-auto">
+  <div class="page-header">
+    <h1 class="page-title">➕ تسجيل سلفة</h1>
+    <%= link_to "← رجوع", dashboard_worker_salary_advances_path(@worker), class: "btn btn-gray" %>
+  </div>
+
+  <%= form_with model: @advance, url: dashboard_worker_salary_advances_path(@worker), class: "bg-white p-6 rounded-xl shadow space-y-4" do |f| %>
+    <% if @advance.errors.any? %>
+      <div class="bg-red-100 p-3 rounded">
+        <% @advance.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+      </div>
+    <% end %>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p class="font-bold text-blue-900"><%= @worker.full_name %></p>
+      <p class="text-sm text-blue-800">
+        الراتب الشهري: <strong><%= number_with_precision(@worker.salary, precision: 0, delimiter: ",") %> <%= @worker.currency %></strong>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :amount, "💸 مبلغ السلفة", class: "block mb-1 font-semibold" %>
+        <%= f.number_field :amount, class: "input", required: true, step: "1000" %>
+      </div>
+      <div>
+        <%= f.label :currency, "💱 العملة", class: "block mb-1 font-semibold" %>
+        <%= f.select :currency, [["ل.س","SYP"],["$","USD"]], {}, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :advance_date, "📅 التاريخ", class: "block mb-1 font-semibold" %>
+        <%= f.date_field :advance_date, class: "input", value: Date.current %>
+      </div>
+      <div class="flex items-center gap-2 pt-6">
+        <%= f.check_box :settled %>
+        <%= f.label :settled, "✅ مسوّاة (تم خصمها)" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :reason, "📝 السبب", class: "block mb-1 font-semibold" %>
+      <%= f.text_area :reason, rows: 2, class: "input", placeholder: "مثال: سلفة شخصية، مصاريف طبية..." %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+      <%= link_to "إلغاء", dashboard_worker_salary_advances_path(@worker), class: "btn btn-gray btn-lg" %>
+    </div>
+  <% end %>
+</div>

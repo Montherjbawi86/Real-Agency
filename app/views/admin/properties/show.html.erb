@@ -1,0 +1,72 @@
+<div dir="rtl" class="max-w-4xl mx-auto">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><%= @property.title %></h1>
+      <p class="page-subtitle">
+        <%= @property.user.display_name %> — <%= @property.city&.name_ar %>
+      </p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <%= link_to "✏️ تعديل", edit_admin_property_path(@property), class: "btn btn-warning" %>
+      <%= link_to "عرض عام", property_path(@property), target: "_blank", class: "btn btn-outline" %>
+      <%= link_to "← رجوع", admin_properties_path, class: "btn btn-gray" %>
+      <%= button_to "🗑️ حذف", admin_property_path(@property), method: :delete, class: "btn btn-danger", data: { turbo_confirm: "سيتم الحذف نهائياً. متأكد؟" } %>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-6">
+    <h3 class="font-bold mb-3">⚡ إجراءات النشر</h3>
+    <div class="flex gap-3">
+      <% if @property.published? %>
+        <%= button_to "⏸️ إلغاء النشر", unpublish_admin_property_path(@property), method: :patch, class: "btn btn-warning" %>
+      <% else %>
+        <%= button_to "✅ نشر", publish_admin_property_path(@property), method: :patch, class: "btn btn-success" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h4 class="report-info-title">💰 السعر</h4>
+      <p class="font-bold"><%= number_with_precision(@property.price, precision: 0, delimiter: ",") %> <%= @property.currency %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📐 المساحة</h4>
+      <p class="font-bold"><%= @property.size %> م²</p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🛏️ الغرف</h4>
+      <p class="font-bold"><%= @property.rooms %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🚿 الحمامات</h4>
+      <p class="font-bold"><%= @property.bathrooms %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">🏠 النوع</h4>
+      <p class="font-bold"><%= @property.property_type_ar %></p>
+    </div>
+    <div class="report-info-card">
+      <h4 class="report-info-title">📌 الحالة</h4>
+      <p><span class="badge badge-gray"><%= @property.status_ar %></span></p>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-6">
+    <h4 class="report-info-title">📝 الوصف</h4>
+    <p><%= simple_format @property.description %></p>
+  </div>
+
+  <% if @property.images.attached? %>
+    <div class="card p-4 mb-6">
+      <h4 class="report-info-title">🖼️ الصور</h4>
+      <div class="grid grid-cols-3 gap-2">
+        <% @property.images.each do |img| %>
+          <%= link_to url_for(img), target: "_blank" do %>
+            <%= image_tag img, class: "w-full h-32 object-cover rounded" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

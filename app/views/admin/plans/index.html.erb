@@ -1,0 +1,34 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">🎯 الخطط</h1>
+    <%= link_to "➕ خطة جديدة", new_admin_plan_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>الاسم</th><th>Slug</th><th>السعر (ل.س)</th><th>السعر ($)</th><th>الإعلانات</th><th>المدة</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @plans.each do |p| %>
+          <tr>
+            <td>#<%= p.id %></td>
+            <td class="font-semibold"><%= p.name_ar %></td>
+            <td><code><%= p.slug %></code></td>
+            <td><%= number_with_precision(p.price_syp, precision: 0, delimiter: ",") %></td>
+            <td><%= number_with_precision(p.price_usd, precision: 0, delimiter: ",") %></td>
+            <td><%= p.max_listings.zero? ? "♾️" : p.max_listings %></td>
+            <td><%= p.duration_days.zero? ? "دائم" : "#{p.duration_days} يوم" %></td>
+            <td><span class="badge <%= p.active? ? 'badge-green' : 'badge-gray' %>"><%= p.active? ? "نشط" : "معطل" %></span></td>
+            <td>
+              <div class="flex gap-1">
+                <%= link_to "تعديل", edit_admin_plan_path(p), class: "btn btn-warning btn-sm" %>
+                <%= button_to "حذف", admin_plan_path(p), method: :delete, class: "btn btn-danger btn-sm", data: { turbo_confirm: "متأكد؟" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

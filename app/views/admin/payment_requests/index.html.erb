@@ -1,0 +1,34 @@
+<div dir="rtl">
+  <div class="page-header">
+    <h1 class="page-title">💳 طلبات الدفع</h1>
+  </div>
+
+  <div class="filter-tabs">
+    <%= link_to "الكل", admin_payment_requests_path, class: "filter-tab #{'active' if params[:status].blank?}" %>
+    <%= link_to "⏳ معلقة", admin_payment_requests_path(status: "pending"), class: "filter-tab #{'active' if params[:status] == 'pending'}" %>
+    <%= link_to "✅ مقبولة", admin_payment_requests_path(status: "approved"), class: "filter-tab #{'active' if params[:status] == 'approved'}" %>
+    <%= link_to "❌ مرفوضة", admin_payment_requests_path(status: "rejected"), class: "filter-tab #{'active' if params[:status] == 'rejected'}" %>
+  </div>
+
+  <div class="card overflow-hidden">
+    <table class="table-clean">
+      <thead>
+        <tr><th>#</th><th>الوكيل</th><th>الخطة</th><th>المبلغ</th><th>الطريقة</th><th>التاريخ</th><th>الحالة</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @requests.each do |r| %>
+          <tr>
+            <td>#<%= r.id %></td>
+            <td class="font-semibold"><%= r.user.display_name %></td>
+            <td><%= r.plan.name_ar %></td>
+            <td class="font-bold"><%= number_with_precision(r.amount, precision: 0, delimiter: ",") %> <%= r.currency %></td>
+            <td><%= r.payment_method_ar %></td>
+            <td><%= r.created_at.strftime("%Y-%m-%d") %></td>
+            <td><span class="badge <%= r.status_badge_class %>"><%= r.status_ar %></span></td>
+            <td><%= link_to "مراجعة", admin_payment_request_path(r), class: "btn btn-primary btn-sm" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

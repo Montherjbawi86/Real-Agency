@@ -1,0 +1,110 @@
+<%
+  # Build hash { contract_id => { total:, paid:, currency: } }
+  contracts_info = current_user.contracts.includes(:payments).map do |c|
+    [
+      c.id,
+      {
+        total:    c.amount.to_f,
+        paid:     c.paid_amount.to_f,
+        currency: c.currency
+      }
+    ]
+  end.to_h
+%>
+
+<%= form_with model: [:dashboard, @payment],
+    data: {
+      controller: "payment-autofill",
+      "payment-autofill-contracts-value": contracts_info.to_json
+    },
+    class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
+
+  <% if @payment.errors.any? %>
+    <div class="bg-red-100 p-3 rounded">
+      <% @payment.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :contract_id, "📄 العقد", class: "block mb-1 font-semibold" %>
+    <%= f.collection_select :contract_id,
+        current_user.contracts.includes(:tenant, :customer),
+        :id,
+        ->(c) { "##{c.id} — #{c.party&.full_name} — #{number_with_precision(c.amount, precision: 0, delimiter: ",")} #{c.currency}" },
+        { include_blank: "— اختر عقد —" },
+        class: "input",
+        data: { "payment-autofill-target": "contract", action: "change->payment-autofill#update" } %>
+  </div>
+
+  <!-- Live remaining display -->
+  <div data-payment-autofill-target="remainingBox" style="display:none;"
+       class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <p class="text-sm font-semibold text-blue-900">💡 المتبقي على هذا العقد:</p>
+    <p class="text-2xl font-bold text-blue-700 mt-1" data-payment-autofill-target="remainingText">0</p>
+  </div>
+
+  <% if current_user.car_agent? %>
+    <div>
+      <%= f.label :customer_id, "🧑‍💼 العميل", class: "block mb-1 font-semibold" %>
+      <%= f.collection_select :customer_id, current_user.customers.order(:full_name), :id, :select_label,
+          { include_blank: "— اختر —" }, class: "input" %>
+    </div>
+  <% else %>
+    <div>
+      <%= f.label :tenant_id, "👤 المستأجر", class: "block mb-1 font-semibold" %>
+      <%= f.collection_select :tenant_id, current_user.tenants.order(:full_name), :id, ->(t) { "#{t.full_name} — #{t.phone}" },
+          { include_blank: "— اختر —" }, class: "input" %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :amount, "💰 المبلغ", class: "block mb-1 font-semibold" %>
+      <%= f.number_field :amount,
+          class: "input",
+          step: "0.01",
+          min: "0.01",
+          required: true,
+          value: @payment.amount,
+          data: { "payment-autofill-target": "amount" } %>
+      <p class="text-xs text-black mt-1">💡 يُملأ تلقائياً بالمبلغ المتبقي (يمكن تعديله)</p>
+    </div>
+    <div>
+      <%= f.label :currency, "💱 العملة", class: "block mb-1 font-semibold" %>
+      <%= f.select :currency, [["ل.س","SYP"],["$ USD","USD"]], {}, class: "input", id: "payment_currency" %>
+      <p class="text-xs text-black mt-1">⚠️ يجب أن تطابق عملة العقد</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :due_on, "📅 تاريخ الاستحقاق", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :due_on, class: "input", value: @payment.due_on || Date.current %>
+    </div>
+    <div>
+      <%= f.label :paid_on, "📅 تاريخ الدفع", class: "block mb-1 font-semibold" %>
+      <%= f.date_field :paid_on, class: "input", value: @payment.paid_on %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :payment_method, "💳 طريقة الدفع", class: "block mb-1 font-semibold" %>
+      <%= f.select :payment_method, [["نقداً","cash"],["بنك","bank"],["شام كاش","sham_cash"],["هرم","haram"],["أخرى","other"]], {}, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :status, "📌 الحالة", class: "block mb-1 font-semibold" %>
+      <%= f.select :status, [["معلقة","pending"],["مدفوعة","paid"],["متأخرة","overdue"]], {}, class: "input" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :notes, "📝 ملاحظات", class: "block mb-1 font-semibold" %>
+    <%= f.text_area :notes, rows: 2, class: "input" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit "💾 حفظ", class: "btn btn-primary btn-lg" %>
+    <%= link_to "إلغاء", dashboard_payments_path, class: "btn btn-gray btn-lg" %>
+  </div>
+<% end %>
