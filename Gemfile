@@ -21,7 +21,7 @@ gem "devise"
 gem "pundit"
  gem "json", "~> 2.7.0"
 # File Uploads (images for properties & cars)
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.1"
 gem "active_storage_validations"
 
 # Arabic / Localization
