@@ -1,0 +1,101 @@
+<div dir="rtl" class="container-page max-w-5xl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">✉️ اتصل بنا</h1>
+      <p class="page-subtitle">نحن هنا للإجابة على أسئلتك</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="card p-6">
+      <h2 class="agency-section-title">📝 أرسل رسالة</h2>
+      <%= form_with url: "#", method: :post, class: "space-y-4" do %>
+        <div>
+          <label class="block mb-1 font-semibold">الاسم الكامل *</label>
+          <input type="text" class="input" required>
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">البريد الإلكتروني *</label>
+          <input type="email" class="input" required>
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">رقم الهاتف</label>
+          <input type="tel" class="input" placeholder="09xxxxxxxx">
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">الموضوع *</label>
+          <select class="input" required>
+            <option value="">— اختر —</option>
+            <option>استفسار عام</option>
+            <option>مشكلة في الحساب</option>
+            <option>استفسار عن اشتراك</option>
+            <option>شكوى</option>
+            <option>اقتراح</option>
+          </select>
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">الرسالة *</label>
+          <textarea rows="5" class="input" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">📤 إرسال</button>
+      <% end %>
+    </div>
+
+    <div class="space-y-4">
+      <div class="card p-6">
+        <h2 class="agency-section-title">📞 معلومات التواصل</h2>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <span class="stat-mini-icon" style="background:#dbeafe;">📧</span>
+            <div>
+              <p class="text-sm text-gray-500">البريد الإلكتروني</p>
+              <a href="mailto:info@syria-agencies.sy" class="font-bold text-blue-600">info@syria-agencies.sy</a>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="stat-mini-icon" style="background:#d1fae5;">📞</span>
+            <div>
+              <p class="text-sm text-gray-500">الهاتف</p>
+              <a href="tel:+963111234567" class="font-bold text-blue-600">+963 11 123 4567</a>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="stat-mini-icon" style="background:#dcfce7;">💬</span>
+            <div>
+              <p class="text-sm text-gray-500">واتساب</p>
+              <a href="https://wa.me/963911234567" target="_blank" class="font-bold text-emerald-600">+963 911 234 567</a>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="stat-mini-icon" style="background:#fef3c7;">📍</span>
+            <div>
+              <p class="text-sm text-gray-500">العنوان</p>
+              <span class="font-bold text-black">دمشق — شارع المزة</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="agency-section-title">🕐 أوقات العمل</h2>
+        <ul class="space-y-2 text-black">
+          <li class="flex justify-between"><span>الأحد - الخميس</span><strong>9:00 – 18:00</strong></li>
+          <li class="flex justify-between"><span>السبت</span><strong>10:00 – 14:00</strong></li>
+          <li class="flex justify-between"><span>الجمعة</span><strong class="text-red-600">مغلق</strong></li>
+        </ul>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="agency-section-title">📱 تابعنا</h2>
+        <div class="footer-social">
+          <a href="#" class="footer-social-icon footer-social-facebook">f</a>
+          <a href="#" class="footer-social-icon footer-social-instagram">📷</a>
+          <a href="#" class="footer-social-icon footer-social-tiktok">♪</a>
+          <a href="#" class="footer-social-icon footer-social-youtube">▶</a>
+          <a href="#" class="footer-social-icon footer-social-x">𝕏</a>
+          <a href="https://wa.me/963911234567" class="footer-social-icon footer-social-whatsapp">💬</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

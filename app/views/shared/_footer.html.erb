@@ -1,7 +1,25 @@
 <footer dir="rtl" class="main-footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
+
+  <!-- Newsletter band -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter-inner">
       <div>
+        <h3 class="footer-newsletter-title">📬 اشترك في النشرة البريدية</h3>
+        <p class="footer-newsletter-sub">أحدث العقارات والسيارات مباشرة إلى بريدك</p>
+      </div>
+      <form action="#" method="post" class="footer-newsletter-form">
+        <input type="email" placeholder="بريدك الإلكتروني" class="footer-newsletter-input" required>
+        <button type="submit" class="footer-newsletter-btn">اشترك</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="footer-inner">
+    <div class="footer-grid-new">
+
+      <!-- Brand -->
+      <div class="footer-col-brand">
         <div class="footer-brand">
           <div class="footer-brand-icon">🏢</div>
           <div>
@@ -13,28 +31,116 @@
           منصة سورية تجمع أفضل وكلاء العقارات والسيارات في مكان واحد.
           ابحث، تواصل، واحصل على ما تريد.
         </p>
+
+        <div class="footer-social">
+          <a href="#" title="فيسبوك" class="footer-social-icon footer-social-facebook">f</a>
+          <a href="#" title="إنستغرام" class="footer-social-icon footer-social-instagram">📷</a>
+          <a href="#" title="تيك توك" class="footer-social-icon footer-social-tiktok">♪</a>
+          <a href="#" title="يوتيوب" class="footer-social-icon footer-social-youtube">▶</a>
+          <a href="#" title="X" class="footer-social-icon footer-social-x">𝕏</a>
+          <a href="https://wa.me/963911234567" title="واتساب" class="footer-social-icon footer-social-whatsapp">💬</a>
+        </div>
       </div>
 
-      <div>
+      <!-- Quick links -->
+      <div class="footer-col">
         <h3 class="footer-head">روابط سريعة</h3>
         <ul class="footer-list">
-          <li><%= link_to "🏠 العقارات", properties_path %></li>
-          <li><%= link_to "🚗 السيارات", cars_path %></li>
-          <li><%= link_to "📝 تسجيل", new_user_registration_path %></li>
+          <li><a href="/">🏠 الرئيسية</a></li>
+          <li><a href="/properties">🏘️ العقارات</a></li>
+          <li><a href="/cars">🚗 السيارات</a></li>
+          <li><a href="/buildings">🏢 الأبنية</a></li>
         </ul>
       </div>
 
-      <div>
-        <h3 class="footer-head">تواصل معنا</h3>
+      <!-- Cities -->
+      <div class="footer-col">
+        <h3 class="footer-head">🏙️ المدن الرئيسية</h3>
         <ul class="footer-list">
-          <li>📧 info@syria-agencies.sy</li>
-          <li>📞 +963 11 123 4567</li>
-          <li>📍 دمشق، سوريا</li>
+          <li><a href="/properties">عقارات دمشق</a></li>
+          <li><a href="/properties">عقارات حلب</a></li>
+          <li><a href="/properties">عقارات حمص</a></li>
+          <li><a href="/properties">عقارات اللاذقية</a></li>
+          <li><a href="/properties">كل المدن ←</a></li>
         </ul>
       </div>
+
+      <!-- Property types -->
+      <div class="footer-col">
+        <h3 class="footer-head">🏘️ أنواع العقارات</h3>
+        <ul class="footer-list">
+          <li><a href="/properties?type=apartment&listing=sale">شقق للبيع</a></li>
+          <li><a href="/properties?type=apartment&listing=rent">شقق للإيجار</a></li>
+          <li><a href="/properties?type=villa">فلل</a></li>
+          <li><a href="/properties?type=land">أراضٍ</a></li>
+          <li><a href="/properties?type=shop">محلات تجارية</a></li>
+        </ul>
+      </div>
+
+      <!-- Help -->
+      <div class="footer-col">
+        <h3 class="footer-head">🆘 المساعدة</h3>
+        <ul class="footer-list">
+          <li><a href="/about">👥 من نحن</a></li>
+          <li><a href="/contact">✉️ اتصل بنا</a></li>
+          <li><a href="/faq">❓ الأسئلة الشائعة</a></li>
+          <li><a href="/how-to-sell">📢 كيفية الإعلان</a></li>
+          <li><a href="/report">🚩 إبلاغ عن مشكلة</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-col">
+        <h3 class="footer-head">📞 تواصل معنا</h3>
+        <ul class="footer-list footer-contact-list">
+          <li>
+            <span class="footer-contact-icon">📧</span>
+            <a href="mailto:info@syria-agencies.sy">info@syria-agencies.sy</a>
+          </li>
+          <li>
+            <span class="footer-contact-icon">📞</span>
+            <a href="tel:+963111234567">+963 11 123 4567</a>
+          </li>
+          <li>
+            <span class="footer-contact-icon">💬</span>
+            <a href="https://wa.me/963911234567" target="_blank">واتساب: +963 911 234 567</a>
+          </li>
+          <li>
+            <span class="footer-contact-icon">📍</span>
+            <span>دمشق، سوريا</span>
+          </li>
+        </ul>
+
+        <div class="footer-hours">
+          <p class="footer-hours-title">🕐 أوقات العمل</p>
+          <p class="footer-hours-row">الأحد - الخميس: 9:00 – 18:00</p>
+          <p class="footer-hours-row">السبت: 10:00 – 14:00</p>
+          <p class="footer-hours-row">الجمعة: مغلق</p>
+        </div>
+      </div>
+
     </div>
   </div>
-  <div class="footer-bottom">
-    © <%= Date.current.year %> سوريا للعقارات والسيارات — جميع الحقوق محفوظة
+
+  <!-- Legal band -->
+  <div class="footer-legal">
+    <div class="footer-legal-inner">
+      <p class="footer-legal-text">
+        © <%= Date.current.year %> <strong>سوريا للعقارات والسيارات</strong> — جميع الحقوق محفوظة
+      </p>
+      <p class="footer-legal-sub">
+        شركة مسجلة في سوريا — السجل التجاري رقم 12345 — الرقم الضريبي 987654321
+      </p>
+    </div>
+    <div class="footer-legal-links">
+      <a href="/terms">الشروط والأحكام</a>
+      <span>·</span>
+      <a href="/privacy">سياسة الخصوصية</a>
+      <span>·</span>
+      <a href="/cookies">ملفات تعريف الارتباط</a>
+      <span>·</span>
+      <a href="/sitemap">خريطة الموقع</a>
+    </div>
   </div>
+
 </footer>

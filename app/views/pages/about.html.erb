@@ -1,0 +1,126 @@
+<div dir="rtl" class="container-page max-w-5xl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">👥 من نحن</h1>
+      <p class="page-subtitle">تعرّف على منصة سوريا للعقارات والسيارات</p>
+    </div>
+  </div>
+
+  <div class="card p-8 mb-6">
+    <h2 class="section-heading">🏢 قصتنا</h2>
+    <p class="text-black leading-relaxed mb-4">
+      منصة <strong>سوريا للعقارات والسيارات</strong> هي منصة سورية حديثة
+      تجمع أفضل وكلاء العقارات والسيارات في مكان واحد، بهدف تسهيل
+      عملية البحث عن العقار أو السيارة المناسبة لجميع السوريين
+      داخل وخارج سوريا.
+    </p>
+    <p class="text-black leading-relaxed">
+      تأسست المنصة على يد فريق من الخبراء في مجال العقارات والتكنولوجيا،
+      لتكون الجسر بين العملاء والوكلاء الموثوقين. نؤمن بأن كل سوري
+      يستحق سهولة الوصول إلى ما يبحث عنه، بكل شفافية ومصداقية.
+    </p>
+  </div>
+
+  <div class="report-info-grid mb-6">
+    <div class="report-info-card">
+      <h3 class="report-info-title">🎯 رسالتنا</h3>
+      <p class="text-black leading-relaxed">
+        تمكين السوريين من إيجاد العقار والسيارة المثالية بسهولة،
+        وشفافية، وبأقل وقت ممكن، عبر منصة رقمية موثوقة تجمع
+        أفضل الوكلاء في سوريا.
+      </p>
+    </div>
+    <div class="report-info-card">
+      <h3 class="report-info-title">👁️ رؤيتنا</h3>
+      <p class="text-black leading-relaxed">
+        أن نكون المنصة الأولى الموثوقة للعقارات والسيارات في سوريا،
+        والمرجع الأساسي لكل من يبحث عن عقار أو سيارة بجودة عالية
+        وخدمة ممتازة.
+      </p>
+    </div>
+    <div class="report-info-card">
+      <h3 class="report-info-title">💎 قيمنا</h3>
+      <ul class="list-disc pr-5 space-y-1 text-black">
+        <li>الشفافية والمصداقية في كل تعامل</li>
+        <li>الاحترافية في الخدمة والدعم</li>
+        <li>الالتزام بالجودة والسرعة</li>
+        <li>احترام خصوصية العملاء والوكلاء</li>
+        <li>الابتكار المستمر في التقنية</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card p-8 mb-6">
+    <h2 class="section-heading">📊 أرقامنا</h2>
+    <div class="stats-grid-4">
+      <div class="stat-mini" style="border-right-color:#2563eb;">
+        <p class="stat-mini-label">🏘️ عقارات</p>
+        <p class="stat-mini-value"><%= Property.published.count %>+</p>
+      </div>
+      <div class="stat-mini" style="border-right-color:#059669;">
+        <p class="stat-mini-label">🚗 سيارات</p>
+        <p class="stat-mini-value"><%= Car.published.count %>+</p>
+      </div>
+      <div class="stat-mini" style="border-right-color:#d97706;">
+        <p class="stat-mini-label">🤝 وكلاء موثوقون</p>
+        <p class="stat-mini-value"><%= User.agents.count %>+</p>
+      </div>
+      <div class="stat-mini" style="border-right-color:#7c3aed;">
+        <p class="stat-mini-label">🏙️ محافظات</p>
+        <p class="stat-mini-value"><%= City.count %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-8 mb-6">
+    <h2 class="section-heading">✨ لماذا نحن؟</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="detail-feature">
+        <div class="detail-feature-icon">✅</div>
+        <div>
+          <div class="detail-feature-value">وكلاء موثّقون</div>
+          <div class="detail-feature-label">نتحقق من كل وكيل قبل الموافقة</div>
+        </div>
+      </div>
+      <div class="detail-feature">
+        <div class="detail-feature-icon">🔍</div>
+        <div>
+          <div class="detail-feature-value">بحث متقدم</div>
+          <div class="detail-feature-label">فلاتر دقيقة حسب النوع، السعر، المدينة</div>
+        </div>
+      </div>
+      <div class="detail-feature">
+        <div class="detail-feature-icon">💬</div>
+        <div>
+          <div class="detail-feature-value">تواصل مباشر</div>
+          <div class="detail-feature-label">واتساب وهاتف مباشرة مع الوكيل</div>
+        </div>
+      </div>
+      <div class="detail-feature">
+        <div class="detail-feature-icon">🆓</div>
+        <div>
+          <div class="detail-feature-value">مجاني للعملاء</div>
+          <div class="detail-feature-label">التصفح والتواصل بدون رسوم</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-8">
+    <h2 class="section-heading">📞 تواصل معنا</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="report-info-card">
+        <p class="font-bold mb-1">📧 البريد</p>
+        <a href="mailto:info@syria-agencies.sy" class="text-blue-600">info@syria-agencies.sy</a>
+      </div>
+      <div class="report-info-card">
+        <p class="font-bold mb-1">📞 الهاتف</p>
+        <a href="tel:+963111234567" class="text-blue-600">+963 11 123 4567</a>
+      </div>
+      <div class="report-info-card">
+        <p class="font-bold mb-1">📍 العنوان</p>
+        <span class="text-black">دمشق، سوريا</span>
+      </div>
+    </div>
+  </div>
+</div>

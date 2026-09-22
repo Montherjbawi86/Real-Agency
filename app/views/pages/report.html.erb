@@ -1,0 +1,62 @@
+<div dir="rtl" class="container-page max-w-2xl">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🚩 إبلاغ عن مشكلة</h1>
+      <p class="page-subtitle">ساعدنا في الحفاظ على جودة المنصة</p>
+    </div>
+  </div>
+
+  <div class="alert-info mb-6">
+    <p>🔒 <strong>خصوصيتك محمية:</strong> لن نُفصح عن هويتك للمُبلَّغ عنه.</p>
+  </div>
+
+  <div class="card p-6">
+    <%= form_with url: "#", method: :post, class: "space-y-4" do %>
+      <div>
+        <label class="block mb-1 font-semibold">نوع المشكلة *</label>
+        <select class="input" required>
+          <option value="">— اختر —</option>
+          <option>إعلان مخالف أو مضلل</option>
+          <option>محتوى غير لائق</option>
+          <option>وكيل وهمي أو محتال</option>
+          <option>سعر غير صحيح</option>
+          <option>مشكلة تقنية في الموقع</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-1 font-semibold">رابط الإعلان (إن وُجد)</label>
+        <input type="url" class="input" placeholder="https://...">
+      </div>
+
+      <div>
+        <label class="block mb-1 font-semibold">الوصف التفصيلي *</label>
+        <textarea rows="6" class="input" placeholder="اشرح المشكلة بتفصيل..." required></textarea>
+      </div>
+
+      <div>
+        <label class="block mb-1 font-semibold">بريدك للتواصل (اختياري)</label>
+        <input type="email" class="input" placeholder="لإعلامك بنتيجة المراجعة">
+      </div>
+
+      <button type="submit" class="btn btn-danger btn-lg btn-block">🚩 إرسال الإبلاغ</button>
+    <% end %>
+  </div>
+
+  <div class="report-info-grid mt-6">
+    <div class="report-info-card">
+      <h3 class="report-info-title">🕐 سرعة المراجعة</h3>
+      <p class="text-black">نراجع كل بلاغ خلال 24 ساعة</p>
+    </div>
+    <div class="report-info-card">
+      <h3 class="report-info-title">⚡ حالات طارئة</h3>
+      <p class="text-black">للحالات العاجلة، تواصل عبر واتساب</p>
+    </div>
+  </div>
+
+  <div class="alert-cta mt-6">
+    <p>هل تحتاج استجابة فورية؟</p>
+    <a href="https://wa.me/963911234567" target="_blank" class="btn btn-success btn-lg">💬 واتساب</a>
+  </div>
+</div>

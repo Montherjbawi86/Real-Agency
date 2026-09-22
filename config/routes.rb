@@ -1,6 +1,22 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { registrations: "users/registrations" }
 
+  # ============================================================
+  # PUBLIC PAGES
+  # ============================================================
+  get "/about",       to: "pages#about",       as: :about
+  get "/contact",     to: "pages#contact",     as: :contact
+  get "/faq",         to: "pages#faq",         as: :faq
+  get "/how-to-sell", to: "pages#how_to_sell", as: :how_to_sell
+  get "/report",      to: "pages#report",      as: :report
+  get "/terms",       to: "pages#terms",       as: :terms
+  get "/privacy",     to: "pages#privacy",     as: :privacy
+  get "/cookies",     to: "pages#cookies",     as: :cookies
+  get "/sitemap",     to: "pages#sitemap",     as: :sitemap
+
+  # ============================================================
+  # PUBLIC RESOURCES
+  # ============================================================
   resources :buildings do
     resources :properties, only: [:new, :create, :index], shallow: true
   end
@@ -21,6 +37,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # ============================================================
+  # AGENT DASHBOARD
+  # ============================================================
   namespace :dashboard do
     root "home#index"
 
@@ -33,9 +52,6 @@ Rails.application.routes.draw do
       end
     end
 
-    # ============================================================
-    # WORKERS + nested sub-resources
-    # ============================================================
     resources :workers do
       member do
         patch :toggle_active
@@ -45,18 +61,14 @@ Rails.application.routes.draw do
 
       resources :attendance_records, shallow: true,
                 only: [:index, :new, :create, :edit, :update, :destroy]
-
       resources :worker_holidays, shallow: true,
                 only: [:index, :new, :create, :edit, :update, :destroy]
-
       resources :salary_advances, shallow: true,
                 only: [:index, :new, :create, :edit, :update, :destroy]
-
       resources :worker_payments, shallow: true,
                 only: [:index, :new, :create, :edit, :update, :destroy]
     end
 
-    # Top-level (flat) routes for shallow resources
     resources :attendance_records, only: [:index, :edit, :update, :destroy]
     resources :worker_holidays,    only: [:index, :edit, :update, :destroy]
     resources :salary_advances,    only: [:index, :edit, :update, :destroy]
@@ -96,6 +108,9 @@ Rails.application.routes.draw do
     get "reports/financials", to: "reports#financials"
   end
 
+  # ============================================================
+  # BILLING
+  # ============================================================
   get    "/billing/plans",                to: "billing/subscriptions#plans",   as: :billing_plans
   get    "/billing/subscription",         to: "billing/subscriptions#show",    as: :billing_subscription
   post   "/billing/subscription/upgrade", to: "billing/subscriptions#upgrade", as: :billing_upgrade_subscription
@@ -104,6 +119,9 @@ Rails.application.routes.draw do
     resources :payment_requests, only: [:index, :new, :create, :show]
   end
 
+  # ============================================================
+  # ADMIN
+  # ============================================================
   namespace :admin do
     root "dashboard#index"
 
@@ -154,6 +172,9 @@ Rails.application.routes.draw do
     resource  :settings, only: [:show, :update]
   end
 
+  # ============================================================
+  # SEARCH + ROOT
+  # ============================================================
   get  "/search", to: "home#search", as: :home_search
   post "/search", to: "home#search"
 
