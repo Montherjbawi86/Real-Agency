@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_17_014206) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_23_003058) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -162,6 +162,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_17_014206) do
     t.string "youtube_url"
     t.index ["city_id"], name: "index_cars_on_city_id"
     t.index ["user_id"], name: "index_cars_on_user_id"
+  end
+
+  create_table "chat_messages", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "session_id"
+    t.integer "role"
+    t.text "content"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_chat_messages_on_user_id"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -467,6 +478,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_17_014206) do
   add_foreign_key "buildings", "users"
   add_foreign_key "cars", "cities"
   add_foreign_key "cars", "users"
+  add_foreign_key "chat_messages", "users"
   add_foreign_key "contracts", "cars"
   add_foreign_key "contracts", "customers"
   add_foreign_key "contracts", "properties"

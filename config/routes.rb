@@ -15,6 +15,12 @@ Rails.application.routes.draw do
   get "/sitemap",     to: "pages#sitemap",     as: :sitemap
 
   # ============================================================
+  # AI CHATBOT
+  # ============================================================
+  post "/ai_chat",             to: "ai_chats#create"
+  get  "/ai_chat/:session_id", to: "ai_chats#history", as: :ai_chat_history
+
+  # ============================================================
   # PUBLIC RESOURCES
   # ============================================================
   resources :buildings do
