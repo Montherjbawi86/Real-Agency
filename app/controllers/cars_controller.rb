@@ -6,47 +6,47 @@ class CarsController < ApplicationController
 
   def index
     @cars = Car.published.includes(:city, :user, cover_image_attachment: :blob).recent
-    @cars = @cars.where(city_id: params[:city_id])        if params[:city_id].present?
-    @cars = @cars.where(brand: params[:brand])            if params[:brand].present?
-    @cars = @cars.where(body_type: params[:body_type])    if params[:body_type].present?
-    @cars = @cars.where(fuel_type: params[:fuel_type])    if params[:fuel_type].present?
-    @cars = @cars.where(condition: params[:condition])    if params[:condition].present?
-    @cars = @cars.where("price <= ?", params[:max_price]) if params[:max_price].present?
 
     if params[:q].present?
       q = "%#{params[:q].strip}%"
       @cars = @cars.where("title ILIKE :q OR brand ILIKE :q OR car_model ILIKE :q", q: q)
     end
 
+    @cars = @cars.where(city_id: params[:city_id])        if params[:city_id].present?
+    @cars = @cars.where(brand: params[:brand])            if params[:brand].present?
+    @cars = @cars.where(body_type: params[:body_type])    if params[:body_type].present?
+    @cars = @cars.where(fuel_type: params[:fuel_type])    if params[:fuel_type].present?
+    @cars = @cars.where(condition: params[:condition])    if params[:condition].present?
+    @cars = @cars.where(transmission: params[:transmission]) if params[:transmission].present?
+    @cars = @cars.where("year >= ?", params[:min_year])   if params[:min_year].present?
+    @cars = @cars.where("year <= ?", params[:max_year])   if params[:max_year].present?
+    @cars = @cars.where("price >= ?", params[:min_price]) if params[:min_price].present?
+    @cars = @cars.where("price <= ?", params[:max_price]) if params[:max_price].present?
+    @cars = @cars.where("mileage <= ?", params[:max_mileage]) if params[:max_mileage].present?
+    @cars = @cars.where(currency: params[:currency])      if params[:currency].present?
+    @cars = @cars.where(color: params[:color])            if params[:color].present?
+
     @cars = case params[:sort]
-    when "price_high" then @cars.order(price: :desc)
-    when "price_low"  then @cars.order(price: :asc)
-    when "year_new"   then @cars.order(year: :desc)
-    when "mileage"    then @cars.order(mileage: :asc)
-    else                   @cars.recent
+    when "price_asc"   then @cars.order(price: :asc)
+    when "price_desc"  then @cars.order(price: :desc)
+    when "year_desc"   then @cars.order(year: :desc)
+    when "year_asc"    then @cars.order(year: :asc)
+    when "mileage_asc" then @cars.order(mileage: :asc)
+    else                    @cars.order(created_at: :desc)
     end
 
+    @cities = City.order(:name_ar)
     @brands = Car.published.distinct.pluck(:brand).compact.sort
+    @colors = Car.published.distinct.pluck(:color).compact.reject(&:blank?).sort
   end
 
-  def show
-  end
+  def show; end
 
   def new
-    unless current_user.can_add_listing?
-      redirect_to billing_subscription_path,
-                  alert: "لقد استنفدت عدد الإعلانات المسموح بها — قم بترقية خطتك"
-      return
-    end
     @car = current_user.cars.new
   end
 
   def create
-    unless current_user.can_add_listing?
-      redirect_to billing_subscription_path,
-                  alert: "لقد استنفدت عدد الإعلانات المسموح بها — قم بترقية خطتك"
-      return
-    end
     @car = current_user.cars.new(car_params)
     if @car.save
       redirect_to @car, notice: "تم إنشاء السيارة بنجاح"
@@ -55,8 +55,7 @@ class CarsController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @car.update(car_params)
@@ -108,8 +107,7 @@ class CarsController < ApplicationController
       :price, :currency, :mileage, :fuel_type, :transmission,
       :condition, :body_type, :color, :doors, :seats,
       :engine_size, :city_id, :status,
-      :latitude, :longitude,
-      :youtube_url,
+      :latitude, :longitude, :youtube_url,
       :cover_image,
       images: []
     ] + Car::FEATURES.keys

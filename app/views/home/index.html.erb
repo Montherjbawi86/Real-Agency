@@ -21,50 +21,111 @@
         </p>
 
         <div class="search-box">
-          <%= form_with url: home_search_path, method: :get do %>
-            <div class="search-tabs">
-              <label class="search-tab">
-                <input type="radio" name="type" value="property" class="search-tab-input" checked>
-                <div class="search-tab-label">🏘️ عقارات</div>
-              </label>
-              <label class="search-tab">
-                <input type="radio" name="type" value="car" class="search-tab-input">
-                <div class="search-tab-label">🚗 سيارات</div>
-              </label>
-            </div>
+  <div style="display:flex; gap:0.5rem; padding:0.5rem; border-radius:0.75rem; background:#e5e7eb; margin-bottom:0.75rem;">
+    <button type="button"
+            class="search-tab-btn active"
+            onclick="window.homeTab('property')"
+            data-tab="property"
+            style="flex:1; padding:1rem; background:#2563eb; color:#000000; border:2px solid #2563eb; border-radius:0.5rem; font-weight:700; font-size:1.0625rem; cursor:pointer;">
+      🏘️ عقارات
+    </button>
+    <button type="button"
+            class="search-tab-btn"
+            onclick="window.homeTab('car')"
+            data-tab="car"
+            style="flex:1; padding:1rem; background:transparent; color:#000000; border:2px solid transparent; border-radius:0.5rem; font-weight:700; font-size:1.0625rem; cursor:pointer;">
+      🚗 سيارات
+    </button>
+  </div>
 
-            <div class="search-fields">
-              <div class="search-select-wrap">
-                <span class="search-select-icon">📍</span>
-                <%= select_tag :city_id,
-                    options_from_collection_for_select(@cities, :id, :name_ar),
-                    include_blank: "كل المدن",
-                    class: "input" %>
-              </div>
+  <form action="/properties" method="get" id="property-search-form" class="search-fields">
+    <div class="search-select-wrap">
+      <span class="search-select-icon">📍</span>
+      <select name="city_id" class="input">
+        <option value="">كل المدن</option>
+        <% @cities.each do |city| %>
+          <option value="<%= city.id %>"><%= city.name_ar %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="search-select-wrap">
+      <span class="search-select-icon">🏠</span>
+      <select name="type" class="input">
+        <option value="">كل الأنواع</option>
+        <option value="apartment">شقة</option>
+        <option value="villa">فيلا</option>
+        <option value="land">أرض</option>
+        <option value="shop">محل تجاري</option>
+        <option value="office">مكتب</option>
+      </select>
+    </div>
+    <div class="search-select-wrap">
+      <span class="search-select-icon">💰</span>
+      <select name="listing" class="input">
+        <option value="">بيع / إيجار</option>
+        <option value="sale">للبيع</option>
+        <option value="rent">للإيجار</option>
+      </select>
+    </div>
+    <button type="submit" class="search-btn">🔍 ابحث الآن</button>
+  </form>
 
-              <div class="search-select-wrap">
-                <span class="search-select-icon">🏠</span>
-                <%= select_tag :property_type,
-                    options_for_select([
-                      ["شقة","apartment"],["فيلا","villa"],["أرض","land"],
-                      ["محل تجاري","shop"],["مكتب","office"]
-                    ]),
-                    include_blank: "كل الأنواع",
-                    class: "input" %>
-              </div>
+  <form action="/cars" method="get" id="car-search-form" class="search-fields" style="display:none;">
+    <div class="search-select-wrap">
+      <span class="search-select-icon">📍</span>
+      <select name="city_id" class="input">
+        <option value="">كل المدن</option>
+        <% @cities.each do |city| %>
+          <option value="<%= city.id %>"><%= city.name_ar %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="search-select-wrap">
+      <span class="search-select-icon">🚗</span>
+      <select name="body_type" class="input">
+        <option value="">كل الأنواع</option>
+        <option value="sedan">سيدان</option>
+        <option value="suv">دفع رباعي</option>
+        <option value="hatchback">هاتشباك</option>
+        <option value="pickup">بيك أب</option>
+        <option value="van">فان</option>
+      </select>
+    </div>
+    <div class="search-select-wrap">
+      <span class="search-select-icon">⛽</span>
+      <select name="fuel_type" class="input">
+        <option value="">كل أنواع الوقود</option>
+        <option value="petrol">بنزين</option>
+        <option value="diesel">ديزل</option>
+        <option value="hybrid">هجين</option>
+        <option value="electric">كهربائي</option>
+        <option value="gas">غاز</option>
+      </select>
+    </div>
+    <button type="submit" class="search-btn">🔍 ابحث الآن</button>
+  </form>
+</div>
 
-              <div class="search-select-wrap">
-                <span class="search-select-icon">💰</span>
-                <%= select_tag :listing_type,
-                    options_for_select([["للبيع","sale"],["للإيجار","rent"]]),
-                    include_blank: "بيع / إيجار",
-                    class: "input" %>
-              </div>
-
-              <button type="submit" class="search-btn">🔍 ابحث الآن</button>
-            </div>
-          <% end %>
-        </div>
+<script>
+  window.homeTab = function(tab) {
+    var buttons = document.querySelectorAll(".search-tab-btn");
+    buttons.forEach(function(b) {
+      var isActive = b.dataset.tab === tab;
+      b.classList.toggle("active", isActive);
+      if (isActive) {
+        b.style.background = "#2563eb";
+        b.style.color = "#000000";
+        b.style.borderColor = "#2563eb";
+      } else {
+        b.style.background = "transparent";
+        b.style.color = "#000000";
+        b.style.borderColor = "transparent";
+      }
+    });
+    document.getElementById("property-search-form").style.display = tab === "property" ? "grid" : "none";
+    document.getElementById("car-search-form").style.display      = tab === "car"      ? "grid" : "none";
+  };
+</script>
 
         <div class="hero-quick-links">
           <span>بحث سريع:</span>

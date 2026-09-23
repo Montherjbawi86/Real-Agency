@@ -1,0 +1,31 @@
+namespace :admin do
+  desc "Create or update the admin user from ENV (ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME, ADMIN_PHONE)"
+  task create: :environment do
+    email    = ENV.fetch("ADMIN_EMAIL")    { abort "❌ ADMIN_EMAIL is required" }
+    password = ENV.fetch("ADMIN_PASSWORD") { abort "❌ ADMIN_PASSWORD is required" }
+    name     = ENV.fetch("ADMIN_NAME", "Admin")
+    phone    = ENV.fetch("ADMIN_PHONE", "0991234567")
+role = ENV.fetch("ADMIN_ROLE", "admin")
+    user = User.find_or_initialize_by(email: email)
+
+    # Only set password for new users so we don't reset it on every deploy
+    if user.new_record?
+      user.password = password
+      user.password_confirmation = password
+    end
+
+    # Set these on every run — adjust to match your schema
+    user.full_name = name if user.respond_to?(:full_name=)
+    user.name      = name if user.respond_to?(:name=)
+    user.phone     = phone if user.respond_to?(:phone=)
+    user.admin     = true  if user.respond_to?(:admin=)
+    user.role      = "admin" if user.respond_to?(:role=)
+
+    if user.save
+      puts "✅ Admin user ready: #{user.email}"
+    else
+      puts "❌ Failed: #{user.errors.full_messages.join(', ')}"
+      exit 1
+    end
+  end
+end

@@ -7,21 +7,22 @@ class HomeController < ApplicationController
     @cars_count        = Car.published.count
     @agents_count      = User.agents.count
     @cities_count      = City.count
-    @buildings         = Building.includes(:city, :properties).order(created_at: :desc).limit(6)
   end
 
   def search
     if params[:type] == "car"
       redirect_to cars_path(
-        city_id:   params[:city_id],
-        body_type: params[:body_type],
-        fuel_type: params[:fuel_type]
+        city_id:   params[:city_id].presence,
+        body_type: params[:body_type].presence,
+        fuel_type: params[:fuel_type].presence,
+        max_price: params[:max_price].presence
       )
     else
       redirect_to properties_path(
-        city_id: params[:city_id],
-        type:    params[:property_type],
-        listing: params[:listing_type]
+        city_id:   params[:city_id].presence,
+        type:      params[:property_type].presence,
+        listing:   params[:listing_type].presence,
+        max_price: params[:max_price].presence
       )
     end
   end

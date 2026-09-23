@@ -6,32 +6,42 @@ class PropertiesController < ApplicationController
 
   def index
     @properties = Property.published.includes(:city, :user, :building, cover_image_attachment: :blob).recent
+
+    if params[:q].present?
+      q = "%#{params[:q].strip}%"
+      @properties = @properties.where("title ILIKE :q OR description ILIKE :q OR address ILIKE :q", q: q)
+    end
+
     @properties = @properties.where(city_id: params[:city_id])         if params[:city_id].present?
     @properties = @properties.where(property_type: params[:type])      if params[:type].present?
     @properties = @properties.where(listing_type: params[:listing])    if params[:listing].present?
-    @properties = @properties.where(building_id: params[:building_id]) if params[:building_id].present?
+    @properties = @properties.where("price >= ?", params[:min_price])  if params[:min_price].present?
     @properties = @properties.where("price <= ?", params[:max_price])  if params[:max_price].present?
+    @properties = @properties.where("size >= ?",  params[:min_size])   if params[:min_size].present?
+    @properties = @properties.where("size <= ?",  params[:max_size])   if params[:max_size].present?
+    @properties = @properties.where("rooms >= ?", params[:min_rooms])  if params[:min_rooms].present?
+    @properties = @properties.where("bathrooms >= ?", params[:min_bathrooms]) if params[:min_bathrooms].present?
+    @properties = @properties.where(currency: params[:currency])       if params[:currency].present?
+
+    @properties = case params[:sort]
+    when "price_asc"  then @properties.order(price: :asc)
+    when "price_desc" then @properties.order(price: :desc)
+    when "size_asc"   then @properties.order(size: :asc)
+    when "size_desc"  then @properties.order(size: :desc)
+    else                   @properties.order(created_at: :desc)
+    end
+
+    @cities = City.order(:name_ar)
   end
 
-  def show
-  end
+  def show; end
 
   def new
-    unless current_user.can_add_listing?
-      redirect_to billing_subscription_path,
-                  alert: "لقد استنفدت عدد الإعلانات المسموح بها — قم بترقية خطتك"
-      return
-    end
     @property = current_user.properties.new
     @property.building_id = params[:building_id] if params[:building_id].present?
   end
 
   def create
-    unless current_user.can_add_listing?
-      redirect_to billing_subscription_path,
-                  alert: "لقد استنفدت عدد الإعلانات المسموح بها — قم بترقية خطتك"
-      return
-    end
     @property = current_user.properties.new(property_params)
     if @property.save
       redirect_to @property, notice: "تم إنشاء العقار بنجاح"
@@ -40,8 +50,7 @@ class PropertiesController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @property.update(property_params)
@@ -73,9 +82,7 @@ class PropertiesController < ApplicationController
 
   private
 
-  def set_property
-    @property = Property.find(params[:id])
-  end
+  def set_property = @property = Property.find(params[:id])
 
   def authorize_agent!
     unless current_user&.property_agent?
@@ -95,8 +102,7 @@ class PropertiesController < ApplicationController
       :price, :currency, :size, :floor, :total_floors,
       :rooms, :bathrooms, :address, :city_id, :status,
       :latitude, :longitude,
-      :building_id, :unit_number, :unit_label,
-      :youtube_url,
+      :building_id, :unit_number, :unit_label, :youtube_url,
       :cover_image,
       images: []
     ] + Property::AMENITIES.keys
