@@ -1,6 +1,7 @@
 module Dashboard
   class TenantsController < Dashboard::BaseController
     before_action :set_tenant, only: [:edit, :update, :destroy, :toggle_active]
+    before_action :load_properties, only: [:index]
 
     def index
       @tenants = current_user.tenants.includes(:property, :contracts, :payments)
@@ -16,6 +17,7 @@ module Dashboard
       end
 
       @tenants = @tenants.joins(:contracts).where(contracts: { kind: params[:kind] }).distinct if params[:kind].present?
+      @tenants = @tenants.where(property_id: params[:property_id]) if params[:property_id].present?
 
       @tenants = case params[:sort]
       when "name"      then @tenants.order(:full_name)
@@ -67,7 +69,16 @@ module Dashboard
 
     private
 
-    def set_tenant = @tenant = current_user.tenants.find(params[:id])
+    def set_tenant
+      @tenant = current_user.tenants.find(params[:id])
+    end
+
+    def load_properties
+      @in_buildings = current_user.properties.where.not(building_id: nil)
+                                 .includes(:building)
+                                 .group_by(&:building)
+      @standalone   = current_user.properties.where(building_id: nil)
+    end
 
     def tenant_params
       params.require(:tenant).permit(:property_id, :full_name, :phone, :national_id,

@@ -1,0 +1,21 @@
+<select name="<%= name %>" class="input">
+  <option value="">🏢 كل الأبنية</option>
+  <% in_buildings.each do |building, units| %>
+    <optgroup label="🏢 <%= building.name %>">
+      <% units.each do |p| %>
+        <option value="<%= p.id %>" <%= "selected" if selected_id.to_s == p.id.to_s %>>
+          🚪 وحدة <%= p.unit_number %> — <%= p.property_type_ar %> (<%= p.size %> م²)
+        </option>
+      <% end %>
+    </optgroup>
+  <% end %>
+  <% if standalone.any? %>
+    <optgroup label="🏘️ عقارات مستقلة">
+      <% standalone.each do |p| %>
+        <option value="<%= p.id %>" <%= "selected" if selected_id.to_s == p.id.to_s %>>
+          <%= p.title %> — <%= p.city.name_ar %>
+        </option>
+      <% end %>
+    </optgroup>
+  <% end %>
+</select>

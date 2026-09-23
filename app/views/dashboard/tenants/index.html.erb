@@ -41,9 +41,11 @@
           placeholder: "🔍 بحث بالاسم أو الهاتف أو الرقم الوطني",
           class: "input", style: "grid-column: span 2;" %>
 
-      <%= select_tag :building_id,
-          options_from_collection_for_select(@buildings, :id, :name, params[:building_id]),
-          include_blank: "🏢 كل الأبنية", class: "input" %>
+     <%= render "property_select",
+    name: "property_id",
+    in_buildings: @in_buildings,
+    standalone: @standalone,
+    selected_id: params[:property_id] %>
 
       <%= select_tag :sort,
           options_for_select([
