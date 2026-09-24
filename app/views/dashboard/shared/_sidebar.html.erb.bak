@@ -125,4 +125,4 @@
         class: "dash-nav-link #{'active' if current_page?(dashboard_reports_financials_path)}" %>
 
   </nav>
-</div>
+</aside>

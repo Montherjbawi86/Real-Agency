@@ -1,10 +1,10 @@
-<nav dir="rtl" class="main-nav">
+<nav dir="rtl" class="main-nav" id="main-nav">
   <div class="nav-inner">
     <div class="nav-row">
 
       <%= link_to root_path, class: "nav-logo" do %>
         <div class="nav-logo-icon">🏢</div>
-        <div>
+        <div class="nav-logo-text">
           <div class="nav-logo-title">سوريا للعقارات والسيارات</div>
           <div class="nav-logo-sub">منصة الوكلاء الموثوقين</div>
         </div>
@@ -20,36 +20,28 @@
       <div class="nav-user">
         <% if user_signed_in? %>
 
-          <%# ============ ADMIN BUTTON ============ %>
           <% if current_user.admin? %>
-            <a href="/admin"
-               class="nav-admin-btn"
-               title="لوحة الإدارة">
-              🛡️ <span class="hidden md:inline">لوحة الإدارة</span>
-            </a>
-          <% end %>
-
-          <%# ============ AGENT DASHBOARD ============ %>
-          <% if current_user.agent? %>
-            <%= link_to dashboard_root_path, class: "nav-dashboard-btn" do %>
-              <span>🎛️</span> <span class="hidden md:inline">لوحة التحكم</span>
+            <%= link_to "/admin", class: "nav-admin-btn", title: "لوحة الإدارة" do %>
+              🛡️ <span class="nav-btn-label">لوحة الإدارة</span>
             <% end %>
           <% end %>
 
-          <%# ============ USER DROPDOWN ============ %>
+          <% if current_user.agent? %>
+            <%= link_to dashboard_root_path, class: "nav-dashboard-btn" do %>
+              <span>🎛️</span> <span class="nav-btn-label">لوحة التحكم</span>
+            <% end %>
+          <% end %>
+
           <div class="nav-dropdown-wrap">
-            <button class="nav-user-btn">
+            <button class="nav-user-btn" type="button" aria-label="الحساب">
               <div class="nav-avatar"><%= current_user.display_name.first %></div>
-              <span class="hidden md:inline"><%= current_user.display_name %></span>
-              <span>▼</span>
+              <span class="nav-user-name"><%= current_user.display_name %></span>
+              <span class="nav-caret">▼</span>
             </button>
 
             <div class="nav-dropdown">
-
               <% if current_user.admin? %>
-                <a href="/admin" class="logout" style="color:#dc2626; font-weight:700;">
-                  🛡️ لوحة الإدارة
-                </a>
+                <a href="/admin" class="dropdown-admin">🛡️ لوحة الإدارة</a>
                 <div class="divider"></div>
               <% end %>
 
@@ -76,8 +68,66 @@
           <%= link_to "دخول", new_user_session_path, class: "nav-login" %>
           <%= link_to "تسجيل", new_user_registration_path, class: "nav-signup" %>
         <% end %>
+
+        <%# ============ HAMBURGER (mobile + tablet) ============ %>
+        <button class="nav-hamburger" id="nav-hamburger" type="button" aria-label="القائمة">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
 
     </div>
   </div>
+
+  <%# ============ MOBILE DRAWER ============ %>
+  <div class="nav-drawer-backdrop" id="nav-drawer-backdrop"></div>
+  <aside class="nav-drawer" id="nav-drawer" dir="rtl">
+    <div class="nav-drawer-header">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">🏢</div>
+        <div class="nav-logo-text">
+          <div class="nav-logo-title">سوريا للعقارات</div>
+          <div class="nav-logo-sub">والسيارات</div>
+        </div>
+      </div>
+      <button class="nav-drawer-close" id="nav-drawer-close" type="button" aria-label="إغلاق">✕</button>
+    </div>
+
+    <nav class="nav-drawer-links">
+      <%= link_to "🏠 الرئيسية", root_path, class: "nav-drawer-link" %>
+      <%= link_to "🏘️ العقارات", properties_path, class: "nav-drawer-link" %>
+      <%= link_to "🚗 السيارات", cars_path, class: "nav-drawer-link" %>
+      <%= link_to "🏢 الأبنية", buildings_path, class: "nav-drawer-link" %>
+
+      <div class="nav-drawer-divider"></div>
+
+      <% if user_signed_in? %>
+        <% if current_user.admin? %>
+          <%= link_to "🛡️ لوحة الإدارة", "/admin", class: "nav-drawer-link nav-drawer-link-admin" %>
+        <% end %>
+
+        <% if current_user.agent? %>
+          <%= link_to "🎛️ لوحة التحكم", dashboard_root_path, class: "nav-drawer-link" %>
+          <% if current_user.agency %>
+            <%= link_to "🏢 ملف الوكالة", dashboard_agency_path, class: "nav-drawer-link" %>
+          <% else %>
+            <%= link_to "🏢 أنشئ وكالتك", new_dashboard_agency_path, class: "nav-drawer-link" %>
+          <% end %>
+          <%= link_to "💳 الاشتراك", billing_subscription_path, class: "nav-drawer-link" %>
+        <% end %>
+
+        <%= link_to "⚙️ حسابي", edit_user_registration_path, class: "nav-drawer-link" %>
+
+        <div class="nav-drawer-divider"></div>
+
+        <%= button_to "🚪 خروج", destroy_user_session_path,
+            method: :delete, class: "nav-drawer-link nav-drawer-logout" %>
+      <% else %>
+        <%= link_to "دخول", new_user_session_path, class: "nav-drawer-link" %>
+        <%= link_to "تسجيل", new_user_registration_path,
+            class: "nav-drawer-link nav-drawer-signup" %>
+      <% end %>
+    </nav>
+  </aside>
 </nav>

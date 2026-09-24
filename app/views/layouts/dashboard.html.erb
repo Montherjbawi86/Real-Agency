@@ -6,29 +6,41 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
   <body class="flex flex-col min-h-screen <%= "#{controller_path.tr('/', '-')}-#{action_name}" %>" style="background:#f9fafb;">
+
     <%= render "shared/navbar" %>
 
     <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
     <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
 
     <div class="dash-layout">
-      <%= render "dashboard/shared/sidebar" %>
+      <div class="dash-sidebar-backdrop" id="dash-sidebar-backdrop"></div>
+      <aside class="dash-sidebar" id="dash-sidebar">
+        <%= render "dashboard/shared/sidebar" %>
+      </aside>
+
       <div class="dash-main">
         <header class="dash-header">
-          <h1 class="dash-header-title">
-            <%= current_user.property_agent? ? "🎛️ لوحة تحكم العقارات" : "🎛️ لوحة تحكم السيارات" %>
-          </h1>
-          <div class="flex gap-2">
+          <div class="dash-header-left">
+            <button class="dash-sidebar-toggle" id="dash-sidebar-toggle" type="button" aria-label="القائمة">
+              ☰
+            </button>
+            <h1 class="dash-header-title">
+              <%= current_user.property_agent? ? "🎛️ لوحة تحكم العقارات" : "🎛️ لوحة تحكم السيارات" %>
+            </h1>
+          </div>
+          <div class="dash-header-actions">
             <% if current_user.admin? %>
-              <a href="/admin" class="btn btn-danger btn-sm" style="background:#dc2626;">
+              <%= link_to "/admin", class: "btn btn-danger btn-sm" do %>
                 🛡️ لوحة الإدارة
-              </a>
+              <% end %>
             <% end %>
             <%= link_to "الموقع العام ←", root_path, class: "btn btn-outline btn-sm" %>
           </div>
         </header>
+
         <main class="dash-content">
           <%= render "shared/subscription_banner" %>
           <%= yield %>

@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
-    <title>لوحة الإدارة — سوريا للعقارات</title>
+    <title>لوحة الإدارة — سوريا للعقارات والسيارات</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
-  <body class="bg-gray-100 flex flex-col min-h-screen">
-    <nav class="main-nav">
-      <div class="nav-inner">
-        <div class="nav-row">
-          <%= link_to admin_root_path, class: "nav-logo" do %>
-            <div class="nav-logo-icon" style="background:linear-gradient(to bottom right, #dc2626, #991b1b);">🛡️</div>
-            <div>
-              <div class="nav-logo-title">لوحة الإدارة</div>
-              <div class="nav-logo-sub">سوريا للعقارات والسيارات</div>
-            </div>
-          <% end %>
-          <div class="nav-links">
-            <%= link_to "📊 الرئيسية", admin_root_path, class: "nav-link #{'active' if current_page?(admin_root_path)}" %>
-            <%= link_to "💳 طلبات الدفع", admin_payment_requests_path, class: "nav-link #{'active' if current_page?(admin_payment_requests_path)}" %>
-            <%= link_to "🏢 الوكالات", admin_agencies_path, class: "nav-link #{'active' if current_page?(admin_agencies_path)}" %>
-            <%= link_to "🏘️ العقارات", admin_properties_path, class: "nav-link #{'active' if current_page?(admin_properties_path)}" %>
-            <%= link_to "🚗 السيارات", admin_cars_path, class: "nav-link #{'active' if current_page?(admin_cars_path)}" %>
-            <%= link_to "👥 المستخدمون", admin_users_path, class: "nav-link #{'active' if current_page?(admin_users_path)}" %>
-            <%= link_to "📋 الاشتراكات", admin_subscriptions_path, class: "nav-link #{'active' if current_page?(admin_subscriptions_path)}" %>
-            <%= link_to "🎯 الخطط", admin_plans_path, class: "nav-link #{'active' if current_page?(admin_plans_path)}" %>
-            <%= link_to "⚙️ الإعدادات", admin_settings_path, class: "nav-link #{'active' if current_page?(admin_settings_path)}" %>
-            <%= link_to "🌐 الموقع", root_path, class: "nav-link" %>
-          </div>
-          <div class="nav-user">
-            <span class="text-white text-sm"><%= current_user.display_name %></span>
-            <%= button_to "خروج", destroy_user_session_path, method: :delete, class: "nav-login" %>
-          </div>
+  <body class="flex flex-col min-h-screen bg-gray-100">
+
+    <%= render "shared/navbar" %>
+
+    <div class="admin-topbar">
+      <div class="admin-topbar-inner">
+        <div class="admin-topbar-title">
+          <span class="admin-badge">🛡️</span>
+          <span>لوحة الإدارة</span>
         </div>
+        <nav class="admin-topbar-links">
+          <%= link_to "📊 الرئيسية", admin_root_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_root_path)}" %>
+          <%= link_to "💳 طلبات الدفع", admin_payment_requests_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_payment_requests_path)}" %>
+          <%= link_to "🏢 الوكالات", admin_agencies_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_agencies_path)}" %>
+          <%= link_to "🏘️ العقارات", admin_properties_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_properties_path)}" %>
+          <%= link_to "🚗 السيارات", admin_cars_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_cars_path)}" %>
+          <%= link_to "👥 المستخدمون", admin_users_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_users_path)}" %>
+          <%= link_to "📋 الاشتراكات", admin_subscriptions_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_subscriptions_path)}" %>
+          <%= link_to "🎯 الخطط", admin_plans_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_plans_path)}" %>
+          <%= link_to "⚙️ الإعدادات", admin_settings_path,
+              class: "admin-topbar-link #{'active' if current_page?(admin_settings_path)}" %>
+          <%= link_to "🌐 الموقع", root_path, class: "admin-topbar-link" %>
+        </nav>
       </div>
-    </nav>
+    </div>
 
     <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
     <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>

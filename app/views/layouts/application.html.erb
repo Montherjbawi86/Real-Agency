@@ -21,6 +21,7 @@
     <meta name="twitter:description" content="<%= content_for?(:og_description) ? yield(:og_description) : 'منصة تجمع أفضل وكلاء العقارات والسيارات' %>">
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
   <body class="flex flex-col min-h-screen" style="background:#f9fafb;">
     <%= render "shared/navbar" %>
@@ -34,7 +35,10 @@
 
     <% if show_sidebar %>
       <div class="dash-layout">
-        <%= render "dashboard/shared/sidebar" %>
+        <div class="dash-sidebar-backdrop" id="dash-sidebar-backdrop"></div>
+        <aside class="dash-sidebar" id="dash-sidebar">
+          <%= render "dashboard/shared/sidebar" %>
+        </aside>
         <main class="dash-main">
           <div class="dash-content"><%= yield %></div>
         </main>
@@ -44,6 +48,6 @@
     <% end %>
 
     <%= render "shared/footer" %>
-      <%= render "shared/ai_chat_widget" %>
+    <%= render "shared/ai_chat_widget" %>
   </body>
 </html>

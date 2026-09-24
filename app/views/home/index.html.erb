@@ -1,9 +1,7 @@
 <div dir="rtl">
 
+  <!-- HERO -->
   <section class="hero">
-    <div class="hero-blob hero-blob-top"></div>
-    <div class="hero-blob hero-blob-bottom"></div>
-
     <div class="hero-inner">
       <div class="hero-content">
         <span class="hero-badge">✨ منصة سورية موثوقة</span>
@@ -16,283 +14,180 @@
           <br>في كل سوريا
         </h1>
 
-        <p class="hero-subtitle">
-          منصة تجمع أفضل وكلاء العقارات والسيارات في مكان واحد
-        </p>
+        <p class="hero-subtitle">منصة تجمع أفضل وكلاء العقارات والسيارات</p>
 
-        <div class="search-box">
-  <div style="display:flex; gap:0.5rem; padding:0.5rem; border-radius:0.75rem; background:#e5e7eb; margin-bottom:0.75rem;">
-    <button type="button"
-            class="search-tab-btn active"
-            onclick="window.homeTab('property')"
-            data-tab="property"
-            style="flex:1; padding:1rem; background:#2563eb; color:#000000; border:2px solid #2563eb; border-radius:0.5rem; font-weight:700; font-size:1.0625rem; cursor:pointer;">
-      🏘️ عقارات
-    </button>
-    <button type="button"
-            class="search-tab-btn"
-            onclick="window.homeTab('car')"
-            data-tab="car"
-            style="flex:1; padding:1rem; background:transparent; color:#000000; border:2px solid transparent; border-radius:0.5rem; font-weight:700; font-size:1.0625rem; cursor:pointer;">
-      🚗 سيارات
-    </button>
-  </div>
+        <!-- SEARCH BOX -->
+        <div class="search-box" style="background:#fff; border-radius:1rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:1.25rem;">
 
-  <form action="/properties" method="get" id="property-search-form" class="search-fields">
-    <div class="search-select-wrap">
-      <span class="search-select-icon">📍</span>
-      <select name="city_id" class="input">
-        <option value="">كل المدن</option>
-        <% @cities.each do |city| %>
-          <option value="<%= city.id %>"><%= city.name_ar %></option>
-        <% end %>
-      </select>
-    </div>
-    <div class="search-select-wrap">
-      <span class="search-select-icon">🏠</span>
-      <select name="type" class="input">
-        <option value="">كل الأنواع</option>
-        <option value="apartment">شقة</option>
-        <option value="villa">فيلا</option>
-        <option value="land">أرض</option>
-        <option value="shop">محل تجاري</option>
-        <option value="office">مكتب</option>
-      </select>
-    </div>
-    <div class="search-select-wrap">
-      <span class="search-select-icon">💰</span>
-      <select name="listing" class="input">
-        <option value="">بيع / إيجار</option>
-        <option value="sale">للبيع</option>
-        <option value="rent">للإيجار</option>
-      </select>
-    </div>
-    <button type="submit" class="search-btn">🔍 ابحث الآن</button>
-  </form>
+          <div style="display:flex; gap:0.5rem; padding:0.5rem; border-radius:0.75rem; background:#f1f5f9; margin-bottom:1rem;">
+            <button type="button" class="search-tab-btn active" onclick="window.homeTab('property')" data-tab="property"
+                    style="flex:1; padding:0.875rem; background:#0f766e; color:#ffffff; border:2px solid #0f766e; border-radius:0.5rem; font-weight:700; font-size:1rem; cursor:pointer;">🏘️ عقارات</button>
+            <button type="button" class="search-tab-btn" onclick="window.homeTab('car')" data-tab="car"
+                    style="flex:1; padding:0.875rem; background:transparent; color:#374151; border:2px solid transparent; border-radius:0.5rem; font-weight:700; font-size:1rem; cursor:pointer;">🚗 سيارات</button>
+          </div>
 
-  <form action="/cars" method="get" id="car-search-form" class="search-fields" style="display:none;">
-    <div class="search-select-wrap">
-      <span class="search-select-icon">📍</span>
-      <select name="city_id" class="input">
-        <option value="">كل المدن</option>
-        <% @cities.each do |city| %>
-          <option value="<%= city.id %>"><%= city.name_ar %></option>
-        <% end %>
-      </select>
-    </div>
-    <div class="search-select-wrap">
-      <span class="search-select-icon">🚗</span>
-      <select name="body_type" class="input">
-        <option value="">كل الأنواع</option>
-        <option value="sedan">سيدان</option>
-        <option value="suv">دفع رباعي</option>
-        <option value="hatchback">هاتشباك</option>
-        <option value="pickup">بيك أب</option>
-        <option value="van">فان</option>
-      </select>
-    </div>
-    <div class="search-select-wrap">
-      <span class="search-select-icon">⛽</span>
-      <select name="fuel_type" class="input">
-        <option value="">كل أنواع الوقود</option>
-        <option value="petrol">بنزين</option>
-        <option value="diesel">ديزل</option>
-        <option value="hybrid">هجين</option>
-        <option value="electric">كهربائي</option>
-        <option value="gas">غاز</option>
-      </select>
-    </div>
-    <button type="submit" class="search-btn">🔍 ابحث الآن</button>
-  </form>
-</div>
+          <!-- PROPERTIES FORM -->
+          <form action="/properties" method="get" id="property-search-form" style="display:grid; gap:0.75rem;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">📍 المدينة</label>
+                <select name="city_id" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">كل المدن</option>
+                  <% @cities.each do |city| %><option value="<%= city.id %>"><%= city.name_ar %></option><% end %>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">🏠 نوع العقار</label>
+                <select name="type" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">كل الأنواع</option>
+                  <option value="apartment">شقة</option><option value="villa">فيلا</option>
+                  <option value="land">أرض</option><option value="shop">محل تجاري</option>
+                  <option value="office">مكتب</option><option value="building">بناء</option>
+                  <option value="warehouse">مستودع</option><option value="farm">مزرعة</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">💰 العرض</label>
+                <select name="listing" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">بيع / إيجار</option>
+                  <option value="sale">للبيع</option><option value="rent">للإيجار</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">🛏️ غرف النوم</label>
+                <select name="min_rooms" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">الكل</option>
+                  <option value="1">1+</option><option value="2">2+</option>
+                  <option value="3">3+</option><option value="4">4+</option><option value="5">5+</option>
+                </select>
+              </div>
+            </div>
 
-<script>
-  window.homeTab = function(tab) {
-    var buttons = document.querySelectorAll(".search-tab-btn");
-    buttons.forEach(function(b) {
-      var isActive = b.dataset.tab === tab;
-      b.classList.toggle("active", isActive);
-      if (isActive) {
-        b.style.background = "#2563eb";
-        b.style.color = "#000000";
-        b.style.borderColor = "#2563eb";
-      } else {
-        b.style.background = "transparent";
-        b.style.color = "#000000";
-        b.style.borderColor = "transparent";
-      }
-    });
-    document.getElementById("property-search-form").style.display = tab === "property" ? "grid" : "none";
-    document.getElementById("car-search-form").style.display      = tab === "car"      ? "grid" : "none";
-  };
-</script>
+            <details style="border:1px solid #e5e7eb; border-radius:0.5rem; padding:0.75rem;">
+              <summary style="cursor:pointer; font-weight:700; color:#111827;">⚙️ فلاتر متقدمة</summary>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0.75rem; margin-top:0.75rem;">
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">💵 السعر من</label><input type="number" name="min_price" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">💵 السعر إلى</label><input type="number" name="max_price" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">💱 العملة</label><select name="currency" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"><option value="">الكل</option><option value="SYP">ل.س</option><option value="USD">$</option></select></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">📐 المساحة من</label><input type="number" name="min_size" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">📐 المساحة إلى</label><input type="number" name="max_size" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">🚿 الحمامات</label><select name="min_bathrooms" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"><option value="">الكل</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select></div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#374151;">✨ المزايا</label>
+                <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.35rem;">
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_elevator" value="1"> مصعد</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_parking" value="1"> موقف</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="furnished" value="1"> مفروش</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_pool" value="1"> مسبح</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_garden" value="1"> حديقة</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_solar_energy" value="1"> طاقة شمسية</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_generator" value="1"> مولّد</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_central_heating" value="1"> تدفئة</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_ac" value="1"> تكييف</label>
+                </div>
+              </div>
+            </details>
 
-        <div class="hero-quick-links">
-          <span>بحث سريع:</span>
-          <%= link_to "شقق للبيع", properties_path(type: "apartment", listing: "sale"), class: "hero-quick-link" %>
-          <%= link_to "فلل",       properties_path(type: "villa"),                          class: "hero-quick-link" %>
-          <%= link_to "سيارات",    cars_path,                                               class: "hero-quick-link" %>
+            <button type="submit" style="width:100%; padding:1rem; background:linear-gradient(to left, #f59e0b, #f97316); color:#fff; border:none; border-radius:0.5rem; font-weight:700; font-size:1.05rem; cursor:pointer;">🔍 ابحث الآن</button>
+          </form>
+
+          <!-- CARS FORM -->
+          <form action="/cars" method="get" id="car-search-form" style="display:none; gap:0.75rem;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">📍 المدينة</label>
+                <select name="city_id" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">كل المدن</option>
+                  <% @cities.each do |city| %><option value="<%= city.id %>"><%= city.name_ar %></option><% end %>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">🚗 نوع الهيكل</label>
+                <select name="body_type" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">الكل</option>
+                  <option value="sedan">سيدان</option><option value="suv">دفع رباعي</option>
+                  <option value="hatchback">هاتشباك</option><option value="pickup">بيك أب</option>
+                  <option value="van">فان</option><option value="coupe">كوبيه</option>
+                  <option value="convertible">مكشوفة</option><option value="wagon">ستيشن</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">⛽ الوقود</label>
+                <select name="fuel_type" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">الكل</option>
+                  <option value="petrol">بنزين</option><option value="diesel">ديزل</option>
+                  <option value="hybrid">هجين</option><option value="electric">كهربائي</option>
+                  <option value="gas">غاز</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:#374151; margin-bottom:0.25rem;">🔧 الحالة</label>
+                <select name="condition" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;">
+                  <option value="">الكل</option>
+                  <option value="new_car">جديد</option><option value="used">مستعمل</option>
+                  <option value="certified">معتمد</option>
+                </select>
+              </div>
+            </div>
+
+            <details style="border:1px solid #e5e7eb; border-radius:0.5rem; padding:0.75rem;">
+              <summary style="cursor:pointer; font-weight:700; color:#111827;">⚙️ فلاتر متقدمة</summary>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0.75rem; margin-top:0.75rem;">
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">💵 السعر من</label><input type="number" name="min_price" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">💵 السعر إلى</label><input type="number" name="max_price" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">📅 السنة من</label><input type="number" name="min_year" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">📅 السنة إلى</label><input type="number" name="max_year" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">🛣️ أقصى مسافة (كم)</label><input type="number" name="max_mileage" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"></div>
+                <div><label style="font-size:0.75rem; font-weight:700; color:#374151;">⚙️ ناقل الحركة</label><select name="transmission" style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:0.5rem;"><option value="">الكل</option><option value="manual">عادي</option><option value="automatic">أوتوماتيك</option></select></div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#374151;">✨ المزايا</label>
+                <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.35rem;">
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_ac" value="1"> تكييف</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_sunroof" value="1"> فتحة سقف</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_camera" value="1"> كاميرا</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_navigation" value="1"> ملاحة</label>
+                  <label style="display:flex; gap:0.35rem; font-size:0.85rem;"><input type="checkbox" name="has_leather_seats" value="1"> مقاعد جلد</label>
+                </div>
+              </div>
+            </details>
+
+            <button type="submit" style="width:100%; padding:1rem; background:linear-gradient(to left, #f59e0b, #f97316); color:#fff; border:none; border-radius:0.5rem; font-weight:700; font-size:1.05rem; cursor:pointer;">🔍 ابحث الآن</button>
+          </form>
+
+          <script>
+            window.homeTab = function(tab) {
+              document.querySelectorAll(".search-tab-btn").forEach(function(b) {
+                var isActive = b.dataset.tab === tab;
+                b.classList.toggle("active", isActive);
+                if (isActive) {
+                  b.style.background = "#0f766e";
+                  b.style.color = "#ffffff";
+                  b.style.borderColor = "#0f766e";
+                } else {
+                  b.style.background = "transparent";
+                  b.style.color = "#374151";
+                  b.style.borderColor = "transparent";
+                }
+              });
+              document.getElementById("property-search-form").style.display = tab === "property" ? "grid" : "none";
+              document.getElementById("car-search-form").style.display = tab === "car" ? "grid" : "none";
+            };
+          </script>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- STATS BAR -->
   <section class="stats-bar">
     <div class="stats-inner">
       <div class="stats-grid">
-        <div class="stat-item">
-          <p class="stat-value stat-value-blue"><%= @properties_count %></p>
-          <p class="stat-label">🏘️ عقار متاح</p>
-        </div>
-        <div class="stat-item" style="animation-delay:50ms;">
-          <p class="stat-value stat-value-emerald"><%= @cars_count %></p>
-          <p class="stat-label">🚗 سيارة متاحة</p>
-        </div>
-        <div class="stat-item" style="animation-delay:100ms;">
-          <p class="stat-value stat-value-amber"><%= @agents_count %></p>
-          <p class="stat-label">🤝 وكيل موثوق</p>
-        </div>
-        <div class="stat-item" style="animation-delay:150ms;">
-          <p class="stat-value stat-value-indigo"><%= @cities_count %></p>
-          <p class="stat-label">🏙️ محافظة</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="categories-section">
-    <div class="categories-grid">
-
-      <div class="category-card category-card-property">
-        <div class="category-head">
-          <div class="category-icon category-icon-property">🏘️</div>
-          <%= link_to "العقارات", properties_path, class: "category-title" %>
-        </div>
-        <p class="category-desc">شقق، فلل، أراضٍ، محلات، مكاتب</p>
-        <div class="category-actions">
-          <%= link_to "شقق للبيع",   properties_path(type: "apartment", listing: "sale"), class: "category-chip" %>
-          <%= link_to "فلل للإيجار", properties_path(type: "villa", listing: "rent"),     class: "category-chip" %>
-          <%= link_to "أراضٍ",       properties_path(type: "land"),                       class: "category-chip" %>
-          <%= link_to "الكل ←",      properties_path,                                     class: "category-chip-primary" %>
-        </div>
-      </div>
-
-      <div class="category-card category-card-car">
-        <div class="category-head">
-          <div class="category-icon category-icon-car">🚗</div>
-          <%= link_to "السيارات", cars_path, class: "category-title" %>
-        </div>
-        <p class="category-desc">سيارات جديدة ومستعملة</p>
-        <div class="category-actions">
-          <%= link_to "سيدان",     cars_path(body_type: "sedan"),  class: "category-chip" %>
-          <%= link_to "دفع رباعي", cars_path(body_type: "suv"),    class: "category-chip" %>
-          <%= link_to "بيك أب",    cars_path(body_type: "pickup"), class: "category-chip" %>
-          <%= link_to "الكل ←",    cars_path,                      class: "category-chip-primary" %>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <section class="recent-section">
-    <div class="recent-head">
-      <div>
-        <h2 class="recent-title">🏘️ أحدث العقارات</h2>
-        <p class="recent-sub">آخر العقارات المضافة على المنصة</p>
-      </div>
-      <%= link_to "عرض الكل ←", properties_path, class: "recent-link-blue" %>
-    </div>
-
-    <div class="recent-grid">
-      <% @recent_properties.each_with_index do |p, i| %>
-        <div class="listing-card" style="animation-delay: <%= i * 60 %>ms;">
-          <div class="listing-image-wrap">
-            <% if p.cover_image.attached? %>
-              <%= image_tag p.cover_image, class: "listing-image" %>
-            <% else %>
-              <div class="listing-image-placeholder">🏠</div>
-            <% end %>
-            <div class="listing-badges-tr">
-              <span class="badge <%= p.sale? ? 'badge-purple' : 'badge-blue' %>">
-                <%= p.sale? ? "💰 للبيع" : "🔑 للإيجار" %>
-              </span>
-            </div>
-            <div class="listing-price-badge">
-              <span class="listing-price-value"><%= number_with_precision(p.price, precision: 0, delimiter: ",") %></span>
-              <span class="listing-price-currency"><%= p.currency %></span>
-            </div>
-          </div>
-          <div class="listing-body">
-            <h3 class="listing-title"><%= link_to p.title, property_path(p) %></h3>
-            <p class="listing-sub">📍 <%= p.city.name_ar %> — <%= p.property_type_ar %></p>
-            <div class="listing-features">
-              <span>📐 <%= p.size %> م²</span>
-              <% if p.rooms.to_i > 0 %><span>🛏️ <%= p.rooms %></span><% end %>
-              <% if p.bathrooms.to_i > 0 %><span>🚿 <%= p.bathrooms %></span><% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  </section>
-
-  <section class="recent-section-alt">
-    <div class="container mx-auto px-6">
-      <div class="recent-head">
-        <div>
-          <h2 class="recent-title">🚗 أحدث السيارات</h2>
-          <p class="recent-sub">آخر السيارات المضافة على المنصة</p>
-        </div>
-        <%= link_to "عرض الكل ←", cars_path, class: "recent-link-emerald" %>
-      </div>
-
-      <div class="recent-grid">
-        <% @recent_cars.each_with_index do |c, i| %>
-          <div class="listing-card" style="animation-delay: <%= i * 60 %>ms;">
-            <div class="listing-image-wrap">
-              <% if c.cover_image.attached? %>
-                <%= image_tag c.cover_image, class: "listing-image" %>
-              <% else %>
-                <div class="listing-image-placeholder">🚗</div>
-              <% end %>
-              <div class="listing-badges-tr">
-                <span class="badge <%= c.new_car? ? 'badge-green' : (c.certified? ? 'badge-blue' : 'badge-yellow') %>">
-                  <%= c.condition_ar %>
-                </span>
-              </div>
-              <div class="listing-price-badge">
-                <span class="listing-price-value"><%= number_with_precision(c.price, precision: 0, delimiter: ",") %></span>
-                <span class="listing-price-currency"><%= c.currency %></span>
-              </div>
-            </div>
-            <div class="listing-body">
-              <h3 class="listing-title"><%= link_to c.title, car_path(c) %></h3>
-              <p class="listing-sub"><%= c.brand %> <%= c.car_model %> — <%= c.year %></p>
-              <p class="listing-sub">📍 <%= c.city.name_ar %></p>
-              <div class="listing-features">
-                <span>🛣️ <%= number_with_delimiter(c.mileage) %> كم</span>
-                <span>⛽ <%= c.fuel_type_ar %></span>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  </section>
-
-  <section class="cta-section">
-    <div class="cta-box">
-      <div class="cta-blob cta-blob-top"></div>
-      <div class="cta-blob cta-blob-bottom"></div>
-      <div class="cta-content">
-        <h2 class="cta-title">هل أنت وكيل عقارات أو سيارات؟</h2>
-        <p class="cta-sub">
-          انضم إلى منصتنا واعرض عقاراتك وسياراتك لآلاف العملاء في كل سوريا
-        </p>
-        <div class="cta-actions">
-          <%= link_to "سجّل كـ وكيل", new_user_registration_path, class: "cta-btn-primary" %>
-          <%= link_to "تصفح المنصة", properties_path,             class: "cta-btn-secondary" %>
-        </div>
+        <div class="stat-item"><p class="stat-value stat-value-blue"><%= @properties_count %></p><p class="stat-label">🏘️ عقار متاح</p></div>
+        <div class="stat-item"><p class="stat-value stat-value-emerald"><%= @cars_count %></p><p class="stat-label">🚗 سيارة متاحة</p></div>
+        <div class="stat-item"><p class="stat-value stat-value-amber"><%= @agents_count %></p><p class="stat-label">🤝 وكيل موثوق</p></div>
+        <div class="stat-item"><p class="stat-value stat-value-indigo"><%= @cities_count %></p><p class="stat-label">🏙️ محافظة</p></div>
       </div>
     </div>
   </section>
