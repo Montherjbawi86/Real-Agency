@@ -45,6 +45,6 @@
     <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
     <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
 
-    <main class="admin-main"><%= yield %></main>
+    <main class="flex-1 container-page"><%= yield %></main>
   </body>
 </html>

@@ -3,122 +3,769 @@
 <head>
   <meta charset="utf-8">
   <style>
-    @page { size: A4; margin: 15mm; }
-    body { font-family: 'Arial', sans-serif; direction: rtl; color: #111; font-size: 13px; }
-    h1 { font-size: 26px; text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; }
-    .sub { text-align: center; color: #555; font-size: 12px; margin-bottom: 25px; }
-    h2 { font-size: 16px; color: #1e3a8a; border-right: 4px solid #fbbf24; padding-right: 10px; margin-top: 20px; margin-bottom: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-    td { padding: 8px 12px; border: 1px solid #e5e7eb; }
-    td:first-child { background: #f9fafb; font-weight: bold; width: 35%; }
-    .amount { background: #eff6ff; text-align: center; font-size: 18px; font-weight: bold; padding: 15px; border-radius: 8px; margin: 15px 0; }
-    .progress { background: #f3f4f6; height: 10px; border-radius: 9999px; overflow: hidden; margin: 8px 0; }
-    .progress-fill { background: linear-gradient(to left, #059669, #10b981); height: 100%; }
-    .signatures { display: flex; justify-content: space-between; margin-top: 60px; }
-    .signature { width: 45%; text-align: center; border-top: 1px solid #333; padding-top: 8px; font-size: 12px; }
-    .footer { text-align: center; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 40px; font-size: 11px; color: #666; }
+    @page {
+      size: A4;
+      margin: 15mm 15mm 20mm 15mm;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+      direction: rtl;
+      color: #1f2937;
+      font-size: 14px;
+      line-height: 1.75;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ============ HEADER ============ */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 4px solid #1e3a8a;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      right: 0;
+      width: 30%;
+      height: 4px;
+      background: linear-gradient(to left, #fbbf24, #f97316);
+    }
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .header-logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #1e3a8a, #312e81);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: #fff;
+      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.25);
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1e3a8a;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+    .header-meta {
+      text-align: left;
+      font-size: 12px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+    .header-meta strong {
+      display: block;
+      font-size: 18px;
+      color: #1e3a8a;
+      margin-bottom: 5px;
+      font-weight: 800;
+    }
+    .header-meta .meta-label {
+      color: #9ca3af;
+      font-size: 11px;
+    }
+
+    /* ============ DOCUMENT TITLE ============ */
+    .doc-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e3a8a;
+      margin: 24px 0 8px;
+      letter-spacing: -0.5px;
+    }
+    .doc-subtitle {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 26px;
+    }
+    .doc-subtitle strong { color: #1e3a8a; font-weight: 800; }
+
+    .doc-badge {
+      display: inline-block;
+      padding: 6px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 12px;
+      letter-spacing: 0.02em;
+    }
+    .doc-badge-paid    { background: #d1fae5; color: #065f46; border: 2px solid #6ee7b7; }
+    .doc-badge-partial { background: #fef3c7; color: #92400e; border: 2px solid #fcd34d; }
+    .doc-badge-overdue { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
+    .doc-badge-unpaid  { background: #f3f4f6; color: #374151; border: 2px solid #d1d5db; }
+
+    /* ============ SECTION ============ */
+    .section {
+      margin-bottom: 22px;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1e3a8a;
+      padding: 10px 16px;
+      background: linear-gradient(to left, #eff6ff, #f9fafb);
+      border-right: 5px solid #fbbf24;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ============ TABLES ============ */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+    }
+    td {
+      padding: 11px 16px;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      vertical-align: middle;
+      line-height: 1.6;
+    }
+    td:first-child {
+      background: #f9fafb;
+      font-weight: 700;
+      color: #374151;
+      width: 38%;
+    }
+    tr:nth-child(even) td:first-child { background: #f3f4f6; }
+
+    /* ============ AGENT CARD ============ */
+    .agent-card {
+      display: flex;
+      gap: 16px;
+      background: linear-gradient(to left, #eff6ff, #ffffff);
+      border: 2px solid #bfdbfe;
+      border-right: 6px solid #2563eb;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+    .agent-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+    }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .agent-agency {
+      font-size: 14px;
+      color: #1e40af;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .agent-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    .agent-detail {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ============ FINANCIAL CARDS ============ */
+    .financial-grid {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .financial-card {
+      flex: 1;
+      padding: 16px 14px;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      text-align: center;
+      background: #fff;
+    }
+    .financial-card.total     { border-color: #1e3a8a; background: linear-gradient(to bottom, #eff6ff, #fff); }
+    .financial-card.paid      { border-color: #059669; background: linear-gradient(to bottom, #ecfdf5, #fff); }
+    .financial-card.remaining { border-color: #dc2626; background: linear-gradient(to bottom, #fef2f2, #fff); }
+    .financial-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #6b7280;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .financial-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.1;
+    }
+    .financial-card.total     .financial-value { color: #1e3a8a; }
+    .financial-card.paid      .financial-value { color: #047857; }
+    .financial-card.remaining .financial-value { color: #b91c1c; }
+
+    /* ============ PROGRESS ============ */
+    .progress-wrap { margin: 18px 0 22px; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+    .progress-label .percent {
+      color: #1e3a8a;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .progress-bar {
+      height: 14px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid #e5e7eb;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to left, #059669, #10b981);
+      border-radius: 999px;
+    }
+    .progress-fill.warn   { background: linear-gradient(to left, #d97706, #f59e0b); }
+    .progress-fill.danger { background: linear-gradient(to left, #dc2626, #ef4444); }
+
+    /* ============ PAYMENTS TABLE ============ */
+    .payments-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .payments-table thead tr {
+      background: linear-gradient(to left, #f9fafb, #f3f4f6);
+    }
+    .payments-table th {
+      padding: 11px 12px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 800;
+      color: #4b5563;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid #e5e7eb;
+    }
+    .payments-table td {
+      padding: 10px 12px;
+      border: 1px solid #f3f4f6;
+      font-size: 13px;
+    }
+    .payments-table td:first-child {
+      background: transparent;
+      width: auto;
+      font-weight: 700;
+      color: #111827;
+    }
+    .payments-table tr:nth-child(even) td { background: #f9fafb; }
+
+    /* ============ STATUS BADGES ============ */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .status-paid    { background: #d1fae5; color: #065f46; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-overdue { background: #fee2e2; color: #991b1b; }
+
+    /* ============ NOTES ============ */
+    .notes-box {
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+      border-right: 5px solid #fbbf24;
+      border-radius: 10px;
+      padding: 16px 18px;
+      font-size: 14px;
+      color: #78350f;
+      line-height: 1.8;
+    }
+
+    /* ============ SIGNATURES — PROPERLY ALIGNED ============ */
+    .signatures-section {
+      margin-top: 60px;
+      page-break-inside: avoid;
+    }
+    .signatures-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #6b7280;
+      margin-bottom: 40px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .signatures {
+      display: flex;
+      justify-content: space-between;
+      gap: 60px;
+    }
+    .signature-block {
+      flex: 1;
+      text-align: center;
+    }
+    .signature-party-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 55px;
+    }
+    .signature-line {
+      border-bottom: 2px solid #374151;
+      margin-bottom: 10px;
+      height: 1px;
+    }
+    .signature-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+    .signature-hint {
+      font-size: 11px;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    /* ============ STAMP BOX ============ */
+    .stamp-box {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0 20px;
+    }
+    .stamp-placeholder {
+      width: 130px;
+      height: 130px;
+      border: 3px dashed #d1d5db;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d1d5db;
+      font-size: 12px;
+      text-align: center;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* ============ FOOTER ============ */
+    .footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 3px solid #1e3a8a;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.8;
+    }
+    .footer strong {
+      color: #1e3a8a;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+    .footer-contact {
+      font-size: 12px;
+      color: #4b5563;
+      margin: 8px 0;
+    }
+    .footer-note {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e5e7eb;
+      font-style: italic;
+      color: #9ca3af;
+      font-size: 11px;
+    }
   </style>
 </head>
 <body>
-  <h1>عقد <%= @contract.kind_ar %></h1>
-  <div class="sub">
-    رقم العقد: #<%= @contract.id %><br>
-    التاريخ: <%= Date.current.strftime("%Y-%m-%d") %>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo">🏢</div>
+      <div>
+        <div class="header-title">سوريا للعقارات والسيارات</div>
+        <div class="header-sub">منصة الوكلاء الموثوقين</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <strong>عقد #<%= @contract.id %></strong>
+      <span class="meta-label">التاريخ:</span> <%= Date.current.strftime("%Y/%m/%d") %><br>
+      <span class="meta-label">الحالة:</span> <%= @contract.status_ar %>
+    </div>
   </div>
 
-  <h2>الأطراف</h2>
-  <table>
-    <tr><td>الطرف الأول (الوكيل)</td><td><%= @contract.user.display_name %></td></tr>
-    <tr><td>الطرف الثاني</td><td><%= @contract.party&.full_name %></td></tr>
-    <tr><td>رقم الهاتف</td><td><%= @contract.party&.phone %></td></tr>
-    <tr><td>الرقم الوطني</td><td><%= @contract.party&.try(:national_id) || "—" %></td></tr>
-  </table>
+  <!-- ============================================================
+       TITLE
+       ============================================================ -->
+  <div class="doc-title">عقد <%= @contract.kind_ar %></div>
+  <div class="doc-subtitle">
+    رقم العقد: <strong>#<%= @contract.id %></strong>
+    &nbsp;·&nbsp;
+    صدر بتاريخ <strong><%= Date.current.strftime("%Y/%m/%d") %></strong>
+    <br>
+    <span class="doc-badge
+      <%= 'doc-badge-paid'    if @contract.fully_paid? && !@contract.overpaid? %>
+      <%= 'doc-badge-overdue' if @contract.overpaid? || @contract.overdue_amount > 0 %>
+      <%= 'doc-badge-partial' if @contract.paid_amount > 0 && !@contract.fully_paid? && @contract.overdue_amount.zero? %>
+      <%= 'doc-badge-unpaid'  if @contract.paid_amount.zero? %>">
+      <%= @contract.payment_status_ar %>
+    </span>
+  </div>
 
-  <h2>الموضوع</h2>
-  <table>
-    <tr><td>النوع</td><td><%= @contract.subject_type_ar %></td></tr>
-    <% if @contract.property&.building %>
-      <tr><td>البناء</td><td><%= @contract.property.building.name %></td></tr>
-      <tr><td>رقم الوحدة</td><td><%= @contract.property.unit_number || "—" %></td></tr>
-      <tr><td>الطابق</td><td><%= @contract.property.floor || "—" %></td></tr>
+  <!-- ============================================================
+       AGENT
+       ============================================================ -->
+  <div class="section">
+    <div class="section-title">👤 بيانات الوكيل</div>
+    <div class="agent-card">
+      <div class="agent-avatar"><%= @contract.user.display_name.first.upcase %></div>
+      <div class="agent-info">
+        <div class="agent-name"><%= @contract.user.display_name %></div>
+        <% if @contract.user.agency %>
+          <div class="agent-agency">
+            🏢 <%= @contract.user.agency.name %>
+            <% if @contract.user.agency.city %>
+              — <%= @contract.user.agency.city.name_ar %>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="agent-details">
+          <% if @contract.user.phone.present? %>
+            <span class="agent-detail">📞 <%= @contract.user.phone %></span>
+          <% end %>
+          <% if @contract.user.email.present? %>
+            <span class="agent-detail">✉️ <%= @contract.user.email %></span>
+          <% end %>
+          <% if @contract.user.agency&.tax_number.present? %>
+            <span class="agent-detail">🆔 <%= @contract.user.agency.tax_number %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% if @contract.user.agency %>
+      <table>
+        <tr><td>اسم الوكالة</td><td><%= @contract.user.agency.name %></td></tr>
+        <% if @contract.user.agency.address.present? %>
+          <tr><td>عنوان الوكالة</td><td><%= @contract.user.agency.address %></td></tr>
+        <% end %>
+        <% if @contract.user.agency.commercial_registry.present? %>
+          <tr><td>السجل التجاري</td><td><%= @contract.user.agency.commercial_registry %></td></tr>
+        <% end %>
+      </table>
     <% end %>
-    <tr><td>الوصف</td><td><%= @contract.subject&.try(:title) %></td></tr>
-  </table>
+  </div>
 
-  <h2>الشروط</h2>
-  <table>
-    <tr><td>نوع العقد</td><td><%= @contract.kind_ar %></td></tr>
-    <tr><td>من تاريخ</td><td><%= @contract.start_date %></td></tr>
-    <tr><td>إلى تاريخ</td><td><%= @contract.end_date %></td></tr>
-    <% if @contract.days.present? %>
-      <tr><td>عدد الأيام</td><td><%= @contract.days %></td></tr>
-    <% end %>
-    <% if @contract.daily_rate.present? %>
-      <tr><td>السعر اليومي</td><td><%= number_with_precision(@contract.daily_rate, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
-    <% end %>
-    <% if @contract.start_odometer.present? || @contract.end_odometer.present? %>
-      <tr><td>عداد الاستلام</td><td><%= @contract.start_odometer || "—" %> كم</td></tr>
-      <tr><td>عداد التسليم</td><td><%= @contract.end_odometer || "—" %> كم</td></tr>
+  <!-- ============================================================
+       PARTIES
+       ============================================================ -->
+  <div class="section">
+    <div class="section-title">🤝 أطراف العقد</div>
+    <table>
+      <tr>
+        <td>الطرف الأول (الوكيل)</td>
+        <td><%= @contract.user.display_name %></td>
+      </tr>
+      <tr>
+        <td>الطرف الثاني</td>
+        <td><%= @contract.party&.full_name || "—" %></td>
+      </tr>
+      <tr>
+        <td>هاتف الطرف الثاني</td>
+        <td><%= @contract.party&.phone || "—" %></td>
+      </tr>
+      <% if @contract.party&.try(:national_id).present? %>
+        <tr>
+          <td>الرقم الوطني</td>
+          <td><%= @contract.party.national_id %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       SUBJECT
+       ============================================================ -->
+  <div class="section">
+    <div class="section-title">📋 موضوع العقد</div>
+    <table>
+      <tr>
+        <td>نوع الموضوع</td>
+        <td><%= @contract.subject_type_ar %></td>
+      </tr>
+      <tr>
+        <td>الوصف</td>
+        <td><%= @contract.subject_label %></td>
+      </tr>
+      <% if @contract.property&.building %>
+        <tr><td>البناء</td><td><%= @contract.property.building.name %></td></tr>
+        <tr><td>رقم الوحدة</td><td><%= @contract.property.unit_number || "—" %></td></tr>
+        <tr><td>الطابق</td><td><%= @contract.property.floor || "—" %></td></tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       TERMS
+       ============================================================ -->
+  <div class="section">
+    <div class="section-title">📝 شروط العقد</div>
+    <table>
+      <tr><td>نوع العقد</td><td><%= @contract.kind_ar %></td></tr>
+      <tr><td>من تاريخ</td><td><%= @contract.start_date %></td></tr>
+      <tr><td>إلى تاريخ</td><td><%= @contract.end_date %></td></tr>
+      <% if @contract.days.present? %>
+        <tr><td>عدد الأيام</td><td><%= @contract.days %></td></tr>
+      <% end %>
+      <% if @contract.daily_rate.present? %>
+        <tr>
+          <td>السعر اليومي</td>
+          <td><%= number_with_precision(@contract.daily_rate, precision: 0, delimiter: ",") %> <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %></td>
+        </tr>
+      <% end %>
+      <% if @contract.start_odometer.present? %>
+        <tr><td>عداد الاستلام</td><td><%= @contract.start_odometer %> كم</td></tr>
+      <% end %>
+      <% if @contract.end_odometer.present? %>
+        <tr><td>عداد التسليم</td><td><%= @contract.end_odometer %> كم</td></tr>
+      <% end %>
       <% if @contract.distance_km %>
         <tr><td>المسافة المقطوعة</td><td><%= @contract.distance_km %> كم</td></tr>
       <% end %>
-    <% end %>
-    <tr><td>الحالة</td><td><%= @contract.status_ar %></td></tr>
-  </table>
-
-  <h2>الملخص المالي</h2>
-  <div class="amount">
-    الإجمالي: <%= number_with_precision(@contract.amount, precision: 0, delimiter: ",") %>
-    <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
-  </div>
-
-  <table>
-    <tr><td>المدفوع</td><td><%= number_with_precision(@contract.paid_amount, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
-    <tr><td>المتبقي</td><td><%= number_with_precision(@contract.remaining_amount, precision: 0, delimiter: ",") %> <%= @contract.currency %></td></tr>
-    <tr><td>نسبة الإنجاز</td><td><%= @contract.progress_percent %>%</td></tr>
-    <tr><td>حالة الدفع</td><td><%= @contract.payment_status_ar %></td></tr>
-  </table>
-
-  <div class="progress"><div class="progress-fill" style="width: <%= @contract.progress_percent %>%;"></div></div>
-
-  <% if @contract.payments.any? %>
-    <h2>سجل الدفعات</h2>
-    <table>
-      <thead>
-        <tr style="background:#f3f4f6;">
-          <th style="padding:6px;">#</th>
-          <th style="padding:6px;">المبلغ</th>
-          <th style="padding:6px;">تاريخ الدفع</th>
-          <th style="padding:6px;">الحالة</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @contract.payments.order(:due_on).each do |p| %>
-          <tr>
-            <td style="padding:6px;">#<%= p.id %></td>
-            <td style="padding:6px;"><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
-            <td style="padding:6px;"><%= p.paid_on || "—" %></td>
-            <td style="padding:6px;"><%= p.status_ar %></td>
-          </tr>
-        <% end %>
-      </tbody>
+      <tr><td>حالة العقد</td><td><%= @contract.status_ar %></td></tr>
     </table>
+  </div>
+
+  <!-- ============================================================
+       FINANCIAL
+       ============================================================ -->
+  <div class="section">
+    <div class="section-title">💰 الملخص المالي</div>
+
+    <div class="financial-grid">
+      <div class="financial-card total">
+        <div class="financial-label">إجمالي المبلغ</div>
+        <div class="financial-value">
+          <%= number_with_precision(@contract.amount, precision: 0, delimiter: ",") %>
+          <div style="font-size:12px; color:#6b7280; font-weight:600; margin-top:4px;">
+            <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+          </div>
+        </div>
+      </div>
+      <div class="financial-card paid">
+        <div class="financial-label">المدفوع</div>
+        <div class="financial-value">
+          <%= number_with_precision(@contract.paid_amount, precision: 0, delimiter: ",") %>
+          <div style="font-size:12px; color:#6b7280; font-weight:600; margin-top:4px;">
+            <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+          </div>
+        </div>
+      </div>
+      <div class="financial-card remaining">
+        <div class="financial-label">المتبقي</div>
+        <div class="financial-value">
+          <%= number_with_precision(@contract.remaining_amount, precision: 0, delimiter: ",") %>
+          <div style="font-size:12px; color:#6b7280; font-weight:600; margin-top:4px;">
+            <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>نسبة الإنجاز</span>
+        <span class="percent"><%= @contract.progress_percent %>%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill <%= 'warn' if @contract.progress_percent < 60 && @contract.progress_percent >= 30 %><%= 'danger' if @contract.progress_percent < 30 %>"
+             style="width: <%= @contract.progress_percent %>%;"></div>
+      </div>
+    </div>
+
+    <table>
+      <tr><td>حالة الدفع</td><td><%= @contract.payment_status_ar %></td></tr>
+      <tr>
+        <td>العملة</td>
+        <td><%= { "SYP" => "ليرة سورية", "USD" => "دولار أمريكي" }[@contract.currency] %></td>
+      </tr>
+      <% if @contract.pending_amount > 0 %>
+        <tr>
+          <td>مبلغ معلق</td>
+          <td style="color:#b45309; font-weight:700;">
+            <%= number_with_precision(@contract.pending_amount, precision: 0, delimiter: ",") %>
+            <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @contract.overdue_amount > 0 %>
+        <tr>
+          <td>مبلغ متأخر</td>
+          <td style="color:#b91c1c; font-weight:700;">
+            <%= number_with_precision(@contract.overdue_amount, precision: 0, delimiter: ",") %>
+            <%= { "SYP" => "ل.س", "USD" => "$" }[@contract.currency] %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       PAYMENTS LOG
+       ============================================================ -->
+  <% if @contract.payments.any? %>
+    <div class="section">
+      <div class="section-title">📊 سجل الدفعات</div>
+      <table class="payments-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>المبلغ</th>
+            <th>الاستحقاق</th>
+            <th>تاريخ الدفع</th>
+            <th>الطريقة</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @contract.payments.order(:due_on).each do |p| %>
+            <tr>
+              <td>#<%= p.id %></td>
+              <td><%= number_with_precision(p.amount, precision: 0, delimiter: ",") %> <%= p.currency %></td>
+              <td><%= p.due_on || "—" %></td>
+              <td><%= p.paid_on || "—" %></td>
+              <td>
+                <%= { "cash" => "نقدي", "bank" => "بنك", "sham_cash" => "شام كاش",
+                      "haram" => "هرم", "other" => "أخرى" }[p.payment_method] || p.payment_method %>
+              </td>
+              <td>
+                <span class="status-badge
+                  <%= 'status-paid'    if p.paid? %>
+                  <%= 'status-overdue' if p.is_overdue? %>
+                  <%= 'status-pending' if p.pending? && !p.is_overdue? %>">
+                  <%= p.status_ar %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   <% end %>
 
+  <!-- ============================================================
+       NOTES
+       ============================================================ -->
   <% if @contract.notes.present? %>
-    <h2>ملاحظات</h2>
-    <p><%= @contract.notes %></p>
+    <div class="section">
+      <div class="section-title">📌 ملاحظات إضافية</div>
+      <div class="notes-box"><%= simple_format @contract.notes %></div>
+    </div>
   <% end %>
 
-  <div class="signatures">
-    <div class="signature">توقيع الطرف الأول</div>
-    <div class="signature">توقيع الطرف الثاني</div>
+  <!-- ============================================================
+       STAMP
+       ============================================================ -->
+  <div class="stamp-box">
+    <div class="stamp-placeholder">
+      ختم الوكالة<br>الرسمي
+    </div>
   </div>
 
-  <div class="footer">
-    سوريا للعقارات والسيارات<br>
-    info@syria-agencies.sy | 011 123 4567<br>
-    هذا العقد صادر إلكترونياً من المنصة.
+  <!-- ============================================================
+       SIGNATURES
+       ============================================================ -->
+  <div class="signatures-section">
+    <div class="signatures-title">التوقيعات</div>
+    <div class="signatures">
+
+      <div class="signature-block">
+        <div class="signature-party-label">الطرف الأول (الوكيل)</div>
+        <div class="signature-line"></div>
+        <div class="signature-name"><%= @contract.user.display_name %></div>
+        <div class="signature-hint">التوقيع والتاريخ</div>
+      </div>
+
+      <div class="signature-block">
+        <div class="signature-party-label">الطرف الثاني</div>
+        <div class="signature-line"></div>
+        <div class="signature-name"><%= @contract.party&.full_name || "—" %></div>
+        <div class="signature-hint">التوقيع والتاريخ</div>
+      </div>
+
+    </div>
   </div>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <div class="footer">
+    <strong>🏢 سوريا للعقارات والسيارات</strong>
+    منصة الوكلاء الموثوقين
+    <div class="footer-contact">
+      📧 info@syria-agencies.sy &nbsp;|&nbsp; 📞 011 123 4567
+    </div>
+    <div class="footer-note">
+      هذا العقد صادر إلكترونياً من المنصة — رقم العقد #<%= @contract.id %>
+      — تاريخ الإصدار: <%= Date.current.strftime("%Y/%m/%d") %>
+    </div>
+  </div>
+
 </body>
 </html>

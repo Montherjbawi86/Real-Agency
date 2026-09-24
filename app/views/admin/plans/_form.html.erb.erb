@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, @plan], class: "bg-white p-6 rounded-xl shadow space-y-4" do |f| %>
+<%= form_with model: [:admin, @plan], class: "bg-white p-6 rounded-xl shadow max-w-2xl space-y-4" do |f| %>
   <% if @plan.errors.any? %>
     <div class="bg-red-100 p-3 rounded">
       <% @plan.errors.full_messages.each do |m| %><p>• <%= m %></p><% end %>
