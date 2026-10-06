@@ -4,7 +4,7 @@ ruby "3.2.2"
 
 # Core
 gem "rails", "~> 7.2.3"
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.7"
 gem "puma", ">= 5.0"
 gem "bootsnap", require: false
 
