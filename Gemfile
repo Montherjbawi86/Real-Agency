@@ -76,4 +76,4 @@ gem "prawn-table"
 
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
-gem "rqrcode", "~> 2.0"
+gem "rqrcode", "~> 3.2"
