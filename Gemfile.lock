@@ -255,7 +255,7 @@ GEM
     pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
     pg (1.6.3-x86_64-linux-musl)
-    phonelib (0.10.27)
+    phonelib (0.10.28)
     pp (0.6.4)
       prettyprint
     prawn (2.4.0)
@@ -626,7 +626,7 @@ CHECKSUMS
   pg (1.6.3-x86_64-darwin) sha256=ee2e04a17c0627225054ffeb43e31a95be9d7e93abda2737ea3ce4a62f2729d6
   pg (1.6.3-x86_64-linux) sha256=5d9e188c8f7a0295d162b7b88a768d8452a899977d44f3274d1946d67920ae8d
   pg (1.6.3-x86_64-linux-musl) sha256=9c9c90d98c72f78eb04c0f55e9618fe55d1512128e411035fe229ff427864009
-  phonelib (0.10.27) sha256=375b4da75242191e0f5aa553d2652710bf891ba8fe72678d1bdf8af221d41ebf
+  phonelib (0.10.28) sha256=96dbb0ac9a76e3997825470b47ce7425f4ddf5e9ba52aad40fc465b839bc3dc6
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prawn (2.4.0) sha256=82062744f7126c2d77501da253a154271790254dfa8c309b8e52e79bc5de2abd
   prawn-table (0.2.2) sha256=336d46e39e003f77bf973337a958af6a68300b941c85cb22288872dc2b36addb
